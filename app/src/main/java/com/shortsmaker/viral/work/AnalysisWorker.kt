@@ -102,7 +102,7 @@ class AnalysisWorker(context: Context, params: WorkerParameters) : CoroutineWork
         fun enqueue(context: Context, projectId: String) {
             val request = OneTimeWorkRequestBuilder<AnalysisWorker>()
                 .setInputData(workDataOf(KEY_PROJECT_ID to projectId))
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST_IF_QUOTA_EXCEEDED)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .addTag(TAG_ANALYSIS)
                 .addTag(PROJECT_TAG_PREFIX + projectId)
                 .build()
