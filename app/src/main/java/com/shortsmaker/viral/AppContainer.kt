@@ -10,8 +10,9 @@ import com.shortsmaker.viral.data.SettingsRepository
 import com.shortsmaker.viral.data.VideoExporter
 import com.shortsmaker.viral.data.VoskModelManager
 import com.shortsmaker.viral.data.VoskTranscriber
-import com.shortsmaker.viral.data.YouTubeClient
+import com.shortsmaker.viral.data.LinkMetadataClient
 import com.shortsmaker.viral.domain.Language
+import com.shortsmaker.viral.domain.MediaLink
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,7 +25,8 @@ data class ImportRequest(
     val sourceUri: Uri,
     val displayName: String?,
     val language: Language,
-    val youtubeUrl: String?,
+    /** Enlace opcional (YouTube/Twitch/Kick). Sin enlace = flujo de video local con análisis sólo por transcripción. */
+    val link: MediaLink?,
 )
 
 /** Inyección de dependencias manual (suficiente para esta app, sin KSP/Hilt). */
@@ -41,11 +43,11 @@ class AppContainer(val app: Application) {
     val settings = SettingsRepository(app)
     val projects = ProjectRepository(app)
     val modelManager = VoskModelManager(app, http)
-    val youTube = YouTubeClient(app, http)
+    val linkMetadata = LinkMetadataClient(app, http)
     val transcriber = VoskTranscriber()
     val faceTracker = FaceTracker(app)
     val exporter = VideoExporter(app)
-    val pipeline = AnalysisPipeline(app, projects, modelManager, youTube, transcriber)
+    val pipeline = AnalysisPipeline(app, projects, modelManager, linkMetadata, transcriber)
 
     val pendingImports = ConcurrentHashMap<String, ImportRequest>()
 }

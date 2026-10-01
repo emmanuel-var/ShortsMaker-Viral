@@ -8,9 +8,9 @@ App Android (Kotlin + Jetpack Compose) para convertir videos largos en clips ver
 | Pantalla | Archivo | Qué hace |
 |---|---|---|
 | 1. Inicio | `ui/home/HomeScreen.kt` | Botón “Crear nuevo Clip IA”, búsqueda, cuadrícula de proyectos guardados localmente, ajustes |
-| 2. Importación | `ui/importer/ImportScreen.kt` | Enlace de YouTube (validado) o video de la galería (Photo Picker, sin permisos), idioma del video |
+| 2. Importación | `ui/importer/ImportScreen.kt` | **Video de la galería (único requisito, Photo Picker sin permisos)** + enlace OPCIONAL de YouTube, Twitch o Kick (validado), idioma del video |
 | 3. Procesamiento | `ui/processing/ProcessingScreen.kt` + `data/AnalysisPipeline.kt` | Barra de progreso real por pasos: importar → YouTube → modelo de voz → transcribir → analizar |
-| 4. Sugerencias | `ui/suggestions/SuggestionsScreen.kt` | Tarjetas con título, puntaje viral, primeras palabras, vista previa rápida y “Editar clip” |
+| 4. Sugerencias | `ui/suggestions/SuggestionsScreen.kt` | Botón fijo “Crear clip manualmente” + tarjetas con título, puntaje viral, primeras palabras, vista previa rápida y “Editar clip” |
 | 5. Editor vertical | `ui/editor/EditorScreen.kt` | Lienzo 9:16, línea de tiempo con recorte, subtítulos editables, estilos, formato y encuadre |
 | 6. Exportar | `ui/export/ExportScreen.kt` | Render con el hardware del móvil, guardar en galería y atajos a TikTok / Instagram / Facebook |
 
@@ -29,6 +29,23 @@ La **misma** transformación de encuadre (`FramingMath`) y el **mismo** renderiz
 
 ### Puntaje viral
 `score = 0.42·heatmap + 0.24·ganchos + 0.14·gancho inicial + 0.12·ritmo + 0.08·duración` (si no hay heatmap, los pesos se redistribuyen sobre el texto). Se generan ventanas de 15-60 s alineadas a frases y se eligen las mejores sin solaparse (máx. 25 %).
+
+## Flujos de importación
+
+| Entrada | Metadatos | Sugerencias de clips |
+|---|---|---|
+| Sólo video local (sin enlace) | — | `LocalTextClipGenerator` (sólo transcripción de Vosk) |
+| + enlace de **YouTube** | título, duración y *heatmap* (scraping) | heatmap + texto (`ClipAnalyzer`) |
+| + enlace de **Twitch / Kick** (VOD, clip o canal) | título y duración si aparecen en el HTML/DOM. **No exponen heatmap**, así que no hay picos | `LocalTextClipGenerator` |
+| Enlace cuyo scraping falla | — | fallback automático a `LocalTextClipGenerator` (el flujo nunca se detiene) |
+
+En ningún caso se descarga el video ni el directo: el usuario selecciona siempre el archivo local (p. ej. el VOD que ya bajó).
+
+### `LocalTextClipGenerator` (`domain/LocalTextClipGenerator.kt`)
+Ventanas de 15-60 s alineadas a frases, puntuadas (0-1) con: densidad de habla relativa al video y poco silencio (30 %), preguntas/exclamaciones (20 %; Vosk no emite puntuación, así que se infiere por palabras interrogativas y énfasis), palabras clave repetidas de todo el video (25 %), ganchos (15 %) y duración (10 %). Se eligen los mejores sin solaparse (máx. 25 %).
+
+### Modo manual
+El botón fijo de Sugerencias navega a `manual/{id}` (`ui/manual/ManualClipEntryScreen.kt`), que crea un clip con el **video completo** (hasta 10 min) y salta a `editor/{id}/{clip}` sacando `manual/{id}` de la pila (Atrás vuelve a Sugerencias). En el editor se recorta con la línea de tiempo (más saltos de ±1 s / ±10 s para videos largos). La transcripción de Vosk ya cubre todo el video, y el auto-encuadre de MediaPipe se calcula **sobre el tramo recortado** (se reanaliza al soltar el control, sólo para tramos ≤ 2 min; el resultado se guarda por clip).
 
 ## Idiomas
 

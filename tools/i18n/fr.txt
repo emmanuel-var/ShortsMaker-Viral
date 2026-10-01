@@ -33,17 +33,18 @@ affiliation_disclaimer|ShortsMaker Viral est indépendante et n'est affiliée ni
 ads_privacy_options|Options de confidentialité des annonces
 privacy_policy|Politique de confidentialité
 open_source_licenses|Licences open source
-privacy_policy_body|ShortsMaker Viral traite vos vidéos sur votre appareil.\n\n• Vos vidéos, transcriptions et projets sont stockés uniquement dans le stockage privé de l'application. Ils ne sont envoyés à aucun de nos serveurs.\n• La transcription (Vosk) et la détection de visages (MediaPipe) s'exécutent localement. Les modèles vocaux sont téléchargés une fois depuis alphacephei.com.\n• Si vous collez un lien YouTube, l'application lit sur votre appareil les données publiques de cette page (titre, durée et moments les plus revus). La vidéo YouTube n'est pas téléchargée.\n• Publicité : l'application affiche une bannière Google AdMob sur certains écrans. AdMob peut utiliser l'identifiant publicitaire de votre appareil et des données de l'appareil pour diffuser des annonces et mesurer leurs performances. Lorsque la loi l'exige (EEE, Royaume-Uni), nous demandons votre consentement et vous pouvez le modifier dans Paramètres → Options de confidentialité des annonces. Vous pouvez réinitialiser ou supprimer votre identifiant publicitaire dans les paramètres Android. Plus d'informations : policies.google.com/technologies/ads.\n• Aucun compte ni outil d'analyse propre.\n• La vidéo exportée ne quitte l'application que lorsque vous touchez Enregistrer ou Partager.\n• Vous pouvez supprimer projets et modèles dans les Paramètres à tout moment.\n\nSi vous utilisez des vidéos de tiers, vous devez détenir les droits nécessaires.
+privacy_policy_body|ShortsMaker Viral traite vos vidéos sur votre appareil.\n\n• Vos vidéos, transcriptions et projets sont stockés uniquement dans le stockage privé de l'application. Ils ne sont envoyés à aucun de nos serveurs.\n• La transcription (Vosk) et la détection de visages (MediaPipe) s'exécutent localement. Les modèles vocaux sont téléchargés une fois depuis alphacephei.com.\n• Si vous collez un lien YouTube, Twitch ou Kick, l'application lit sur votre appareil les données publiques de cette page (titre, durée et, sur YouTube, moments les plus revus). Aucune vidéo ni aucun direct n'est téléchargé : vous modifiez toujours le fichier que vous choisissez. Sans lien, toute l'analyse repose sur la transcription locale.\n• Publicité : l'application affiche une bannière Google AdMob sur certains écrans. AdMob peut utiliser l'identifiant publicitaire de votre appareil et des données de l'appareil pour diffuser des annonces et mesurer leurs performances. Lorsque la loi l'exige (EEE, Royaume-Uni), nous demandons votre consentement et vous pouvez le modifier dans Paramètres → Options de confidentialité des annonces. Vous pouvez réinitialiser ou supprimer votre identifiant publicitaire dans les paramètres Android. Plus d'informations : policies.google.com/technologies/ads.\n• Aucun compte ni outil d'analyse propre.\n• La vidéo exportée ne quitte l'application que lorsque vous touchez Enregistrer ou Partager.\n• Vous pouvez supprimer projets et modèles dans les Paramètres à tout moment.\n\nSi vous utilisez des vidéos de tiers, vous devez détenir les droits nécessaires.
 licenses_body|Cette application utilise des logiciels open source :\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose et AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin et kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK et User Messaging Platform – Conditions de Google\n\nLes modèles vocaux Vosk sont distribués sous Apache License 2.0.
 import_title|Importer une vidéo
-paste_youtube_link|Coller un lien YouTube
-upload_from_gallery|Depuis la galerie
-youtube_link|Lien YouTube
+video_required_hint|C'est la seule exigence. Pour les directs Twitch/Kick, choisissez le fichier que vous avez déjà téléchargé.
+link_title|Lien (facultatif)
+link_hint|Collez un lien YouTube, Twitch ou Kick pour lire le titre et, sur YouTube, les moments les plus revus.
+link_label|Lien YouTube, Twitch ou Kick
+invalid_link|Lien non valide. Utilisez un lien YouTube, Twitch ou Kick, ou laissez vide.
+valid_link|Lien valide : %1$s
+link_policy_note|L'application ne télécharge ni vidéos ni directs : elle lit uniquement les données publiques du lien. La vidéo que vous modifiez est le fichier que vous avez sélectionné. Si aucune donnée ne peut être lue, les clips sont suggérés d'après la transcription seule.
+local_only_hint|Sans lien, les clips sont suggérés uniquement d'après la transcription de votre vidéo (tout sur votre téléphone).
 paste|Coller depuis le presse-papiers
-invalid_youtube_link|Ce lien ne semble pas être un lien YouTube valide.
-valid_youtube_link|Lien valide
-youtube_policy_note|Les moments les plus revus de la vidéo YouTube sont analysés. En raison des règles de YouTube et de Google Play, l'application ne télécharge pas les vidéos YouTube : sélectionnez ci-dessous le fichier original de votre propre vidéo.
-select_original_file|Fichier original de votre vidéo
 select_video|Vidéo de votre galerie
 choose_video|Choisir une vidéo
 change_video|Changer de vidéo
@@ -54,7 +55,7 @@ analyze_video|Analyser avec l'IA
 processing_title|Création de vos clips…
 processing_subtitle|Tout se passe sur votre téléphone, sans serveur.
 step_import|Importation de la vidéo
-step_youtube|Lecture des moments les plus revus sur YouTube
+step_link|Lecture des données du lien
 step_model|Téléchargement du modèle vocal (première fois uniquement)
 step_transcribe|Transcription en texte
 step_analyze|Analyse des moments viraux
@@ -67,14 +68,17 @@ no_speech_detected|Aucune voix détectée dans la vidéo. Vous pouvez créer un 
 viral_score|Score viral
 youtube_peak|Pic YouTube : %1$d%%
 edit_clip|Modifier le clip
-manual_clip|Créer un clip manuel
+manual_clip|Créer un clip manuellement
 manual_clip_title|Clip manuel
+manual_hint|Mode manuel : ajustez la ligne de temps pour choisir l'extrait (jusqu'à 10 min). Sous-titres et cadrage sont calculés sur votre sélection.
 edit_clip_title|Modifier le clip
 tool_styles|Styles
 tool_format|Format
 tool_text|Texte
 tool_frame|Cadrage
 clip_duration|Durée %1$s
+trim_start|Début
+trim_end|Fin
 edit_subtitle|Corriger le sous-titre
 no_subtitles_in_clip|Aucun sous-titre dans cette partie.
 style_hormozi|Hormozi
@@ -98,6 +102,7 @@ face_idle|Prêt à détecter le visage.
 face_running|Détection du visage… %1$d%%
 face_done|Visage détecté : le cadrage le suit.
 face_unavailable|Aucun visage détecté. Le centre est utilisé ; ajustez à la main.
+face_too_long|Découpez un extrait de 2 minutes maximum pour détecter le visage.
 zoom|Zoom
 move_horizontal|Horizontal
 move_vertical|Vertical

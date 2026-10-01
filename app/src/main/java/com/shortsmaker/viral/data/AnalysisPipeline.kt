@@ -9,8 +9,7 @@ import com.shortsmaker.viral.domain.CueBuilder
 import com.shortsmaker.viral.domain.Project
 import com.shortsmaker.viral.domain.WordTiming
 import com.shortsmaker.viral.domain.YouTubeHtmlParser
-import com.shortsmaker.viral.domain.YouTubeMeta
-import com.shortsmaker.viral.domain.YouTubeUrl
+import com.shortsmaker.viral.domain.SourceMeta
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -22,7 +21,7 @@ import java.io.IOException
 
 enum class PipelineStep(val weight: Float) {
     IMPORT(0.12f),
-    YOUTUBE(0.08f),
+    LINK(0.08f),
     MODEL(0.25f),
     TRANSCRIBE(0.40f),
     ANALYZE(0.15f),
@@ -36,22 +35,22 @@ data class PipelineProgress(
 )
 
 /**
- * Importar → (datos de YouTube) → (modelo de voz, sólo la primera vez) → transcribir → analizar momentos virales.
+ * Importar → (datos del enlace) → (modelo de voz, sólo la primera vez) → transcribir → analizar momentos virales.
  * Todo se ejecuta en el teléfono. Si algo falla o se cancela, se borra el proyecto a medias.
  */
 class AnalysisPipeline(
     private val context: Context,
     private val projects: ProjectRepository,
     private val models: VoskModelManager,
-    private val youTube: YouTubeClient,
+    private val linkMetadata: LinkMetadataClient,
     private val transcriber: VoskTranscriber,
 ) {
 
     suspend fun run(projectId: String, request: ImportRequest, onProgress: (PipelineProgress) -> Unit): Project {
-        val videoId = request.youtubeUrl?.let(YouTubeUrl::extractVideoId)
+        val link = request.link
         val steps = buildList {
             add(PipelineStep.IMPORT)
-            if (videoId != null) add(PipelineStep.YOUTUBE)
+            if (link != null) add(PipelineStep.LINK)
             if (!models.isInstalled(request.language)) add(PipelineStep.MODEL)
             add(PipelineStep.TRANSCRIBE)
             add(PipelineStep.ANALYZE)
@@ -79,12 +78,19 @@ class AnalysisPipeline(
             }
             report(PipelineStep.IMPORT, 1f)
 
-            // 2) Datos de YouTube (heatmap) – opcional y tolerante a fallos.
-            var meta: YouTubeMeta? = null
-            if (videoId != null) {
-                report(PipelineStep.YOUTUBE, 0f)
-                meta = youTube.fetch(videoId)
-                report(PipelineStep.YOUTUBE, 1f)
+            // 2) Datos del enlace (YouTube/Twitch/Kick) – opcional y tolerante a fallos: si no hay enlace o el
+            //    scraping falla, `meta` queda en null y el análisis usa sólo la transcripción (LocalTextClipGenerator).
+            var meta: SourceMeta? = null
+            if (link != null) {
+                report(PipelineStep.LINK, 0f)
+                meta = try {
+                    linkMetadata.fetch(link)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: Exception) {
+                    null
+                }
+                report(PipelineStep.LINK, 1f)
             }
 
             // 3) Modelo de voz (primera vez).
@@ -116,6 +122,7 @@ class AnalysisPipeline(
             // 5) Análisis viral.
             report(PipelineStep.ANALYZE, 0f)
             currentCoroutineContext().ensureActive()
+            // Sólo YouTube aporta heatmap; sin él ClipAnalyzer delega en LocalTextClipGenerator (transcripción de Vosk).
             val heat = meta?.let { YouTubeHtmlParser.rescale(it.heatmap, it.durationMs, info.durationMs) }.orEmpty()
             val cues = CueBuilder.build(clean, wide = !request.language.spaced)
             val clips = withContext(Dispatchers.Default) {
@@ -135,7 +142,8 @@ class AnalysisPipeline(
                 width = info.width,
                 height = info.height,
                 language = request.language.code,
-                youtubeUrl = videoId?.let(YouTubeUrl::canonicalUrl),
+                sourceUrl = link?.canonicalUrl,
+                sourcePlatform = link?.platform?.name,
                 hasHeatmap = heat.isNotEmpty(),
                 heatmap = heat,
                 words = clean,

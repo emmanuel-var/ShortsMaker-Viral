@@ -24,9 +24,9 @@ data class AnalyzerConfig(
  */
 object ClipAnalyzer {
 
-    private data class Sentence(val startMs: Long, val endMs: Long, val first: Int, val last: Int)
+    internal data class Sentence(val startMs: Long, val endMs: Long, val first: Int, val last: Int)
 
-    private data class Candidate(
+    internal data class Candidate(
         val startMs: Long,
         val endMs: Long,
         val firstWord: Int,
@@ -50,12 +50,21 @@ object ClipAnalyzer {
         )
         val heatNorm = normalizeHeat(heatmap)
 
+        // Sin heatmap (video local, Twitch/Kick o scraping fallido): algoritmo de respaldo sólo con la transcripción.
+        if (heatNorm == null && words.size >= 8) {
+            val local = LocalTextClipGenerator.generate(words, durationMs, lang, cfg)
+            if (local.isNotEmpty()) return local
+        }
+
         val candidates = when {
             words.size >= 8 -> textCandidates(words, heatNorm, durationMs, lang, cfg)
             else -> emptyList()
         }.ifEmpty { heatOrUniformCandidates(heatNorm, durationMs, cfg) }
 
-        val selected = pickBest(candidates, cfg)
+        return toSuggestions(pickBest(candidates, cfg), words, lang)
+    }
+
+    internal fun toSuggestions(selected: List<Candidate>, words: List<WordTiming>, lang: Language): List<ClipSuggestion> {
         return selected.mapIndexed { i, c ->
             val clipWords = if (c.firstWord >= 0 && c.lastWord >= c.firstWord) words.subList(c.firstWord, c.lastWord + 1) else emptyList()
             val texts = clipWords.map { it.text }
@@ -75,7 +84,7 @@ object ClipAnalyzer {
 
     // ---------------------------------------------------------------- candidatos por texto
 
-    private fun buildSentences(words: List<WordTiming>): List<Sentence> {
+    internal fun buildSentences(words: List<WordTiming>): List<Sentence> {
         val result = mutableListOf<Sentence>()
         var first = 0
         for (i in words.indices) {
@@ -170,7 +179,7 @@ object ClipAnalyzer {
 
     // ---------------------------------------------------------------- selección
 
-    private fun pickBest(candidates: List<Candidate>, cfg: AnalyzerConfig): List<Candidate> {
+    internal fun pickBest(candidates: List<Candidate>, cfg: AnalyzerConfig): List<Candidate> {
         val chosen = mutableListOf<Candidate>()
         for (c in candidates.sortedByDescending { it.score }) {
             if (chosen.size >= cfg.maxClips) break

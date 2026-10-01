@@ -218,7 +218,13 @@ fun EditorScreen(projectId: String, clipId: String, onBack: () -> Unit, onExport
                     }
                 },
                 actions = {
-                    Button(onClick = { player.pause(); vm.saveAndThen(onExport) }, modifier = Modifier.padding(end = 8.dp)) {
+                    val detecting = state.faceStatus is FaceStatus.Running
+                    if (detecting) CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
+                    Button(
+                        onClick = { player.pause(); vm.saveAndThen(onExport) },
+                        enabled = !detecting,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    ) {
                         Text(stringResource(R.string.export), fontWeight = FontWeight.Bold)
                     }
                 },
@@ -243,6 +249,14 @@ fun EditorScreen(projectId: String, clipId: String, onBack: () -> Unit, onExport
                 )
             }
 
+            if (state.clip?.manual == true) {
+                Text(
+                    stringResource(R.string.manual_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
             TrimTimeline(
                 source = source,
                 durationMs = project.durationMs,
@@ -440,6 +454,28 @@ private fun TrimTimeline(
             },
             valueRange = 0f..durationMs.toFloat(),
         )
+        // Ajuste fino: en videos largos el deslizador es poco preciso, así que se añaden saltos de 1 s y 10 s.
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            NudgeGroup(R.string.trim_start, Modifier.weight(1f)) { d -> onChange(startMs + d, endMs, true) }
+            NudgeGroup(R.string.trim_end, Modifier.weight(1f)) { d -> onChange(startMs, endMs + d, false) }
+        }
+    }
+}
+
+@Composable
+private fun NudgeGroup(label: Int, modifier: Modifier, onNudge: (Long) -> Unit) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(stringResource(label), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            listOf(-10_000L to "−10s", -1_000L to "−1s", 1_000L to "+1s", 10_000L to "+10s").forEach { (delta, text) ->
+                Box(
+                    Modifier.weight(1f).height(28.dp).clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .clickable { onNudge(delta) },
+                    contentAlignment = Alignment.Center,
+                ) { Text(text, fontSize = 11.sp, fontWeight = FontWeight.SemiBold) }
+            }
+        }
     }
 }
 
@@ -581,6 +617,7 @@ private fun FramePanel(framing: Framing, face: FaceStatus, onChange: (Framing) -
                     is FaceStatus.Running -> R.string.face_running
                     is FaceStatus.Done -> R.string.face_done
                     FaceStatus.Unavailable -> R.string.face_unavailable
+                    FaceStatus.TooLong -> R.string.face_too_long
                 }
                 Text(
                     if (face is FaceStatus.Running) stringResource(status, (face.progress * 100).toInt()) else stringResource(status),

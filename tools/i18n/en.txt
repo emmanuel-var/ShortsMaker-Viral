@@ -33,17 +33,18 @@ affiliation_disclaimer|ShortsMaker Viral is independent and not affiliated with 
 ads_privacy_options|Ad privacy options
 privacy_policy|Privacy policy
 open_source_licenses|Open-source licenses
-privacy_policy_body|ShortsMaker Viral processes your videos on your device.\n\n• Your videos, transcripts and projects are stored only in the app's private storage. They are never uploaded to any server of ours.\n• Transcription (Vosk) and face detection (MediaPipe) run locally. Voice models are downloaded once from alphacephei.com.\n• If you paste a YouTube link, the app reads that page's public data on your device (title, duration and most-replayed moments). The YouTube video itself is not downloaded.\n• Ads: the app shows a Google AdMob banner on some screens. AdMob may use your device's advertising ID and device data to serve ads and measure performance. Where required by law (EEA, UK) we ask for your consent and you can change it in Settings → Ad privacy options. You can reset or delete your advertising ID in Android settings. More info: policies.google.com/technologies/ads.\n• No accounts or first-party analytics.\n• The exported video only leaves the app when you tap Save or Share.\n• You can delete projects and models in Settings at any time.\n\nWhen using third-party videos you are responsible for holding the necessary rights.
+privacy_policy_body|ShortsMaker Viral processes your videos on your device.\n\n• Your videos, transcripts and projects are stored only in the app's private storage. They are never uploaded to any server of ours.\n• Transcription (Vosk) and face detection (MediaPipe) run locally. Voice models are downloaded once from alphacephei.com.\n• If you paste a YouTube, Twitch or Kick link, the app reads that page's public data on your device (title, duration and, on YouTube, most-replayed moments). No video or stream is downloaded: you always edit the file you choose. Without a link, all analysis uses the local transcript.\n• Ads: the app shows a Google AdMob banner on some screens. AdMob may use your device's advertising ID and device data to serve ads and measure performance. Where required by law (EEA, UK) we ask for your consent and you can change it in Settings → Ad privacy options. You can reset or delete your advertising ID in Android settings. More info: policies.google.com/technologies/ads.\n• No accounts or first-party analytics.\n• The exported video only leaves the app when you tap Save or Share.\n• You can delete projects and models in Settings at any time.\n\nWhen using third-party videos you are responsible for holding the necessary rights.
 licenses_body|This app uses open-source software:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose and AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin and kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK and User Messaging Platform – Google terms\n\nVosk voice models are distributed under the Apache License 2.0.
 import_title|Import video
-paste_youtube_link|Paste YouTube link
-upload_from_gallery|Upload from Gallery
-youtube_link|YouTube link
+video_required_hint|This is the only requirement. For Twitch/Kick streams, choose the file you already downloaded.
+link_title|Link (optional)
+link_hint|Paste a YouTube, Twitch or Kick link to read the title and, on YouTube, the most-replayed moments.
+link_label|YouTube, Twitch or Kick link
+invalid_link|Invalid link. Use a YouTube, Twitch or Kick link, or leave it empty.
+valid_link|Valid link: %1$s
+link_policy_note|The app does not download videos or streams: it only reads public data from the link. The video you edit is the file you selected. If no data can be read, clips are suggested from the transcript only.
+local_only_hint|Without a link, clips are suggested from your video's transcript only (all on your phone).
 paste|Paste from clipboard
-invalid_youtube_link|This doesn't look like a valid YouTube link.
-valid_youtube_link|Valid link
-youtube_policy_note|The most-replayed moments of the YouTube video are analyzed. Because of YouTube and Google Play policies the app does not download YouTube videos: select the original file of your own video below.
-select_original_file|Original file of your video
 select_video|Video from your gallery
 choose_video|Choose video
 change_video|Change video
@@ -54,7 +55,7 @@ analyze_video|Analyze with AI
 processing_title|Creating your clips…
 processing_subtitle|Everything happens on your phone, no servers.
 step_import|Importing video
-step_youtube|Reading YouTube's most-replayed moments
+step_link|Reading link data
 step_model|Downloading voice model (first time only)
 step_transcribe|Transcribing to text
 step_analyze|Analyzing viral moments
@@ -67,14 +68,17 @@ no_speech_detected|No speech detected in the video. You can create a manual clip
 viral_score|Viral score
 youtube_peak|YouTube peak: %1$d%%
 edit_clip|Edit clip
-manual_clip|Create manual clip
+manual_clip|Create clip manually
 manual_clip_title|Manual clip
+manual_hint|Manual mode: adjust the timeline to choose the segment (up to 10 min). Subtitles and framing are computed on your selection.
 edit_clip_title|Edit clip
 tool_styles|Styles
 tool_format|Format
 tool_text|Text
 tool_frame|Framing
 clip_duration|Duration %1$s
+trim_start|Start
+trim_end|End
 edit_subtitle|Edit subtitle
 no_subtitles_in_clip|No subtitles in this section.
 style_hormozi|Hormozi
@@ -98,6 +102,7 @@ face_idle|Ready to detect the face.
 face_running|Detecting face… %1$d%%
 face_done|Face detected: framing follows it.
 face_unavailable|No face found. Using center; adjust manually.
+face_too_long|Trim a segment of up to 2 minutes to detect the face.
 zoom|Zoom
 move_horizontal|Horizontal
 move_vertical|Vertical

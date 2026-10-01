@@ -33,17 +33,18 @@ affiliation_disclaimer|ShortsMaker Viral は独立したアプリであり、You
 ads_privacy_options|広告のプライバシー オプション
 privacy_policy|プライバシーポリシー
 open_source_licenses|オープンソースライセンス
-privacy_policy_body|ShortsMaker Viral は、お使いの端末上で動画を処理します。\n\n• 動画、文字起こし、プロジェクトはアプリ専用のストレージにのみ保存され、当社のサーバーには送信されません。\n• 文字起こし（Vosk）と顔検出（MediaPipe）は端末内で実行されます。音声モデルは alphacephei.com から一度だけダウンロードされます。\n• YouTube のリンクを貼り付けると、アプリは端末上でそのページの公開情報（タイトル、長さ、よく再生される部分）を読み取ります。YouTube の動画自体はダウンロードしません。\n• 広告：一部の画面に Google AdMob のバナーを表示します。AdMob は広告の配信と効果測定のために、端末の広告 ID や端末データを使用することがあります。法律で必要とされる地域（EEA、英国）では同意をお願いしており、「設定 → 広告のプライバシー オプション」からいつでも変更できます。広告 ID は Android の設定でリセットまたは削除できます。詳細：policies.google.com/technologies/ads\n• アカウントや独自の分析はありません。\n• 書き出した動画は、「保存」または「共有」をタップしたときにのみアプリの外に出ます。\n• プロジェクトとモデルは、設定からいつでも削除できます。\n\n第三者の動画を使用する場合は、必要な権利を保有する責任があなたにあります。
+privacy_policy_body|ShortsMaker Viral は、お使いの端末上で動画を処理します。\n\n• 動画、文字起こし、プロジェクトはアプリ専用のストレージにのみ保存され、当社のサーバーには送信されません。\n• 文字起こし（Vosk）と顔検出（MediaPipe）は端末内で実行されます。音声モデルは alphacephei.com から一度だけダウンロードされます。\n• YouTube・Twitch・Kick のリンクを貼り付けると、アプリは端末上でそのページの公開情報（タイトル、長さ、YouTube ではよく再生される部分）を読み取ります。動画や配信はダウンロードされず、編集するのは常にあなたが選んだファイルです。リンクがない場合、分析はすべて端末内の文字起こしだけで行われます。\n• 広告：一部の画面に Google AdMob のバナーを表示します。AdMob は広告の配信と効果測定のために、端末の広告 ID や端末データを使用することがあります。法律で必要とされる地域（EEA、英国）では同意をお願いしており、「設定 → 広告のプライバシー オプション」からいつでも変更できます。広告 ID は Android の設定でリセットまたは削除できます。詳細：policies.google.com/technologies/ads\n• アカウントや独自の分析はありません。\n• 書き出した動画は、「保存」または「共有」をタップしたときにのみアプリの外に出ます。\n• プロジェクトとモデルは、設定からいつでも削除できます。\n\n第三者の動画を使用する場合は、必要な権利を保有する責任があなたにあります。
 licenses_body|このアプリは次のオープンソースソフトウェアを使用しています：\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose と AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin と kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK と User Messaging Platform – Google の利用規約\n\nVosk の音声モデルは Apache License 2.0 で配布されています。
 import_title|動画をインポート
-paste_youtube_link|YouTube のリンクを貼り付け
-upload_from_gallery|ギャラリーから選択
-youtube_link|YouTube のリンク
+video_required_hint|必須なのはこれだけです。Twitch/Kick の配信は、すでにダウンロードしたファイルを選んでください。
+link_title|リンク（任意）
+link_hint|YouTube・Twitch・Kick のリンクを貼り付けると、タイトルと（YouTube では）よく再生される部分を読み取ります。
+link_label|YouTube・Twitch・Kick のリンク
+invalid_link|無効なリンクです。YouTube・Twitch・Kick のリンクを使うか、空のままにしてください。
+valid_link|有効なリンク：%1$s
+link_policy_note|アプリは動画や配信をダウンロードせず、リンクの公開情報だけを読み取ります。編集する動画は、あなたが選択したファイルです。情報を読み取れない場合は、文字起こしだけでクリップを提案します。
+local_only_hint|リンクがない場合は、動画の文字起こしだけでクリップを提案します（すべてスマートフォン上で処理）。
 paste|クリップボードから貼り付け
-invalid_youtube_link|有効な YouTube のリンクではないようです。
-valid_youtube_link|有効なリンクです
-youtube_policy_note|YouTube 動画の「よく再生される部分」を分析します。YouTube と Google Play のポリシーにより、アプリは YouTube の動画をダウンロードしません。下で、ご自身の動画の元ファイルを選択してください。
-select_original_file|あなたの動画の元ファイル
 select_video|ギャラリーの動画
 choose_video|動画を選択
 change_video|動画を変更
@@ -54,7 +55,7 @@ analyze_video|AI で分析
 processing_title|クリップを作成中…
 processing_subtitle|すべてお使いのスマートフォン上で処理され、サーバーは使いません。
 step_import|動画をインポート中
-step_youtube|YouTube のよく再生される部分を読み取り中
+step_link|リンクの情報を読み取り中
 step_model|音声モデルをダウンロード中（初回のみ）
 step_transcribe|テキストに文字起こし中
 step_analyze|バズる瞬間を分析中
@@ -69,12 +70,15 @@ youtube_peak|YouTube のピーク：%1$d%%
 edit_clip|クリップを編集
 manual_clip|手動でクリップを作成
 manual_clip_title|手動クリップ
+manual_hint|手動モード：タイムラインを調整して区間を選びます（最大10分）。字幕と構図は選択した区間で計算されます。
 edit_clip_title|クリップを編集
 tool_styles|スタイル
 tool_format|書式
 tool_text|テキスト
 tool_frame|構図
 clip_duration|長さ %1$s
+trim_start|開始
+trim_end|終了
 edit_subtitle|字幕を修正
 no_subtitles_in_clip|この区間には字幕がありません。
 style_hormozi|Hormozi
@@ -98,6 +102,7 @@ face_idle|顔検出の準備ができました。
 face_running|顔を検出中… %1$d%%
 face_done|顔を検出しました。構図が顔を追従します。
 face_unavailable|顔が検出されませんでした。中央を使用します。手動で調整してください。
+face_too_long|顔を検出するには、2分以内の区間に絞ってください。
 zoom|ズーム
 move_horizontal|水平
 move_vertical|垂直

@@ -10,12 +10,12 @@ _Última actualización: 2026-10-01_
 | Videos que eliges (galería / archivo) | Transcribir, recortar y exportar clips | Copia en el almacenamiento privado de la app, en tu dispositivo |
 | Transcripciones y proyectos | Reeditar clips más tarde | Sólo en tu dispositivo |
 | Rostros detectados en el video | Encuadre vertical automático | Sólo coordenadas en memoria/proyecto local; las imágenes no se guardan |
-| Enlace de YouTube que pegas | Leer título, duración y momentos más reproducidos | La página pública se consulta desde tu dispositivo; no se envía a nosotros |
+| Enlace de YouTube, Twitch o Kick que pegas (opcional) | Leer título, duración y (sólo YouTube) momentos más reproducidos | La página pública se consulta desde tu dispositivo; no se envía a nosotros. No se descarga ningún video ni directo |
 | Video exportado | Guardar en galería o compartir | Se guarda en Películas/ShortsMaker o se envía a la app que tú elijas |
 
 ## Conexiones de red
 - Descarga única del modelo de voz de cada idioma desde `alphacephei.com` (Vosk).
-- Consulta de la página pública de YouTube cuando pegas un enlace.
+- Consulta de la página pública de YouTube, Twitch o Kick cuando pegas un enlace.
 Ninguna de estas conexiones incluye identificadores personales nuestros; los servidores de terceros pueden ver tu dirección IP como en cualquier navegación.
 
 ## Publicidad (Google AdMob)
@@ -28,7 +28,7 @@ La app muestra un banner de anuncios de Google AdMob en las pantallas de inicio,
 No recopilamos datos personales por nuestra cuenta, no hacemos analíticas propias, no vendemos datos, no pedimos cuenta ni acceso a tus contactos, ubicación, micrófono o cámara.
 
 ## Permisos
-`INTERNET` (descarga del modelo, lectura de YouTube y anuncios) y `AD_ID` (ID de publicidad para AdMob). En Android 9 o inferior, `WRITE_EXTERNAL_STORAGE` sólo para guardar el video exportado en la galería.
+`INTERNET` (descarga del modelo, lectura de enlaces y anuncios) y `AD_ID` (ID de publicidad para AdMob). En Android 9 o inferior, `WRITE_EXTERNAL_STORAGE` sólo para guardar el video exportado en la galería.
 
 ## Tus controles
 Puedes eliminar proyectos y modelos de voz en **Ajustes**. Al desinstalar la app se borran todos sus datos.

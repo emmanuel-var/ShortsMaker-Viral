@@ -79,9 +79,9 @@ object TextAnalysis {
         "danger", "win", "lose", "changed", "life", "powerful", "banned", "urgent", "listen", "fact", "reason",
     )
     private val QUESTION_STARTERS = setOf(
-        "cómo", "como", "qué", "que", "por", "cuál", "cual", "quién", "quien", "cuándo", "cuando", "dónde", "donde",
-        "why", "what", "how", "who", "when", "where", "which", "pourquoi", "comment", "warum", "wie", "perché",
-        "porquê", "por que",
+        "cómo", "como", "qué", "cuál", "cual", "quién", "quien", "cuándo", "dónde",
+        "why", "what", "how", "who", "when", "where", "which", "pourquoi", "comment", "quand", "warum", "wie", "wann",
+        "porquê", "porque", "quando", "onde", "quem",
     )
     private val HOOK_RU = setOf(
         "секрет", "секреты", "никогда", "ошибка", "ошибки", "невероятно", "правда", "деньги", "бесплатно", "лучший",
@@ -101,6 +101,10 @@ object TextAnalysis {
         "डर", "सफलता", "तरीका", "कोई", "ज़रूरी", "जरूरी", "सावधान", "ध्यान", "जानिए", "देखो", "कल्पना", "कहानी",
         "करोड़", "लाख", "आसान", "तेज़", "खतरा", "जीतो", "ज़िंदगी", "जिंदगी",
     )
+    private val RU_QUESTIONS = setOf("как", "что", "почему", "зачем", "кто", "когда", "где", "какой", "сколько")
+    private val HI_QUESTIONS = setOf("क्या", "कैसे", "क्यों", "कौन", "कब", "कहाँ", "कितना", "कितने")
+    private val ZH_QUESTIONS = setOf("什么", "怎么", "为什么", "谁", "哪", "如何", "多少", "是否")
+    private val JA_QUESTIONS = setOf("なぜ", "どう", "何", "誰", "いつ", "どこ", "どれ", "どうして", "どのように")
     private val EMOTION = setOf(
         "amor", "odio", "miedo", "feliz", "triste", "llorar", "reír", "risa", "enojo", "rabia", "sorpresa",
         "love", "hate", "fear", "happy", "sad", "cry", "laugh", "angry", "surprise", "wow", "dios", "god",
@@ -192,6 +196,14 @@ object TextAnalysis {
         if (head.first() in QUESTION_STARTERS) return true
         val hooks = hooks(lang)
         return head.any { it in hooks }
+    }
+
+    /** ¿La frase empieza con una palabra interrogativa (cómo, qué, why, как…)? */
+    fun startsWithQuestion(words: List<String>, lang: Language): Boolean {
+        val first = words.firstOrNull()?.let(::normalize) ?: return false
+        return first in QUESTION_STARTERS || (lang == Language.RU && first in RU_QUESTIONS) ||
+            (lang == Language.HI && first in HI_QUESTIONS) || (lang == Language.ZH && first in ZH_QUESTIONS) ||
+            (lang == Language.JA && first in JA_QUESTIONS)
     }
 
     fun emojiFor(word: String): String? = EMOJIS[normalize(word)]

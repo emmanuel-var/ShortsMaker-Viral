@@ -109,7 +109,7 @@ class ProcessingViewModel(private val container: AppContainer, private val proje
 
 private fun stepLabel(step: PipelineStep): Int = when (step) {
     PipelineStep.IMPORT -> R.string.step_import
-    PipelineStep.YOUTUBE -> R.string.step_youtube
+    PipelineStep.LINK -> R.string.step_link
     PipelineStep.MODEL -> R.string.step_model
     PipelineStep.TRANSCRIBE -> R.string.step_transcribe
     PipelineStep.ANALYZE -> R.string.step_analyze

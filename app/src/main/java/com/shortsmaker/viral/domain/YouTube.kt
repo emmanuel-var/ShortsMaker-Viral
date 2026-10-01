@@ -2,13 +2,6 @@ package com.shortsmaker.viral.domain
 
 import java.net.URI
 
-data class YouTubeMeta(
-    val videoId: String,
-    val title: String?,
-    val durationMs: Long?,
-    val heatmap: List<HeatPoint>,
-)
-
 object YouTubeUrl {
     private val ID = Regex("^[A-Za-z0-9_-]{11}$")
     private val HOSTS = setOf("youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtu.be", "www.youtu.be")
@@ -53,10 +46,10 @@ object YouTubeHtmlParser {
     private val OG_TITLE = Regex("<meta\\s+property=\"og:title\"\\s+content=\"([^\"]*)\"")
     private val LENGTH = Regex("\"lengthSeconds\":\\s*\"(\\d+)\"")
 
-    fun parse(videoId: String, html: String): YouTubeMeta {
+    fun parse(videoId: String, html: String): SourceMeta {
         val title = OG_TITLE.find(html)?.groupValues?.get(1)?.let(::decodeEntities)?.takeIf { it.isNotBlank() }
         val duration = LENGTH.find(html)?.groupValues?.get(1)?.toLongOrNull()?.times(1000)
-        return YouTubeMeta(videoId, title, duration, parseHeatmap(html))
+        return SourceMeta(videoId, title, duration, parseHeatmap(html))
     }
 
     fun parseHeatmap(html: String): List<HeatPoint> {

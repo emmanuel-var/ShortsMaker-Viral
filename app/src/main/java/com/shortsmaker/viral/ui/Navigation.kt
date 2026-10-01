@@ -29,6 +29,7 @@ import com.shortsmaker.viral.ui.editor.EditorScreen
 import com.shortsmaker.viral.ui.export.ExportScreen
 import com.shortsmaker.viral.ui.home.HomeScreen
 import com.shortsmaker.viral.ui.importer.ImportScreen
+import com.shortsmaker.viral.ui.manual.ManualClipEntryScreen
 import com.shortsmaker.viral.ui.processing.ProcessingScreen
 import com.shortsmaker.viral.ui.settings.SettingsScreen
 import com.shortsmaker.viral.ui.suggestions.SuggestionsScreen
@@ -39,11 +40,13 @@ private object Routes {
     const val IMPORT = "import"
     const val PROCESSING = "processing/{id}"
     const val SUGGESTIONS = "suggestions/{id}"
+    const val MANUAL = "manual/{id}"
     const val EDITOR = "editor/{id}/{clip}"
     const val EXPORT = "export/{id}/{clip}"
 
     fun processing(id: String) = "processing/$id"
     fun suggestions(id: String) = "suggestions/$id"
+    fun manual(id: String) = "manual/$id"
     fun editor(id: String, clip: String) = "editor/$id/$clip"
     fun export(id: String, clip: String) = "export/$id/$clip"
 }
@@ -111,6 +114,19 @@ private fun AppNavHost(nav: androidx.navigation.NavHostController) {
                 projectId = id,
                 onBack = { nav.popBackStack() },
                 onEdit = { clip -> nav.navigate(Routes.editor(id, clip)) },
+                onManual = { nav.navigate(Routes.manual(id)) },
+            )
+        }
+        // Modo manual: crea el clip "video completo" y salta directo al editor. La entrada se saca de la pila
+        // (inclusive) para que "Atrás" desde el editor vuelva a las sugerencias y no a una pantalla en blanco.
+        composable(Routes.MANUAL, arguments = listOf(idArg)) { entry ->
+            val id = entry.arguments?.getString("id").orEmpty()
+            ManualClipEntryScreen(
+                projectId = id,
+                onReady = { clip ->
+                    nav.navigate(Routes.editor(id, clip)) { popUpTo(Routes.MANUAL) { inclusive = true } }
+                },
+                onFailed = { nav.popBackStack() },
             )
         }
         composable(Routes.EDITOR, arguments = listOf(idArg, clipArg)) { entry ->

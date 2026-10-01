@@ -33,17 +33,18 @@ affiliation_disclaimer|ShortsMaker Viral es independiente y no está afiliada a 
 ads_privacy_options|Opciones de privacidad de anuncios
 privacy_policy|Política de privacidad
 open_source_licenses|Licencias de código abierto
-privacy_policy_body|ShortsMaker Viral procesa tus videos en tu dispositivo.\n\n• Tus videos, transcripciones y proyectos se guardan sólo en el almacenamiento privado de la app. No se suben a ningún servidor nuestro.\n• La transcripción (Vosk) y la detección de rostros (MediaPipe) se ejecutan localmente. Los modelos de voz se descargan una vez desde alphacephei.com.\n• Si pegas un enlace de YouTube, la app lee desde tu dispositivo los datos públicos de esa página (título, duración y momentos más reproducidos). No se descarga el video de YouTube.\n• Anuncios: la app muestra un banner de Google AdMob en algunas pantallas. AdMob puede usar el ID de publicidad de tu dispositivo y datos del dispositivo para mostrar anuncios y medir su rendimiento. Donde la ley lo exige (EEE, Reino Unido) te pedimos consentimiento y puedes cambiarlo en Ajustes → Opciones de privacidad de anuncios. Puedes restablecer o borrar tu ID de publicidad en los ajustes de Android. Más información: policies.google.com/technologies/ads.\n• No hay cuentas ni analíticas propias.\n• El video exportado sólo sale de la app cuando tú pulsas Guardar o Compartir.\n• Puedes borrar proyectos y modelos en Ajustes en cualquier momento.\n\nAl usar videos de terceros eres responsable de tener los derechos necesarios.
+privacy_policy_body|ShortsMaker Viral procesa tus videos en tu dispositivo.\n\n• Tus videos, transcripciones y proyectos se guardan sólo en el almacenamiento privado de la app. No se suben a ningún servidor nuestro.\n• La transcripción (Vosk) y la detección de rostros (MediaPipe) se ejecutan localmente. Los modelos de voz se descargan una vez desde alphacephei.com.\n• Si pegas un enlace de YouTube, Twitch o Kick, la app lee desde tu dispositivo los datos públicos de esa página (título, duración y, en YouTube, los momentos más reproducidos). No se descarga ningún video ni directo: siempre editas el archivo que tú eliges. Sin enlace, todo el análisis se hace con la transcripción local.\n• Anuncios: la app muestra un banner de Google AdMob en algunas pantallas. AdMob puede usar el ID de publicidad de tu dispositivo y datos del dispositivo para mostrar anuncios y medir su rendimiento. Donde la ley lo exige (EEE, Reino Unido) te pedimos consentimiento y puedes cambiarlo en Ajustes → Opciones de privacidad de anuncios. Puedes restablecer o borrar tu ID de publicidad en los ajustes de Android. Más información: policies.google.com/technologies/ads.\n• No hay cuentas ni analíticas propias.\n• El video exportado sólo sale de la app cuando tú pulsas Guardar o Compartir.\n• Puedes borrar proyectos y modelos en Ajustes en cualquier momento.\n\nAl usar videos de terceros eres responsable de tener los derechos necesarios.
 licenses_body|Esta app usa software de código abierto:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose y AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin y kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK y User Messaging Platform – Términos de Google\n\nLos modelos de voz de Vosk se distribuyen bajo Apache License 2.0.
 import_title|Importar video
-paste_youtube_link|Pegar enlace de YouTube
-upload_from_gallery|Subir desde Galería
-youtube_link|Enlace de YouTube
+video_required_hint|Es lo único obligatorio. Para directos de Twitch/Kick, elige el archivo que ya descargaste.
+link_title|Enlace (opcional)
+link_hint|Pega un enlace de YouTube, Twitch o Kick para leer el título y, en YouTube, los momentos más vistos.
+link_label|Enlace de YouTube, Twitch o Kick
+invalid_link|Enlace no válido. Usa un enlace de YouTube, Twitch o Kick, o déjalo vacío.
+valid_link|Enlace válido: %1$s
+link_policy_note|La app no descarga videos ni directos: sólo lee datos públicos del enlace. El video que editas es el archivo que seleccionaste. Si no se pueden leer datos, los clips se sugieren sólo con la transcripción.
+local_only_hint|Sin enlace, los clips se sugieren sólo con la transcripción de tu video (todo en tu teléfono).
 paste|Pegar del portapapeles
-invalid_youtube_link|Este no parece un enlace válido de YouTube.
-valid_youtube_link|Enlace válido
-youtube_policy_note|Se analizan los momentos más reproducidos del video de YouTube. Por las políticas de YouTube y Google Play la app no descarga videos de YouTube: selecciona abajo el archivo original de tu propio video.
-select_original_file|Archivo original de tu video
 select_video|Video de tu galería
 choose_video|Elegir video
 change_video|Cambiar video
@@ -54,7 +55,7 @@ analyze_video|Analizar con IA
 processing_title|Creando tus clips…
 processing_subtitle|Todo ocurre en tu teléfono, sin servidores.
 step_import|Importando video
-step_youtube|Leyendo momentos más vistos de YouTube
+step_link|Leyendo datos del enlace
 step_model|Descargando modelo de voz (sólo la primera vez)
 step_transcribe|Transcribiendo a texto
 step_analyze|Analizando momentos virales
@@ -67,14 +68,17 @@ no_speech_detected|No se detectó voz en el video. Puedes crear un clip manual.
 viral_score|Puntaje viral
 youtube_peak|Pico en YouTube: %1$d%%
 edit_clip|Editar clip
-manual_clip|Crear clip manual
+manual_clip|Crear clip manualmente
 manual_clip_title|Clip manual
+manual_hint|Modo manual: ajusta la línea de tiempo para elegir el fragmento (hasta 10 min). Subtítulos y encuadre se calculan sobre tu selección.
 edit_clip_title|Editar clip
 tool_styles|Estilos
 tool_format|Formato
 tool_text|Texto
 tool_frame|Ajuste
 clip_duration|Duración %1$s
+trim_start|Inicio
+trim_end|Fin
 edit_subtitle|Corregir subtítulo
 no_subtitles_in_clip|No hay subtítulos en este tramo.
 style_hormozi|Hormozi
@@ -98,6 +102,7 @@ face_idle|Listo para detectar el rostro.
 face_running|Detectando rostro… %1$d%%
 face_done|Rostro detectado: el encuadre lo sigue.
 face_unavailable|No se detectó rostro. Se usa el centro; ajusta a mano.
+face_too_long|Recorta un fragmento de hasta 2 minutos para detectar el rostro.
 zoom|Zoom
 move_horizontal|Horizontal
 move_vertical|Vertical

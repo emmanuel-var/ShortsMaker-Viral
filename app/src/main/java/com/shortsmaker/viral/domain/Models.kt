@@ -69,6 +69,9 @@ data class SubtitleCue(val startMs: Long, val endMs: Long, val words: List<WordT
 @Serializable
 data class HeatPoint(val startMs: Long, val endMs: Long, val value: Float)
 
+@Serializable
+data class TimeSpan(val startMs: Long, val endMs: Long)
+
 /** Posición normalizada (0..1) del rostro principal en un instante del video. */
 @Serializable
 data class FacePoint(val timeMs: Long, val x: Float, val y: Float)
@@ -189,7 +192,9 @@ data class Project(
     val width: Int,
     val height: Int,
     val language: String,
-    val youtubeUrl: String? = null,
+    /** Enlace de origen (YouTube/Twitch/Kick) si el usuario lo pegó; sólo informativo, nunca se descarga. */
+    val sourceUrl: String? = null,
+    val sourcePlatform: String? = null,
     val hasHeatmap: Boolean = false,
     val heatmap: List<HeatPoint> = emptyList(),
     val words: List<WordTiming> = emptyList(),
@@ -197,6 +202,8 @@ data class Project(
     val clips: List<ClipSuggestion> = emptyList(),
     val edits: Map<String, ClipEdit> = emptyMap(),
     val faceTracks: Map<String, List<FacePoint>> = emptyMap(),
+    /** Tramo del video (por clip) cuyo rostro ya se analizó; evita repetir la detección. */
+    val faceCoverage: Map<String, TimeSpan> = emptyMap(),
 ) {
     fun toSummary() = ProjectSummary(
         id = id, name = name, createdAt = createdAt, updatedAt = updatedAt,
@@ -219,7 +226,8 @@ data class ProjectSummary(
 /** Reglas para el recorte del clip en la línea de tiempo. */
 object ClipRange {
     const val MIN_MS = 2_000L
-    const val MAX_MS = 180_000L
+    /** Máximo por clip. 10 min cubre TikTok/Reels/Shorts; el editor parte del video completo recortado a este límite. */
+    const val MAX_MS = 600_000L
 
     /** Ajusta (start, end) respetando límites del video y duración mínima/máxima. `movedStart` = qué extremo arrastró el usuario. */
     fun clamp(start: Long, end: Long, movedStart: Boolean, durationMs: Long): Pair<Long, Long> {
@@ -229,5 +237,18 @@ object ClipRange {
         if (e - s < minLen) { if (movedStart) s = (e - minLen).coerceAtLeast(0) else e = (s + minLen).coerceAtMost(durationMs) }
         if (e - s > MAX_MS) { if (movedStart) s = e - MAX_MS else e = s + MAX_MS }
         return s to e
+    }
+}
+
+/** Crea el clip del "Modo manual": el video completo (hasta el máximo permitido) para recortarlo en la línea de tiempo. */
+object ManualClip {
+    fun create(project: Project, nowMs: Long): ClipSuggestion {
+        val end = minOf(project.durationMs, ClipRange.MAX_MS)
+        val lang = Language.fromCode(project.language) ?: Language.ES
+        val preview = project.words.takeWhile { it.startMs < end }.take(if (lang.spaced) 14 else 30)
+            .joinToString(if (lang.spaced) " " else "") { it.text }
+        return ClipSuggestion(
+            id = "manual_$nowMs", title = "", startMs = 0, endMs = end, viralScore = 0, preview = preview, manual = true,
+        )
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Whatshot
@@ -40,6 +41,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -60,6 +62,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -90,38 +94,44 @@ class SuggestionsViewModel(private val container: AppContainer, private val proj
     val sourceFile: File? get() = _project.value?.let { container.projects.sourceFile(it) }
 
     init {
+        reload()
+    }
+
+    /** Relee el proyecto del disco (p. ej. al volver del editor, que pudo crear/editar clips). */
+    fun reload() {
         viewModelScope.launch {
             _project.value = container.projects.load(projectId)
             _loaded.value = true
         }
     }
 
-    /** Crea un clip manual de 30 s al inicio del video, listo para recortar en el editor. */
-    fun addManualClip(onCreated: (String) -> Unit) {
+    /** Elimina un clip manual (los sugeridos por la IA no se pueden borrar). */
+    fun deleteManualClip(clipId: String) {
         viewModelScope.launch {
             // Se recarga desde disco: el editor pudo guardar ediciones desde que se cargó esta pantalla.
             val p = container.projects.load(projectId) ?: return@launch
-            val id = "manual_${System.currentTimeMillis()}"
-            val end = minOf(30_000L, p.durationMs)
-            val clip = ClipSuggestion(
-                id = id, title = "", startMs = 0, endMs = end, viralScore = 0,
-                preview = p.words.takeWhile { it.startMs < end }.take(14).joinToString(" ") { it.text }, manual = true,
+            if (p.clips.none { it.id == clipId && it.manual }) return@launch
+            val updated = p.copy(
+                clips = p.clips.filterNot { it.id == clipId },
+                edits = p.edits - clipId,
+                faceTracks = p.faceTracks - clipId,
+                faceCoverage = p.faceCoverage - clipId,
+                updatedAt = System.currentTimeMillis(),
             )
-            val updated = p.copy(clips = p.clips + clip, updatedAt = System.currentTimeMillis())
             container.projects.save(updated)
             _project.value = updated
-            onCreated(id)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SuggestionsScreen(projectId: String, onBack: () -> Unit, onEdit: (clipId: String) -> Unit) {
+fun SuggestionsScreen(projectId: String, onBack: () -> Unit, onEdit: (clipId: String) -> Unit, onManual: () -> Unit) {
     val vm = appViewModel(key = "suggestions-$projectId") { SuggestionsViewModel(it, projectId) }
     val project by vm.project.collectAsStateWithLifecycle()
     val loaded by vm.loaded.collectAsStateWithLifecycle()
     var playingClip by remember { mutableStateOf<String?>(null) }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { vm.reload() }
 
     Scaffold(
         topBar = {
@@ -143,39 +153,46 @@ fun SuggestionsScreen(projectId: String, onBack: () -> Unit, onEdit: (clipId: St
             }
             else -> {
                 val source = vm.sourceFile
-                LazyColumn(
-                    Modifier.fillMaxSize().padding(padding),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                ) {
-                    item {
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(stringResource(R.string.suggested_clips), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-                            Text(
-                                pluralStringResource(R.plurals.clips_found, p.clips.size, p.clips.size) + " · " +
-                                    stringResource(if (p.hasHeatmap) R.string.analysis_with_heatmap else R.string.analysis_text_only),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            if (p.words.isEmpty()) {
-                                Text(stringResource(R.string.no_speech_detected), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-                            }
+                Column(Modifier.fillMaxSize().padding(padding)) {
+                    // Botón FIJO (fuera de la lista): salta las sugerencias y abre el editor con el video completo.
+                    Surface(tonalElevation = 3.dp, modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = onManual,
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp).height(52.dp),
+                        ) {
+                            Icon(Icons.Filled.ContentCut, null, modifier = Modifier.size(20.dp))
+                            Text(stringResource(R.string.manual_clip), modifier = Modifier.padding(start = 8.dp), fontWeight = FontWeight.Bold)
                         }
                     }
-                    items(p.clips, key = { it.id }) { clip ->
-                        ClipCard(
-                            index = p.clips.indexOf(clip) + 1,
-                            clip = clip,
-                            source = source,
-                            playing = playingClip == clip.id,
-                            onTogglePlay = { playingClip = if (playingClip == clip.id) null else clip.id },
-                            onEdit = { onEdit(clip.id) },
-                        )
-                    }
-                    item {
-                        OutlinedButton(onClick = { vm.addManualClip(onEdit) }, modifier = Modifier.fillMaxWidth()) {
-                            Icon(Icons.Filled.Add, null, modifier = Modifier.size(18.dp))
-                            Text(stringResource(R.string.manual_clip), modifier = Modifier.padding(start = 8.dp))
+                    LazyColumn(
+                        Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                    ) {
+                        item {
+                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text(stringResource(R.string.suggested_clips), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                                Text(
+                                    pluralStringResource(R.plurals.clips_found, p.clips.size, p.clips.size) + " · " +
+                                        stringResource(if (p.hasHeatmap) R.string.analysis_with_heatmap else R.string.analysis_text_only),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                if (p.words.isEmpty()) {
+                                    Text(stringResource(R.string.no_speech_detected), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                }
+                            }
+                        }
+                        items(p.clips, key = { it.id }) { clip ->
+                            ClipCard(
+                                index = p.clips.indexOf(clip) + 1,
+                                clip = clip,
+                                source = source,
+                                playing = playingClip == clip.id,
+                                onTogglePlay = { playingClip = if (playingClip == clip.id) null else clip.id },
+                                onEdit = { onEdit(clip.id) },
+                                onDelete = if (clip.manual) ({ vm.deleteManualClip(clip.id) }) else null,
+                            )
                         }
                     }
                 }
@@ -185,7 +202,15 @@ fun SuggestionsScreen(projectId: String, onBack: () -> Unit, onEdit: (clipId: St
 }
 
 @Composable
-private fun ClipCard(index: Int, clip: ClipSuggestion, source: File?, playing: Boolean, onTogglePlay: () -> Unit, onEdit: () -> Unit) {
+private fun ClipCard(
+    index: Int,
+    clip: ClipSuggestion,
+    source: File?,
+    playing: Boolean,
+    onTogglePlay: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: (() -> Unit)?,
+) {
     val title = clip.title.ifBlank { stringResource(R.string.manual_clip_title) }
     Card(
         shape = RoundedCornerShape(22.dp),
@@ -219,6 +244,11 @@ private fun ClipCard(index: Int, clip: ClipSuggestion, source: File?, playing: B
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     if (!clip.manual) ScoreBadge(clip.viralScore)
+                    if (clip.manual && onDelete != null) {
+                        IconButton(onClick = onDelete) {
+                            Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.delete))
+                        }
+                    }
                     Column(Modifier.weight(1f)) {
                         Text("#$index", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                         Text(title, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)

@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,12 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -60,7 +59,8 @@ import com.shortsmaker.viral.data.MediaUtils
 import com.shortsmaker.viral.data.VideoInfo
 import com.shortsmaker.viral.data.formatTime
 import com.shortsmaker.viral.domain.Language
-import com.shortsmaker.viral.domain.YouTubeUrl
+import com.shortsmaker.viral.domain.MediaLink
+import com.shortsmaker.viral.domain.MediaLinks
 import com.shortsmaker.viral.ui.common.appViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,11 +71,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
-enum class ImportMode { YOUTUBE, GALLERY }
-
 data class ImportUiState(
-    val mode: ImportMode = ImportMode.YOUTUBE,
-    val youtubeUrl: String = "",
+    /** Texto del enlace OPCIONAL (YouTube, Twitch o Kick). Vacío = sólo video local. */
+    val linkText: String = "",
     val videoUri: Uri? = null,
     val videoName: String? = null,
     val videoInfo: VideoInfo? = null,
@@ -83,19 +81,18 @@ data class ImportUiState(
     val language: Language = Language.ES,
     val ownership: Boolean = false,
 ) {
-    val videoId: String? get() = YouTubeUrl.extractVideoId(youtubeUrl)
-    val urlInvalid: Boolean get() = youtubeUrl.isNotBlank() && videoId == null
-    val canContinue: Boolean
-        get() = videoUri != null && videoInfo != null && ownership &&
-            (mode == ImportMode.GALLERY || videoId != null)
+    val link: MediaLink? get() = MediaLinks.parse(linkText)
+    val linkInvalid: Boolean get() = linkText.isNotBlank() && link == null
+
+    /** Basta con el video: el enlace es opcional (pero si se escribe, debe ser válido). */
+    val canContinue: Boolean get() = videoUri != null && videoInfo != null && ownership && !linkInvalid
 }
 
 class ImportViewModel(private val container: AppContainer) : ViewModel() {
     private val _state = MutableStateFlow(ImportUiState(language = container.settings.settings.value.videoLanguage))
     val state: StateFlow<ImportUiState> = _state.asStateFlow()
 
-    fun setMode(mode: ImportMode) = _state.update { it.copy(mode = mode) }
-    fun setUrl(url: String) = _state.update { it.copy(youtubeUrl = url.trim()) }
+    fun setLink(text: String) = _state.update { it.copy(linkText = text.trim()) }
     fun setLanguage(language: Language) = _state.update { it.copy(language = language) }
     fun setOwnership(value: Boolean) = _state.update { it.copy(ownership = value) }
 
@@ -119,7 +116,7 @@ class ImportViewModel(private val container: AppContainer) : ViewModel() {
             sourceUri = s.videoUri!!,
             displayName = s.videoName,
             language = s.language,
-            youtubeUrl = if (s.mode == ImportMode.YOUTUBE) s.youtubeUrl else null,
+            link = s.link,
         )
         return id
     }
@@ -149,61 +146,16 @@ fun ImportScreen(onBack: () -> Unit, onStart: (String) -> Unit) {
             Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                ModeCard(
-                    title = R.string.paste_youtube_link,
-                    icon = { Icon(Icons.Filled.Link, contentDescription = null, modifier = Modifier.size(32.dp)) },
-                    selected = state.mode == ImportMode.YOUTUBE,
-                    modifier = Modifier.weight(1f),
-                ) { vm.setMode(ImportMode.YOUTUBE) }
-                ModeCard(
-                    title = R.string.upload_from_gallery,
-                    icon = { Icon(Icons.Filled.VideoLibrary, contentDescription = null, modifier = Modifier.size(32.dp)) },
-                    selected = state.mode == ImportMode.GALLERY,
-                    modifier = Modifier.weight(1f),
-                ) { vm.setMode(ImportMode.GALLERY) }
-            }
-
-            if (state.mode == ImportMode.YOUTUBE) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = state.youtubeUrl,
-                        onValueChange = vm::setUrl,
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(R.string.youtube_link)) },
-                        placeholder = { Text("https://youtu.be/…") },
-                        singleLine = true,
-                        isError = state.urlInvalid,
-                        supportingText = {
-                            when {
-                                state.urlInvalid -> Text(stringResource(R.string.invalid_youtube_link))
-                                state.videoId != null -> Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Filled.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
-                                    Text(" " + stringResource(R.string.valid_youtube_link))
-                                }
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-                    )
-                    TextButton(onClick = { clipboard.getText()?.text?.let(vm::setUrl) }) {
-                        Text(stringResource(R.string.paste))
-                    }
+            // 1) Video local (obligatorio, el único requisito).
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.select_video), fontWeight = FontWeight.SemiBold)
                     Text(
-                        stringResource(R.string.youtube_policy_note),
+                        stringResource(R.string.video_required_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                }
-            }
-
-            // Archivo de video (obligatorio en ambos modos).
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        stringResource(if (state.mode == ImportMode.YOUTUBE) R.string.select_original_file else R.string.select_video),
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    OutlinedButton(onClick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)) }) {
+                    Button(onClick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)) }) {
                         Icon(Icons.Filled.VideoLibrary, contentDescription = null, modifier = Modifier.size(18.dp))
                         Text(stringResource(if (state.videoUri == null) R.string.choose_video else R.string.change_video), modifier = Modifier.padding(start = 8.dp))
                     }
@@ -217,6 +169,52 @@ fun ImportScreen(onBack: () -> Unit, onStart: (String) -> Unit) {
                         Text(stringResource(R.string.error_unreadable_video), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                     }
                 }
+            }
+
+            // 2) Enlace opcional: YouTube, Twitch o Kick (sólo se leen metadatos públicos; nunca se descarga).
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(stringResource(R.string.link_title), fontWeight = FontWeight.SemiBold)
+                Text(
+                    stringResource(R.string.link_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                OutlinedTextField(
+                    value = state.linkText,
+                    onValueChange = vm::setLink,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.link_label)) },
+                    placeholder = { Text("https://…") },
+                    singleLine = true,
+                    isError = state.linkInvalid,
+                    trailingIcon = {
+                        if (state.linkText.isNotEmpty()) {
+                            IconButton(onClick = { vm.setLink("") }) {
+                                Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.clear))
+                            }
+                        }
+                    },
+                    supportingText = {
+                        val link = state.link
+                        when {
+                            state.linkInvalid -> Text(stringResource(R.string.invalid_link))
+                            link != null -> Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Filled.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+                                Text(" " + stringResource(R.string.valid_link, link.platform.label))
+                            }
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                )
+                TextButton(onClick = { clipboard.getText()?.text?.let(vm::setLink) }) {
+                    Icon(Icons.Filled.ContentPaste, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Text(stringResource(R.string.paste), modifier = Modifier.padding(start = 6.dp))
+                }
+                Text(
+                    stringResource(if (state.link == null) R.string.local_only_hint else R.string.link_policy_note),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
 
             // Idioma del video.
@@ -247,24 +245,6 @@ fun ImportScreen(onBack: () -> Unit, onStart: (String) -> Unit) {
                 enabled = state.canContinue,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
             ) { Text(stringResource(R.string.analyze_video), fontWeight = FontWeight.Bold) }
-        }
-    }
-}
-
-@Composable
-private fun ModeCard(title: Int, icon: @Composable () -> Unit, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(2.dp, if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant),
-        colors = CardDefaults.cardColors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
-        ),
-    ) {
-        Column(Modifier.padding(16.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            icon()
-            Text(stringResource(title), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

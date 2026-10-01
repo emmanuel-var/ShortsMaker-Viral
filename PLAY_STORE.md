@@ -36,11 +36,12 @@
 
 ## Puntos que debes verificar en un dispositivo real
 - **Páginas de 16 KB** (obligatorio para apps con código nativo que apuntan a Android 15+): ejecuta `zipalign -c -P 16 -v 4 app-release.aab`/`check_elf_alignment.sh` sobre el APK generado y comprueba que `libvosk.so`, `libjnidispatch.so` y las libs de MediaPipe estén alineadas. Si alguna no lo está, actualiza esa dependencia.
+- **Twitch / Kick**: sólo se leen título y duración (si aparecen); Kick suele estar tras Cloudflare y puede bloquear la lectura (el flujo sigue con el análisis local). Prueba VODs, clips y canales reales.
 - **Heatmap de YouTube**: pega varios enlaces reales. Es una lectura de página pública (no API oficial), puede fallar si YouTube cambia su HTML o muestra una pantalla de consentimiento; en ese caso la app cae a análisis de texto.
 - **Tiempos del overlay de subtítulos** en un export de 720p y 1080p (los tiempos son relativos al inicio del clip recortado).
 - **TikTok / Instagram / Facebook**: sólo se garantiza abrir la app destino con el video adjunto (intent de compartir). Cada app decide qué pantalla muestra.
 - **Dispositivos de gama baja**: prueba con un video de 10+ minutos (la transcripción de Vosk es en tiempo casi real ≈1× la duración del audio) y el export en 720p.
 
 ## Riesgos de política que debes conocer
-- Leer datos de la página de YouTube **no es una API oficial** y podría contravenir sus Términos. Está aislado en `YouTubeClient`/`AnalysisPipeline` para poder desactivarlo sin afectar al resto.
+- Leer datos de las páginas de YouTube, Twitch o Kick **no es una API oficial** y podría contravenir sus Términos. Está aislado en `YouTubeClient`/`AnalysisPipeline` para poder desactivarlo sin afectar al resto.
 - No añadas la descarga de videos de YouTube: Google Play rechaza apps que lo faciliten.

@@ -165,7 +165,7 @@ class ClipRangeTest {
     @Test fun `respeta minimo maximo y limites`() {
         assertEquals(8_000L to 10_000L, ClipRange.clamp(9_500, 10_000, true, 60_000))
         assertEquals(10_000L to 12_000L, ClipRange.clamp(10_000, 10_500, false, 60_000))
-        assertEquals(0L to 180_000L, ClipRange.clamp(0, 300_000, false, 400_000))
+        assertEquals(0L to 600_000L, ClipRange.clamp(0, 900_000, false, 1_000_000))
         assertEquals(0L to 5_000L, ClipRange.clamp(0, 5_000, true, 5_000))
         val tiny = ClipRange.clamp(0, 1_000, false, 1_000)
         assertEquals(0L to 1_000L, tiny)
