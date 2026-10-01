@@ -1,0 +1,126 @@
+settings|設定
+back|戻る
+cancel|キャンセル
+close|閉じる
+clear|クリア
+delete|削除
+save|保存
+retry|再試行
+play|再生
+preview|プレビュー
+export|書き出し
+create_new_clip|新しい\nAIクリップを作成
+create_new_clip_sub|文字起こし、バズる瞬間の検出、縦型編集まで
+search_projects|プロジェクトを検索
+project_history|プロジェクト履歴
+no_projects|まだプロジェクトがありません。\n最初のAIクリップを作成しましょう。
+no_results|検索結果がありません。
+delete_project_title|プロジェクトを削除しますか？
+delete_project_message|「%1$s」と、この端末に保存された動画を削除します。
+app_language|アプリの言語
+app_language_hint|インターフェース全体にすぐ反映されます。
+export_resolution|書き出し解像度
+voice_models|ダウンロード済みの音声モデル
+voice_models_hint|一度だけダウンロード（1言語あたり約40〜50 MB）すれば、オフラインで使えます。
+no_models_installed|まだありません。
+models_size|使用容量：%1$s
+storage|ストレージ
+delete_all_projects|すべてのプロジェクトを削除
+delete_all_projects_message|この端末に保存されているすべてのプロジェクトと動画を削除します。元に戻せません。
+about|このアプリについて
+version_format|バージョン %1$s
+affiliation_disclaimer|ShortsMaker Viral は独立したアプリであり、YouTube、TikTok、Instagram、Facebook とは一切関係ありません。すべての商標はそれぞれの所有者に帰属します。
+ads_privacy_options|広告のプライバシー オプション
+privacy_policy|プライバシーポリシー
+open_source_licenses|オープンソースライセンス
+privacy_policy_body|ShortsMaker Viral は、お使いの端末上で動画を処理します。\n\n• 動画、文字起こし、プロジェクトはアプリ専用のストレージにのみ保存され、当社のサーバーには送信されません。\n• 文字起こし（Vosk）と顔検出（MediaPipe）は端末内で実行されます。音声モデルは alphacephei.com から一度だけダウンロードされます。\n• YouTube のリンクを貼り付けると、アプリは端末上でそのページの公開情報（タイトル、長さ、よく再生される部分）を読み取ります。YouTube の動画自体はダウンロードしません。\n• 広告：一部の画面に Google AdMob のバナーを表示します。AdMob は広告の配信と効果測定のために、端末の広告 ID や端末データを使用することがあります。法律で必要とされる地域（EEA、英国）では同意をお願いしており、「設定 → 広告のプライバシー オプション」からいつでも変更できます。広告 ID は Android の設定でリセットまたは削除できます。詳細：policies.google.com/technologies/ads\n• アカウントや独自の分析はありません。\n• 書き出した動画は、「保存」または「共有」をタップしたときにのみアプリの外に出ます。\n• プロジェクトとモデルは、設定からいつでも削除できます。\n\n第三者の動画を使用する場合は、必要な権利を保有する責任があなたにあります。
+licenses_body|このアプリは次のオープンソースソフトウェアを使用しています：\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose と AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin と kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK と User Messaging Platform – Google の利用規約\n\nVosk の音声モデルは Apache License 2.0 で配布されています。
+import_title|動画をインポート
+paste_youtube_link|YouTube のリンクを貼り付け
+upload_from_gallery|ギャラリーから選択
+youtube_link|YouTube のリンク
+paste|クリップボードから貼り付け
+invalid_youtube_link|有効な YouTube のリンクではないようです。
+valid_youtube_link|有効なリンクです
+youtube_policy_note|YouTube 動画の「よく再生される部分」を分析します。YouTube と Google Play のポリシーにより、アプリは YouTube の動画をダウンロードしません。下で、ご自身の動画の元ファイルを選択してください。
+select_original_file|あなたの動画の元ファイル
+select_video|ギャラリーの動画
+choose_video|動画を選択
+change_video|動画を変更
+video_language|動画の言語
+video_language_hint|AI モデルがより正確に文字起こしできるようになります。
+ownership_confirm|この動画は自分のものであるか、編集・公開する許可を得ていることを確認します。
+analyze_video|AI で分析
+processing_title|クリップを作成中…
+processing_subtitle|すべてお使いのスマートフォン上で処理され、サーバーは使いません。
+step_import|動画をインポート中
+step_youtube|YouTube のよく再生される部分を読み取り中
+step_model|音声モデルをダウンロード中（初回のみ）
+step_transcribe|テキストに文字起こし中
+step_analyze|バズる瞬間を分析中
+keep_app_open|処理が終わるまでアプリを開いたままにしてください。
+processing_failed|動画を処理できませんでした
+suggested_clips|おすすめのクリップ
+analysis_with_heatmap|YouTube データあり
+analysis_text_only|テキスト分析
+no_speech_detected|動画から音声が検出されませんでした。手動でクリップを作成できます。
+viral_score|バイラルスコア
+youtube_peak|YouTube のピーク：%1$d%%
+edit_clip|クリップを編集
+manual_clip|手動でクリップを作成
+manual_clip_title|手動クリップ
+edit_clip_title|クリップを編集
+tool_styles|スタイル
+tool_format|書式
+tool_text|テキスト
+tool_frame|構図
+clip_duration|長さ %1$s
+edit_subtitle|字幕を修正
+no_subtitles_in_clip|この区間には字幕がありません。
+style_hormozi|Hormozi
+style_karaoke|カラオケ
+style_classic|クラシック
+style_box|ボックス
+style_neon|ネオン
+style_minimal|ミニマル
+font|フォント
+text_color|文字色
+highlight_color|ハイライト色
+text_size|サイズ
+position|位置
+pos_top|上
+pos_center|中央
+pos_bottom|下
+uppercase|大文字
+emojis|絵文字
+auto_face_tracking|顔の自動追跡
+face_idle|顔検出の準備ができました。
+face_running|顔を検出中… %1$d%%
+face_done|顔を検出しました。構図が顔を追従します。
+face_unavailable|顔が検出されませんでした。中央を使用します。手動で調整してください。
+zoom|ズーム
+move_horizontal|水平
+move_vertical|垂直
+reset_framing|構図をリセット
+export_title|書き出し
+rendering_title|クリップをレンダリング中…
+rendering_subtitle|スマートフォンのハードウェアを使用し、外部サーバーは使いません。
+export_ready|クリップが完成しました！
+save_to_device|端末に保存
+saved|保存しました
+saved_to_gallery|Movies/ShortsMaker に保存しました
+publish_on|投稿先
+more_apps|その他のアプリ…
+share_with|共有先
+app_not_installed|%1$s がインストールされていません。別のアプリを選んでください。
+back_to_home|ホームに戻る
+export_footer|アプリが動画なしで開いた場合は、SNS 内で「アップロード」または「ギャラリー」を選んでください。ファイルはすでに端末に保存されています。
+error_generic|予期しないエラーが発生しました。もう一度お試しください。
+error_unreadable_video|この動画を読み込めませんでした。別のファイルをお試しください。
+error_video_too_short|動画が短すぎます（5 秒以上が必要です）。
+error_no_space|端末の空き容量が不足しています。
+error_model_download|音声モデルをダウンロードできませんでした。インターネット接続を確認して再試行してください。
+error_model_corrupt|ダウンロードした音声モデルが破損しています。再度ダウンロードしてください。
+error_transcription|この端末では音声を文字起こしできませんでした。
+error_export|動画をレンダリングできませんでした。設定で 720p をお試しください。
+error_save|動画をギャラリーに保存できませんでした。

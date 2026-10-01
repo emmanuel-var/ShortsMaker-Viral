@@ -1,0 +1,126 @@
+settings|सेटिंग्स
+back|वापस
+cancel|रद्द करें
+close|बंद करें
+clear|साफ़ करें
+delete|हटाएँ
+save|सहेजें
+retry|फिर कोशिश करें
+play|चलाएँ
+preview|पूर्वावलोकन
+export|एक्सपोर्ट
+create_new_clip|नया\nAI क्लिप बनाएँ
+create_new_clip_sub|ट्रांसक्राइब करता है, वायरल पल ढूँढता है और वर्टिकल में एडिट करता है
+search_projects|प्रोजेक्ट खोजें
+project_history|प्रोजेक्ट इतिहास
+no_projects|अभी कोई प्रोजेक्ट नहीं है।\nअपना पहला AI क्लिप बनाएँ।
+no_results|आपकी खोज के लिए कोई परिणाम नहीं मिला।
+delete_project_title|प्रोजेक्ट हटाएँ?
+delete_project_message|"%1$s" और इस डिवाइस पर सहेजा गया उसका वीडियो हटा दिया जाएगा।
+app_language|ऐप की भाषा
+app_language_hint|पूरे इंटरफ़ेस पर तुरंत लागू हो जाती है।
+export_resolution|एक्सपोर्ट रेज़ोल्यूशन
+voice_models|डाउनलोड किए गए वॉइस मॉडल
+voice_models_hint|सिर्फ़ एक बार डाउनलोड होते हैं (प्रति भाषा ≈40–50 MB) और इंटरनेट के बिना काम करते हैं।
+no_models_installed|अभी कोई नहीं।
+models_size|उपयोग की गई जगह: %1$s
+storage|स्टोरेज
+delete_all_projects|सभी प्रोजेक्ट हटाएँ
+delete_all_projects_message|इस डिवाइस पर सहेजे गए सभी प्रोजेक्ट और वीडियो हटा दिए जाएँगे। इसे पहले जैसा नहीं किया जा सकता।
+about|ऐप के बारे में
+version_format|वर्शन %1$s
+affiliation_disclaimer|ShortsMaker Viral एक स्वतंत्र ऐप है और YouTube, TikTok, Instagram या Facebook से संबद्ध नहीं है। सभी ट्रेडमार्क उनके संबंधित स्वामियों के हैं।
+ads_privacy_options|विज्ञापन गोपनीयता विकल्प
+privacy_policy|गोपनीयता नीति
+open_source_licenses|ओपन-सोर्स लाइसेंस
+privacy_policy_body|ShortsMaker Viral आपके वीडियो आपके अपने डिवाइस पर प्रोसेस करता है।\n\n• आपके वीडियो, ट्रांसक्रिप्ट और प्रोजेक्ट सिर्फ़ ऐप के निजी स्टोरेज में रहते हैं। उन्हें हमारे किसी सर्वर पर अपलोड नहीं किया जाता।\n• ट्रांसक्रिप्शन (Vosk) और चेहरा पहचान (MediaPipe) डिवाइस पर ही चलते हैं। वॉइस मॉडल alphacephei.com से सिर्फ़ एक बार डाउनलोड होते हैं।\n• अगर आप YouTube लिंक पेस्ट करते हैं, तो ऐप आपके डिवाइस पर उस पेज का सार्वजनिक डेटा (शीर्षक, अवधि और सबसे ज़्यादा दोबारा देखे गए हिस्से) पढ़ता है। YouTube वीडियो डाउनलोड नहीं किया जाता।\n• विज्ञापन: ऐप कुछ स्क्रीन पर Google AdMob बैनर दिखाता है। AdMob विज्ञापन दिखाने और उनके प्रदर्शन को मापने के लिए आपके डिवाइस की विज्ञापन आईडी और डिवाइस डेटा का उपयोग कर सकता है। जहाँ कानून ज़रूरी करता है (EEA, यूके), हम आपकी सहमति माँगते हैं और आप उसे सेटिंग्स → विज्ञापन गोपनीयता विकल्प में बदल सकते हैं। आप Android सेटिंग्स में अपनी विज्ञापन आईडी रीसेट या हटा सकते हैं। अधिक जानकारी: policies.google.com/technologies/ads।\n• कोई खाता या अपना एनालिटिक्स नहीं।\n• एक्सपोर्ट किया गया वीडियो तभी ऐप से बाहर जाता है जब आप सहेजें या शेयर करें पर टैप करते हैं।\n• आप कभी भी सेटिंग्स में प्रोजेक्ट और मॉडल हटा सकते हैं।\n\nदूसरों के वीडियो इस्तेमाल करते समय ज़रूरी अधिकार होना आपकी ज़िम्मेदारी है।
+licenses_body|यह ऐप ओपन-सोर्स सॉफ़्टवेयर का उपयोग करता है:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose और AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin और kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK और User Messaging Platform – Google की शर्तें\n\nVosk वॉइस मॉडल Apache License 2.0 के तहत वितरित हैं।
+import_title|वीडियो इंपोर्ट करें
+paste_youtube_link|YouTube लिंक पेस्ट करें
+upload_from_gallery|गैलरी से अपलोड करें
+youtube_link|YouTube लिंक
+paste|क्लिपबोर्ड से पेस्ट करें
+invalid_youtube_link|यह मान्य YouTube लिंक नहीं लगता।
+valid_youtube_link|मान्य लिंक
+youtube_policy_note|YouTube वीडियो के सबसे ज़्यादा दोबारा देखे गए हिस्सों का विश्लेषण किया जाता है। YouTube और Google Play की नीतियों के कारण ऐप YouTube वीडियो डाउनलोड नहीं करता: नीचे अपने खुद के वीडियो की मूल फ़ाइल चुनें।
+select_original_file|आपके वीडियो की मूल फ़ाइल
+select_video|आपकी गैलरी का वीडियो
+choose_video|वीडियो चुनें
+change_video|वीडियो बदलें
+video_language|वीडियो की भाषा
+video_language_hint|AI मॉडल को ज़्यादा सटीक ट्रांसक्राइब करने में मदद करता है।
+ownership_confirm|मैं पुष्टि करता/करती हूँ कि यह वीडियो मेरा है या मेरे पास इसे एडिट और पब्लिश करने की अनुमति है।
+analyze_video|AI से विश्लेषण करें
+processing_title|आपके क्लिप बन रहे हैं…
+processing_subtitle|सब कुछ आपके फ़ोन पर होता है, किसी सर्वर के बिना।
+step_import|वीडियो इंपोर्ट हो रहा है
+step_youtube|YouTube के सबसे ज़्यादा देखे गए पल पढ़े जा रहे हैं
+step_model|वॉइस मॉडल डाउनलोड हो रहा है (सिर्फ़ पहली बार)
+step_transcribe|टेक्स्ट में ट्रांसक्राइब हो रहा है
+step_analyze|वायरल पलों का विश्लेषण हो रहा है
+keep_app_open|प्रोसेसिंग के दौरान ऐप खुला रखें।
+processing_failed|वीडियो प्रोसेस नहीं हो सका
+suggested_clips|सुझाए गए क्लिप
+analysis_with_heatmap|YouTube डेटा के साथ
+analysis_text_only|टेक्स्ट विश्लेषण
+no_speech_detected|वीडियो में आवाज़ नहीं मिली। आप मैन्युअल क्लिप बना सकते हैं।
+viral_score|वायरल स्कोर
+youtube_peak|YouTube पीक: %1$d%%
+edit_clip|क्लिप एडिट करें
+manual_clip|मैन्युअल क्लिप बनाएँ
+manual_clip_title|मैन्युअल क्लिप
+edit_clip_title|क्लिप एडिट करें
+tool_styles|स्टाइल
+tool_format|फ़ॉर्मैट
+tool_text|टेक्स्ट
+tool_frame|फ़्रेमिंग
+clip_duration|अवधि %1$s
+edit_subtitle|सबटाइटल ठीक करें
+no_subtitles_in_clip|इस हिस्से में कोई सबटाइटल नहीं है।
+style_hormozi|Hormozi
+style_karaoke|कराओके
+style_classic|क्लासिक
+style_box|बॉक्स
+style_neon|नियॉन
+style_minimal|मिनिमल
+font|फ़ॉन्ट
+text_color|टेक्स्ट रंग
+highlight_color|हाइलाइट रंग
+text_size|आकार
+position|स्थिति
+pos_top|ऊपर
+pos_center|बीच में
+pos_bottom|नीचे
+uppercase|बड़े अक्षर
+emojis|इमोजी
+auto_face_tracking|ऑटो चेहरा ट्रैकिंग
+face_idle|चेहरा पहचानने के लिए तैयार।
+face_running|चेहरा पहचाना जा रहा है… %1$d%%
+face_done|चेहरा मिल गया: फ़्रेम उसका पीछा करता है।
+face_unavailable|चेहरा नहीं मिला। बीच का हिस्सा इस्तेमाल हो रहा है; हाथ से एडजस्ट करें।
+zoom|ज़ूम
+move_horizontal|क्षैतिज
+move_vertical|ऊर्ध्वाधर
+reset_framing|फ़्रेमिंग रीसेट करें
+export_title|एक्सपोर्ट
+rendering_title|आपका क्लिप रेंडर हो रहा है…
+rendering_subtitle|आपके फ़ोन के हार्डवेयर का उपयोग होता है, कोई बाहरी सर्वर नहीं।
+export_ready|आपका क्लिप तैयार है!
+save_to_device|डिवाइस में सहेजें
+saved|सहेजा गया
+saved_to_gallery|Movies/ShortsMaker में सहेजा गया
+publish_on|यहाँ पब्लिश करें
+more_apps|और ऐप…
+share_with|इसके साथ शेयर करें
+app_not_installed|%1$s इंस्टॉल नहीं है। कोई दूसरा ऐप चुनें।
+back_to_home|होम पर वापस जाएँ
+export_footer|अगर ऐप बिना वीडियो के खुले, तो सोशल ऐप में "अपलोड" या "गैलरी" चुनें: फ़ाइल पहले से आपके डिवाइस में सहेजी हुई है।
+error_generic|कोई अनपेक्षित त्रुटि हुई। कृपया फिर कोशिश करें।
+error_unreadable_video|यह वीडियो पढ़ा नहीं जा सका। कोई दूसरी फ़ाइल आज़माएँ।
+error_video_too_short|वीडियो बहुत छोटा है (कम से कम 5 सेकंड)।
+error_no_space|डिवाइस में पर्याप्त खाली जगह नहीं है।
+error_model_download|वॉइस मॉडल डाउनलोड नहीं हो सका। अपना इंटरनेट कनेक्शन जाँचें और फिर कोशिश करें।
+error_model_corrupt|डाउनलोड किया गया वॉइस मॉडल खराब है। दोबारा डाउनलोड करें।
+error_transcription|इस डिवाइस पर ऑडियो ट्रांसक्राइब नहीं हो सका।
+error_export|वीडियो रेंडर नहीं हो सका। सेटिंग्स में 720p आज़माएँ।
+error_save|वीडियो को गैलरी में सहेजा नहीं जा सका।

@@ -1,0 +1,126 @@
+settings|Настройки
+back|Назад
+cancel|Отмена
+close|Закрыть
+clear|Очистить
+delete|Удалить
+save|Сохранить
+retry|Повторить
+play|Воспроизвести
+preview|Предпросмотр
+export|Экспорт
+create_new_clip|Создать новый\nИИ-клип
+create_new_clip_sub|Расшифровывает, находит вирусные моменты и монтирует вертикально
+search_projects|Поиск проектов
+project_history|История проектов
+no_projects|Проектов пока нет.\nСоздайте первый ИИ-клип.
+no_results|По вашему запросу ничего не найдено.
+delete_project_title|Удалить проект?
+delete_project_message|Проект «%1$s» и сохранённое на устройстве видео будут удалены.
+app_language|Язык приложения
+app_language_hint|Применяется сразу ко всему интерфейсу.
+export_resolution|Разрешение экспорта
+voice_models|Загруженные голосовые модели
+voice_models_hint|Скачиваются один раз (≈40–50 МБ на язык) и работают без интернета.
+no_models_installed|Пока нет.
+models_size|Занято места: %1$s
+storage|Хранилище
+delete_all_projects|Удалить все проекты
+delete_all_projects_message|Все проекты и видео, сохранённые на этом устройстве, будут удалены. Это действие нельзя отменить.
+about|О приложении
+version_format|Версия %1$s
+affiliation_disclaimer|ShortsMaker Viral — независимое приложение и не связано с YouTube, TikTok, Instagram и Facebook. Все товарные знаки принадлежат их владельцам.
+ads_privacy_options|Параметры конфиденциальности рекламы
+privacy_policy|Политика конфиденциальности
+open_source_licenses|Лицензии открытого ПО
+privacy_policy_body|ShortsMaker Viral обрабатывает ваши видео на вашем устройстве.\n\n• Ваши видео, расшифровки и проекты хранятся только в закрытом хранилище приложения. Они не отправляются на наши серверы.\n• Расшифровка речи (Vosk) и распознавание лиц (MediaPipe) выполняются локально. Голосовые модели скачиваются один раз с alphacephei.com.\n• Если вы вставляете ссылку на YouTube, приложение считывает на вашем устройстве общедоступные данные этой страницы (название, длительность и самые пересматриваемые моменты). Само видео с YouTube не скачивается.\n• Реклама: на некоторых экранах приложение показывает баннер Google AdMob. AdMob может использовать рекламный идентификатор вашего устройства и данные об устройстве для показа рекламы и оценки её эффективности. Там, где этого требует закон (ЕЭП, Великобритания), мы запрашиваем ваше согласие; изменить его можно в разделе «Настройки → Параметры конфиденциальности рекламы». Рекламный идентификатор можно сбросить или удалить в настройках Android. Подробнее: policies.google.com/technologies/ads.\n• Нет аккаунтов и собственной аналитики.\n• Экспортированное видео покидает приложение только тогда, когда вы нажимаете «Сохранить» или «Поделиться».\n• Проекты и модели можно удалить в настройках в любой момент.\n\nИспользуя чужие видео, вы отвечаете за наличие необходимых прав.
+licenses_body|Это приложение использует программное обеспечение с открытым исходным кодом:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose и AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin и kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK и User Messaging Platform – условия Google\n\nГолосовые модели Vosk распространяются по лицензии Apache License 2.0.
+import_title|Импорт видео
+paste_youtube_link|Вставить ссылку YouTube
+upload_from_gallery|Из галереи
+youtube_link|Ссылка на YouTube
+paste|Вставить из буфера обмена
+invalid_youtube_link|Это не похоже на действительную ссылку YouTube.
+valid_youtube_link|Ссылка верна
+youtube_policy_note|Анализируются самые пересматриваемые моменты видео на YouTube. Из-за правил YouTube и Google Play приложение не скачивает видео с YouTube: ниже выберите исходный файл вашего собственного видео.
+select_original_file|Исходный файл вашего видео
+select_video|Видео из галереи
+choose_video|Выбрать видео
+change_video|Изменить видео
+video_language|Язык видео
+video_language_hint|Помогает ИИ-модели расшифровывать точнее.
+ownership_confirm|Подтверждаю, что это моё видео или у меня есть разрешение редактировать и публиковать его.
+analyze_video|Анализировать с ИИ
+processing_title|Создаём ваши клипы…
+processing_subtitle|Всё происходит на вашем телефоне, без серверов.
+step_import|Импорт видео
+step_youtube|Чтение самых просматриваемых моментов YouTube
+step_model|Загрузка голосовой модели (только в первый раз)
+step_transcribe|Расшифровка в текст
+step_analyze|Анализ вирусных моментов
+keep_app_open|Не закрывайте приложение во время обработки.
+processing_failed|Не удалось обработать видео
+suggested_clips|Рекомендуемые клипы
+analysis_with_heatmap|с данными YouTube
+analysis_text_only|анализ текста
+no_speech_detected|В видео не обнаружена речь. Вы можете создать клип вручную.
+viral_score|Вирусный балл
+youtube_peak|Пик на YouTube: %1$d%%
+edit_clip|Редактировать клип
+manual_clip|Создать клип вручную
+manual_clip_title|Клип вручную
+edit_clip_title|Редактирование клипа
+tool_styles|Стили
+tool_format|Формат
+tool_text|Текст
+tool_frame|Кадр
+clip_duration|Длительность %1$s
+edit_subtitle|Исправить субтитры
+no_subtitles_in_clip|В этом фрагменте нет субтитров.
+style_hormozi|Hormozi
+style_karaoke|Караоке
+style_classic|Классика
+style_box|Плашка
+style_neon|Неон
+style_minimal|Минимал
+font|Шрифт
+text_color|Цвет текста
+highlight_color|Цвет выделения
+text_size|Размер
+position|Положение
+pos_top|Сверху
+pos_center|По центру
+pos_bottom|Снизу
+uppercase|ЗАГЛАВНЫЕ
+emojis|Эмодзи
+auto_face_tracking|Автоматическое слежение за лицом
+face_idle|Готово к поиску лица.
+face_running|Поиск лица… %1$d%%
+face_done|Лицо найдено: кадр следует за ним.
+face_unavailable|Лицо не найдено. Используется центр; настройте вручную.
+zoom|Масштаб
+move_horizontal|По горизонтали
+move_vertical|По вертикали
+reset_framing|Сбросить кадрирование
+export_title|Экспорт
+rendering_title|Рендеринг клипа…
+rendering_subtitle|Используется «железо» вашего телефона, без внешних серверов.
+export_ready|Ваш клип готов!
+save_to_device|Сохранить на устройство
+saved|Сохранено
+saved_to_gallery|Сохранено в Movies/ShortsMaker
+publish_on|Опубликовать в
+more_apps|Другие приложения…
+share_with|Поделиться через
+app_not_installed|%1$s не установлено. Выберите другое приложение.
+back_to_home|На главную
+export_footer|Если приложение открылось без видео, выберите «Загрузить» или «Галерея» в соцсети: файл уже сохранён на вашем устройстве.
+error_generic|Произошла непредвиденная ошибка. Попробуйте ещё раз.
+error_unreadable_video|Не удалось прочитать это видео. Попробуйте другой файл.
+error_video_too_short|Видео слишком короткое (минимум 5 секунд).
+error_no_space|На устройстве недостаточно свободного места.
+error_model_download|Не удалось скачать голосовую модель. Проверьте подключение к интернету и повторите.
+error_model_corrupt|Скачанная голосовая модель повреждена. Повторите загрузку.
+error_transcription|Не удалось расшифровать аудио на этом устройстве.
+error_export|Не удалось отрендерить видео. Попробуйте 720p в настройках.
+error_save|Не удалось сохранить видео в галерею.

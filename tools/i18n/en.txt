@@ -1,0 +1,126 @@
+settings|Settings
+back|Back
+cancel|Cancel
+close|Close
+clear|Clear
+delete|Delete
+save|Save
+retry|Retry
+play|Play
+preview|Preview
+export|Export
+create_new_clip|Create new\nAI Clip
+create_new_clip_sub|Transcribe, find the viral moments and edit in vertical
+search_projects|Search projects
+project_history|Project history
+no_projects|No projects yet.\nCreate your first AI clip.
+no_results|No results for your search.
+delete_project_title|Delete project?
+delete_project_message|“%1$s” and its video stored on this device will be deleted.
+app_language|App language
+app_language_hint|Applies instantly to the whole interface.
+export_resolution|Export resolution
+voice_models|Downloaded voice models
+voice_models_hint|Downloaded once (≈40-50 MB per language) and work offline.
+no_models_installed|None yet.
+models_size|Space used: %1$s
+storage|Storage
+delete_all_projects|Delete all projects
+delete_all_projects_message|All projects and videos stored on this device will be deleted. This cannot be undone.
+about|About
+version_format|Version %1$s
+affiliation_disclaimer|ShortsMaker Viral is independent and not affiliated with YouTube, TikTok, Instagram or Facebook. All trademarks belong to their respective owners.
+ads_privacy_options|Ad privacy options
+privacy_policy|Privacy policy
+open_source_licenses|Open-source licenses
+privacy_policy_body|ShortsMaker Viral processes your videos on your device.\n\n• Your videos, transcripts and projects are stored only in the app's private storage. They are never uploaded to any server of ours.\n• Transcription (Vosk) and face detection (MediaPipe) run locally. Voice models are downloaded once from alphacephei.com.\n• If you paste a YouTube link, the app reads that page's public data on your device (title, duration and most-replayed moments). The YouTube video itself is not downloaded.\n• Ads: the app shows a Google AdMob banner on some screens. AdMob may use your device's advertising ID and device data to serve ads and measure performance. Where required by law (EEA, UK) we ask for your consent and you can change it in Settings → Ad privacy options. You can reset or delete your advertising ID in Android settings. More info: policies.google.com/technologies/ads.\n• No accounts or first-party analytics.\n• The exported video only leaves the app when you tap Save or Share.\n• You can delete projects and models in Settings at any time.\n\nWhen using third-party videos you are responsible for holding the necessary rights.
+licenses_body|This app uses open-source software:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose and AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin and kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK and User Messaging Platform – Google terms\n\nVosk voice models are distributed under the Apache License 2.0.
+import_title|Import video
+paste_youtube_link|Paste YouTube link
+upload_from_gallery|Upload from Gallery
+youtube_link|YouTube link
+paste|Paste from clipboard
+invalid_youtube_link|This doesn't look like a valid YouTube link.
+valid_youtube_link|Valid link
+youtube_policy_note|The most-replayed moments of the YouTube video are analyzed. Because of YouTube and Google Play policies the app does not download YouTube videos: select the original file of your own video below.
+select_original_file|Original file of your video
+select_video|Video from your gallery
+choose_video|Choose video
+change_video|Change video
+video_language|Video language
+video_language_hint|Helps the AI model transcribe more accurately.
+ownership_confirm|I confirm this video is mine or I have permission to edit and publish it.
+analyze_video|Analyze with AI
+processing_title|Creating your clips…
+processing_subtitle|Everything happens on your phone, no servers.
+step_import|Importing video
+step_youtube|Reading YouTube's most-replayed moments
+step_model|Downloading voice model (first time only)
+step_transcribe|Transcribing to text
+step_analyze|Analyzing viral moments
+keep_app_open|Keep the app open while processing.
+processing_failed|Couldn't process the video
+suggested_clips|Recommended clips
+analysis_with_heatmap|with YouTube data
+analysis_text_only|text analysis
+no_speech_detected|No speech detected in the video. You can create a manual clip.
+viral_score|Viral score
+youtube_peak|YouTube peak: %1$d%%
+edit_clip|Edit clip
+manual_clip|Create manual clip
+manual_clip_title|Manual clip
+edit_clip_title|Edit clip
+tool_styles|Styles
+tool_format|Format
+tool_text|Text
+tool_frame|Framing
+clip_duration|Duration %1$s
+edit_subtitle|Edit subtitle
+no_subtitles_in_clip|No subtitles in this section.
+style_hormozi|Hormozi
+style_karaoke|Karaoke
+style_classic|Classic
+style_box|Box
+style_neon|Neon
+style_minimal|Minimal
+font|Font
+text_color|Text color
+highlight_color|Highlight
+text_size|Size
+position|Position
+pos_top|Top
+pos_center|Center
+pos_bottom|Bottom
+uppercase|UPPERCASE
+emojis|Emojis
+auto_face_tracking|Automatic face tracking
+face_idle|Ready to detect the face.
+face_running|Detecting face… %1$d%%
+face_done|Face detected: framing follows it.
+face_unavailable|No face found. Using center; adjust manually.
+zoom|Zoom
+move_horizontal|Horizontal
+move_vertical|Vertical
+reset_framing|Reset framing
+export_title|Export
+rendering_title|Rendering your clip…
+rendering_subtitle|Using your phone's hardware, no external servers.
+export_ready|Your clip is ready!
+save_to_device|Save to device
+saved|Saved
+saved_to_gallery|Saved to Movies/ShortsMaker
+publish_on|Publish on
+more_apps|More apps…
+share_with|Share with
+app_not_installed|%1$s isn't installed. Pick another app.
+back_to_home|Back to home
+export_footer|If the app opens without the video, choose “Upload” or “Gallery” inside the social app: the file is already saved on your device.
+error_generic|An unexpected error occurred. Please try again.
+error_unreadable_video|That video couldn't be read. Try another file.
+error_video_too_short|The video is too short (minimum 5 seconds).
+error_no_space|Not enough free space on the device.
+error_model_download|The voice model couldn't be downloaded. Check your internet connection and retry.
+error_model_corrupt|The downloaded voice model is corrupted. Retry the download.
+error_transcription|Audio couldn't be transcribed on this device.
+error_export|The video couldn't be rendered. Try 720p in Settings.
+error_save|The video couldn't be saved to the gallery.

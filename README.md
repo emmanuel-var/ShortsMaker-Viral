@@ -30,6 +30,26 @@ La **misma** transformación de encuadre (`FramingMath`) y el **mismo** renderiz
 ### Puntaje viral
 `score = 0.42·heatmap + 0.24·ganchos + 0.14·gancho inicial + 0.12·ritmo + 0.08·duración` (si no hay heatmap, los pesos se redistribuyen sobre el texto). Se generan ventanas de 15-60 s alineadas a frases y se eligen las mejores sin solaparse (máx. 25 %).
 
+## Idiomas
+
+La interfaz se puede cambiar **en caliente** (Ajustes → Idioma de la app, sin reiniciar) entre: español, inglés, francés, alemán, portugués, chino, japonés, ruso e hindi (`ui/Localization.kt`).
+Los mismos 9 idiomas están disponibles como **idioma del video** al importar (el último elegido se recuerda como predeterminado), porque Vosk tiene un modelo pequeño con licencia Apache 2.0 para cada uno:
+
+| Idioma | Modelo Vosk |
+|---|---|
+| Español | `vosk-model-small-es-0.42` |
+| English | `vosk-model-small-en-us-0.15` |
+| Français | `vosk-model-small-fr-0.22` |
+| Deutsch | `vosk-model-small-de-0.15` |
+| Português | `vosk-model-small-pt-0.3` |
+| 中文 | `vosk-model-small-cn-0.22` |
+| 日本語 | `vosk-model-small-ja-0.22` |
+| Русский | `vosk-model-small-ru-0.22` |
+| हिन्दी | `vosk-model-small-hi-0.22` |
+
+Los textos viven en `tools/i18n/<idioma>.txt`; tras editarlos ejecuta `python3 tools/i18n/generate.py` (valida claves y marcadores y regenera los `strings.xml`).
+La precisión de los modelos *small* varía mucho (el portugués y el hindi son los más débiles); el usuario puede corregir el texto en el editor.
+
 ## Compilar
 
 Requisitos: Android Studio Ladybug o superior (o JDK 17 + Android SDK 36).

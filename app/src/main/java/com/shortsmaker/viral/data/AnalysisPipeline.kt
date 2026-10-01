@@ -117,7 +117,7 @@ class AnalysisPipeline(
             report(PipelineStep.ANALYZE, 0f)
             currentCoroutineContext().ensureActive()
             val heat = meta?.let { YouTubeHtmlParser.rescale(it.heatmap, it.durationMs, info.durationMs) }.orEmpty()
-            val cues = CueBuilder.build(clean)
+            val cues = CueBuilder.build(clean, wide = !request.language.spaced)
             val clips = withContext(Dispatchers.Default) {
                 ClipAnalyzer.suggest(clean, heat, info.durationMs, request.language)
             }

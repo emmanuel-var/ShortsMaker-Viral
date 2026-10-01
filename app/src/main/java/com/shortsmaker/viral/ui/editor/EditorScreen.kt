@@ -109,6 +109,7 @@ import com.shortsmaker.viral.domain.ClipRange
 import com.shortsmaker.viral.domain.FaceTrack
 import com.shortsmaker.viral.domain.FontChoice
 import com.shortsmaker.viral.domain.Framing
+import com.shortsmaker.viral.domain.Language
 import com.shortsmaker.viral.domain.FramingMath
 import com.shortsmaker.viral.domain.Project
 import com.shortsmaker.viral.domain.SubtitleCue
@@ -321,6 +322,7 @@ private fun VerticalPreview(
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
+    val spaced = remember(project.language) { Language.fromCode(project.language)?.spaced ?: true }
     BoxWithConstraints(modifier.clip(RoundedCornerShape(16.dp)).background(Color.Black)) {
         val boxW = constraints.maxWidth.toFloat()
         val boxH = constraints.maxHeight.toFloat()
@@ -347,8 +349,8 @@ private fun VerticalPreview(
         // Subtítulo activo, dibujado con el mismo renderizador que usa la exportación.
         val active = visibleCues.firstOrNull { positionMs >= it.value.startMs && positionMs < it.value.endMs }
         val word = active?.let { renderer.activeWord(it.value, positionMs) } ?: -1
-        val subtitle: ImageBitmap? = remember(active?.index, word, edit.style, active?.value?.text, boxW) {
-            active?.let { renderer.render(it.value, word, edit.style, boxW.toInt())?.asImageBitmap() }
+        val subtitle: ImageBitmap? = remember(active?.index, word, edit.style, active?.value?.text, boxW, spaced) {
+            active?.let { renderer.render(it.value, word, edit.style, boxW.toInt(), spaced)?.asImageBitmap() }
         }
         val subtitleRect: Rect? = subtitle?.let {
             val top = (boxH * edit.style.position.centerYFraction - it.height / 2f).coerceIn(0f, max(0f, boxH - it.height))

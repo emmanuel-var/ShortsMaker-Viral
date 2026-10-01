@@ -32,7 +32,7 @@ android {
     }
 
     androidResources {
-        localeFilters += listOf("es", "en")
+        localeFilters += listOf("es", "en", "fr", "de", "pt", "zh", "ja", "ru", "hi")
         noCompress += "tflite" // MediaPipe mapea el modelo directamente desde assets
     }
 

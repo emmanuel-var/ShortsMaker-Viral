@@ -67,7 +67,7 @@ object ClipAnalyzer {
                 endMs = c.endMs,
                 viralScore = (40 + 59 * c.score).toInt().coerceIn(30, 99),
                 heatScore = c.heat?.let { (it * 100).toInt().coerceIn(0, 100) } ?: 0,
-                preview = texts.take(14).joinToString(" "),
+                preview = texts.take(if (lang.spaced) 14 else 30).joinToString(if (lang.spaced) " " else ""),
                 keywords = keywords,
             )
         }

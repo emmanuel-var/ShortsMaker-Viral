@@ -4,11 +4,13 @@ package com.shortsmaker.viral.domain
 object CueBuilder {
     private const val MAX_WORDS = 4
     private const val MAX_CHARS = 26
+    private const val MAX_CHARS_WIDE = 12 // chino/japonés: cada carácter ocupa ~el doble
     private const val MAX_GAP_MS = 650L
     private const val MAX_CUE_MS = 2800L
     private const val TAIL_PADDING_MS = 180L
 
-    fun build(words: List<WordTiming>): List<SubtitleCue> {
+    fun build(words: List<WordTiming>, wide: Boolean = false): List<SubtitleCue> {
+        val maxChars = if (wide) MAX_CHARS_WIDE else MAX_CHARS
         if (words.isEmpty()) return emptyList()
         val groups = mutableListOf<MutableList<WordTiming>>()
         var current = mutableListOf<WordTiming>()
@@ -19,7 +21,7 @@ object CueBuilder {
                 val gap = w.startMs - last.endMs
                 val tooLong = w.endMs - current.first().startMs > MAX_CUE_MS
                 val endsSentence = last.text.endsWith(".") || last.text.endsWith("?") || last.text.endsWith("!")
-                if (gap >= MAX_GAP_MS || chars > MAX_CHARS || current.size >= MAX_WORDS || tooLong || endsSentence) {
+                if (gap >= MAX_GAP_MS || chars > maxChars || current.size >= MAX_WORDS || tooLong || endsSentence) {
                     groups += current
                     current = mutableListOf()
                 }

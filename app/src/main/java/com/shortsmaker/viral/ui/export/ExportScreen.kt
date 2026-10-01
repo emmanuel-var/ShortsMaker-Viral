@@ -73,6 +73,7 @@ import com.shortsmaker.viral.data.MediaSaver
 import com.shortsmaker.viral.data.ShareTarget
 import com.shortsmaker.viral.domain.ClipEdit
 import com.shortsmaker.viral.domain.FaceTrack
+import com.shortsmaker.viral.domain.Language
 import com.shortsmaker.viral.domain.SubtitleTemplates
 import com.shortsmaker.viral.ui.common.KeepScreenOn
 import com.shortsmaker.viral.ui.common.appViewModel
@@ -128,6 +129,7 @@ class ExportViewModel(
                     cues = project.cues,
                     faceTrack = track,
                     resolution = resolution,
+                    spaced = Language.fromCode(project.language)?.spaced ?: true,
                     output = out,
                 ) { _state.value = ExportState.Rendering(it) }
 

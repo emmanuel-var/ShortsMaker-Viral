@@ -91,7 +91,7 @@ data class ImportUiState(
 }
 
 class ImportViewModel(private val container: AppContainer) : ViewModel() {
-    private val _state = MutableStateFlow(ImportUiState(language = container.settings.settings.value.defaultLanguage))
+    private val _state = MutableStateFlow(ImportUiState(language = container.settings.settings.value.videoLanguage))
     val state: StateFlow<ImportUiState> = _state.asStateFlow()
 
     fun setMode(mode: ImportMode) = _state.update { it.copy(mode = mode) }
@@ -113,6 +113,7 @@ class ImportViewModel(private val container: AppContainer) : ViewModel() {
     fun start(): String? {
         val s = _state.value
         if (!s.canContinue) return null
+        container.settings.setVideoLanguage(s.language) // se recuerda como idioma por defecto del próximo video
         val id = UUID.randomUUID().toString()
         container.pendingImports[id] = ImportRequest(
             sourceUri = s.videoUri!!,

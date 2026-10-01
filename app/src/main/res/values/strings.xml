@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ShortsMaker Viral</string>
+    <string name="app_name" translatable="false">ShortsMaker Viral</string>
     <string name="settings">Ajustes</string>
     <string name="back">Atrás</string>
     <string name="cancel">Cancelar</string>
@@ -20,8 +20,8 @@
     <string name="no_results">Sin resultados para tu búsqueda.</string>
     <string name="delete_project_title">¿Eliminar proyecto?</string>
     <string name="delete_project_message">Se borrará «%1$s» y su video guardado en este dispositivo.</string>
-    <string name="default_language">Idioma por defecto del video</string>
-    <string name="default_language_hint">Se usa para transcribir; puedes cambiarlo en cada importación.</string>
+    <string name="app_language">Idioma de la app</string>
+    <string name="app_language_hint">Se aplica al instante a toda la interfaz.</string>
     <string name="export_resolution">Resolución de exportación</string>
     <string name="voice_models">Modelos de voz descargados</string>
     <string name="voice_models_hint">Se descargan una sola vez (≈40-50 MB por idioma) y funcionan sin internet.</string>
@@ -129,10 +129,12 @@
     <string name="error_save">No se pudo guardar el video en la galería.</string>
     <plurals name="clip_count">
         <item quantity="one">%1$d clip</item>
+        <item quantity="many">%1$d clips</item>
         <item quantity="other">%1$d clips</item>
     </plurals>
     <plurals name="clips_found">
         <item quantity="one">%1$d clip sugerido</item>
+        <item quantity="many">%1$d clips sugeridos</item>
         <item quantity="other">%1$d clips sugeridos</item>
     </plurals>
 </resources>

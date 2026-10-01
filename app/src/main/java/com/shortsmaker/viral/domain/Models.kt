@@ -2,19 +2,28 @@ package com.shortsmaker.viral.domain
 
 import kotlinx.serialization.Serializable
 
-/** Idiomas soportados para la transcripción local (modelos Vosk pequeños, licencia Apache 2.0). */
-enum class Language(val code: String, val label: String, val voskModel: String) {
+/**
+ * Idiomas de la app: sirven tanto para la interfaz como para transcribir el video (modelos Vosk pequeños, Apache 2.0).
+ * `spaced = false` para idiomas sin espacios entre palabras (chino, japonés).
+ */
+enum class Language(val code: String, val label: String, val voskModel: String, val spaced: Boolean = true) {
     ES("es", "Español", "vosk-model-small-es-0.42"),
     EN("en", "English", "vosk-model-small-en-us-0.15"),
-    PT("pt", "Português", "vosk-model-small-pt-0.3"),
     FR("fr", "Français", "vosk-model-small-fr-0.22"),
     DE("de", "Deutsch", "vosk-model-small-de-0.15"),
-    IT("it", "Italiano", "vosk-model-small-it-0.22");
+    PT("pt", "Português", "vosk-model-small-pt-0.3"),
+    ZH("zh", "中文", "vosk-model-small-cn-0.22", spaced = false),
+    JA("ja", "日本語", "vosk-model-small-ja-0.22", spaced = false),
+    RU("ru", "Русский", "vosk-model-small-ru-0.22"),
+    HI("hi", "हिन्दी", "vosk-model-small-hi-0.22");
 
     val modelUrl: String get() = "https://alphacephei.com/vosk/models/$voskModel.zip"
 
     companion object {
-        fun fromCode(code: String?): Language = entries.firstOrNull { it.code == code } ?: ES
+        fun fromCode(code: String?): Language? = entries.firstOrNull { it.code == code }
+
+        /** Idioma del dispositivo si está soportado; si no, inglés. */
+        fun fromDevice(deviceCode: String): Language = fromCode(deviceCode) ?: EN
     }
 }
 

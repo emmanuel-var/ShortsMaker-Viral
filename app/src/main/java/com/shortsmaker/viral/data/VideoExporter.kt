@@ -55,6 +55,7 @@ class VideoExporter(private val context: Context) {
         cues: List<SubtitleCue>,
         faceTrack: FaceTrack?,
         resolution: ExportResolution,
+        spaced: Boolean,
         output: File,
         onProgress: (Float) -> Unit,
     ) = withContext(Dispatchers.Main) {
@@ -84,7 +85,7 @@ class VideoExporter(private val context: Context) {
                 )
             }
         if (relativeCues.isNotEmpty()) {
-            videoEffects += OverlayEffect(listOf<TextureOverlay>(SubtitleOverlay(relativeCues, edit.style, resolution.width)))
+            videoEffects += OverlayEffect(listOf<TextureOverlay>(SubtitleOverlay(relativeCues, edit.style, resolution.width, spaced)))
         }
 
         val mediaItem = MediaItem.Builder()
@@ -156,6 +157,7 @@ class VideoExporter(private val context: Context) {
         private val cues: List<SubtitleCue>,
         private val style: SubtitleStyle,
         private val frameWidth: Int,
+        private val spaced: Boolean,
     ) : BitmapOverlay() {
         private val renderer = SubtitleRenderer()
         private val empty: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
@@ -183,7 +185,7 @@ class VideoExporter(private val context: Context) {
             if (cueIdx != cachedCue || word != cachedWord) {
                 cachedCue = cueIdx
                 cachedWord = word
-                cachedBitmap = renderer.render(cue, word, style, frameWidth) ?: empty
+                cachedBitmap = renderer.render(cue, word, style, frameWidth, spaced) ?: empty
             }
             return cachedBitmap
         }

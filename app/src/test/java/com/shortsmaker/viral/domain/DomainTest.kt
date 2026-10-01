@@ -171,3 +171,35 @@ class ClipRangeTest {
         assertEquals(0L to 1_000L, tiny)
     }
 }
+
+class LanguageTest {
+    @Test fun `los 9 idiomas tienen modelo de voz propio y codigo unico`() {
+        assertEquals(9, Language.entries.size)
+        assertEquals(9, Language.entries.map { it.code }.toSet().size)
+        assertEquals(9, Language.entries.map { it.voskModel }.toSet().size)
+        assertTrue(Language.entries.all { it.modelUrl.startsWith("https://alphacephei.com/vosk/models/vosk-model-small-") })
+        assertEquals(Language.ZH, Language.fromCode("zh"))
+        assertNull(Language.fromCode("it"))
+        assertEquals(Language.EN, Language.fromDevice("it")) // idioma no soportado -> inglés
+        assertEquals(Language.HI, Language.fromDevice("hi"))
+    }
+
+    @Test fun `palabras clave y titulos en idiomas sin espacios y devanagari`() {
+        val ru = "деньги важны деньги растут бизнес приносит деньги бизнес".split(" ")
+        assertEquals(listOf("деньги", "бизнес"), TextAnalysis.topKeywords(ru, Language.RU, 2))
+        val zh = "金钱 很 重要 金钱 改变 生活 生活 金钱".split(" ")
+        val zhKw = TextAnalysis.topKeywords(zh, Language.ZH, 2)
+        assertEquals(listOf("金钱", "生活"), zhKw)
+        assertTrue(TitleGenerator.generate(zh, zhKw, Language.ZH, 0, 1).contains("金钱和生活"))
+        val hi = "पैसा ज़रूरी है पैसा बढ़ता है व्यापार पैसा व्यापार".split(" ")
+        assertEquals("पैसा", TextAnalysis.topKeywords(hi, Language.HI, 1).first()) // conserva las vocales (marcas)
+        assertTrue(TextAnalysis.hookHits(listOf("秘密"), Language.JA) == 1)
+    }
+
+    @Test fun `subtitulos anchos usan bloques mas cortos`() {
+        val words = (0 until 24).map { WordTiming("我们们们", it * 300L, it * 300L + 250) }
+        val normal = CueBuilder.build(words)
+        val wide = CueBuilder.build(words, wide = true)
+        assertTrue(wide.size > normal.size)
+    }
+}

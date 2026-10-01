@@ -75,15 +75,16 @@ fun SettingsScreen(onBack: () -> Unit) {
         },
     ) { padding ->
         Column(Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
-            SectionTitle(R.string.default_language)
+            SectionTitle(R.string.app_language)
             Text(
-                stringResource(R.string.default_language_hint),
+                stringResource(R.string.app_language_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
+            // El cambio es inmediato: toda la interfaz se recompone con el nuevo idioma.
             Language.entries.forEach { lang ->
-                RadioRow(lang.label, settings.defaultLanguage == lang) { container.settings.setDefaultLanguage(lang) }
+                RadioRow(lang.label, settings.uiLanguage == lang) { container.settings.setUiLanguage(lang) }
             }
 
             HorizontalDivider(Modifier.padding(vertical = 12.dp))

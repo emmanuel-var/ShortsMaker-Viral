@@ -36,7 +36,7 @@ class SubtitleRenderer {
         return idx
     }
 
-    fun render(cue: SubtitleCue, activeWord: Int, style: SubtitleStyle, frameWidth: Int): Bitmap? {
+    fun render(cue: SubtitleCue, activeWord: Int, style: SubtitleStyle, frameWidth: Int, spaced: Boolean = true): Bitmap? {
         if (cue.words.isEmpty()) return null
         val pieces: List<Piece> = when (style.mode) {
             SubtitleMode.STATIC -> cue.words.map { Piece(display(it.text, style), false) }
@@ -57,7 +57,7 @@ class SubtitleRenderer {
         while (true) {
             fill.textSize = textPx
             stroke.textSize = textPx
-            spaceWidth = fill.measureText(" ")
+            spaceWidth = if (spaced) fill.measureText(" ") else 0f
             pieces.forEach { it.width = fill.measureText(it.text) }
             lines = wrap(pieces, spaceWidth, maxLineWidth)
             // Si una palabra no cabe en el ancho, se reduce el tamaño de todo el bloque.

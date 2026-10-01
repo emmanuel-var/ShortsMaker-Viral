@@ -1,0 +1,126 @@
+settings|设置
+back|返回
+cancel|取消
+close|关闭
+clear|清除
+delete|删除
+save|保存
+retry|重试
+play|播放
+preview|预览
+export|导出
+create_new_clip|创建新的\nAI 剪辑
+create_new_clip_sub|转写语音、找出爆款片段，并以竖屏剪辑
+search_projects|搜索项目
+project_history|项目历史
+no_projects|你还没有项目。\n创建你的第一个 AI 剪辑吧。
+no_results|没有找到相关结果。
+delete_project_title|删除项目？
+delete_project_message|将删除“%1$s”及其保存在此设备上的视频。
+app_language|应用语言
+app_language_hint|立即应用于整个界面。
+export_resolution|导出分辨率
+voice_models|已下载的语音模型
+voice_models_hint|只需下载一次（每种语言约 40–50 MB），之后可离线使用。
+no_models_installed|暂无。
+models_size|已用空间：%1$s
+storage|存储
+delete_all_projects|删除所有项目
+delete_all_projects_message|将删除此设备上保存的所有项目和视频，且无法恢复。
+about|关于
+version_format|版本 %1$s
+affiliation_disclaimer|ShortsMaker Viral 为独立应用，与 YouTube、TikTok、Instagram 和 Facebook 无任何关联。所有商标均归其各自所有者所有。
+ads_privacy_options|广告隐私选项
+privacy_policy|隐私政策
+open_source_licenses|开源许可
+privacy_policy_body|ShortsMaker Viral 在你的设备上处理你的视频。\n\n• 你的视频、转写文本和项目仅保存在应用的私有存储中，不会上传到我们的任何服务器。\n• 语音转写（Vosk）和人脸检测（MediaPipe）均在本地运行。语音模型只会从 alphacephei.com 下载一次。\n• 如果你粘贴 YouTube 链接，应用会在你的设备上读取该页面的公开数据（标题、时长和回放最多的片段），不会下载 YouTube 视频本身。\n• 广告：应用在部分页面显示 Google AdMob 横幅广告。AdMob 可能使用你设备的广告 ID 和设备数据来投放广告并衡量效果。在法律要求的地区（欧洲经济区、英国），我们会征求你的同意，你可以在“设置 → 广告隐私选项”中更改。你可以在 Android 设置中重置或删除广告 ID。详情：policies.google.com/technologies/ads。\n• 没有账号，也没有自有的数据分析。\n• 只有当你点击“保存”或“分享”时，导出的视频才会离开应用。\n• 你可以随时在设置中删除项目和模型。\n\n使用第三方视频时，你需自行确保拥有必要的权利。
+licenses_body|本应用使用以下开源软件：\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose 和 AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin 和 kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK 和 User Messaging Platform – Google 条款\n\nVosk 语音模型采用 Apache License 2.0 发布。
+import_title|导入视频
+paste_youtube_link|粘贴 YouTube 链接
+upload_from_gallery|从相册上传
+youtube_link|YouTube 链接
+paste|从剪贴板粘贴
+invalid_youtube_link|这看起来不是有效的 YouTube 链接。
+valid_youtube_link|链接有效
+youtube_policy_note|应用会分析该 YouTube 视频中回放最多的片段。根据 YouTube 和 Google Play 的政策，应用不会下载 YouTube 视频：请在下方选择你自己视频的原始文件。
+select_original_file|你的视频原始文件
+select_video|相册中的视频
+choose_video|选择视频
+change_video|更换视频
+video_language|视频语言
+video_language_hint|帮助 AI 模型更准确地转写。
+ownership_confirm|我确认该视频是我本人的，或我有权编辑和发布它。
+analyze_video|使用 AI 分析
+processing_title|正在创建你的剪辑…
+processing_subtitle|一切都在你的手机上完成，无需服务器。
+step_import|正在导入视频
+step_youtube|正在读取 YouTube 回放最多的片段
+step_model|正在下载语音模型（仅首次）
+step_transcribe|正在转写为文字
+step_analyze|正在分析爆款片段
+keep_app_open|处理过程中请保持应用打开。
+processing_failed|无法处理该视频
+suggested_clips|推荐剪辑
+analysis_with_heatmap|含 YouTube 数据
+analysis_text_only|文本分析
+no_speech_detected|视频中未检测到语音。你可以创建手动剪辑。
+viral_score|爆款指数
+youtube_peak|YouTube 峰值：%1$d%%
+edit_clip|编辑剪辑
+manual_clip|创建手动剪辑
+manual_clip_title|手动剪辑
+edit_clip_title|编辑剪辑
+tool_styles|样式
+tool_format|格式
+tool_text|文字
+tool_frame|构图
+clip_duration|时长 %1$s
+edit_subtitle|修改字幕
+no_subtitles_in_clip|此片段没有字幕。
+style_hormozi|Hormozi
+style_karaoke|卡拉 OK
+style_classic|经典
+style_box|方框
+style_neon|霓虹
+style_minimal|极简
+font|字体
+text_color|文字颜色
+highlight_color|高亮颜色
+text_size|大小
+position|位置
+pos_top|顶部
+pos_center|居中
+pos_bottom|底部
+uppercase|大写
+emojis|表情符号
+auto_face_tracking|自动人脸跟踪
+face_idle|已准备好检测人脸。
+face_running|正在检测人脸… %1$d%%
+face_done|已检测到人脸：画面会跟随人脸。
+face_unavailable|未检测到人脸。将使用居中构图，请手动调整。
+zoom|缩放
+move_horizontal|水平
+move_vertical|垂直
+reset_framing|重置构图
+export_title|导出
+rendering_title|正在渲染你的剪辑…
+rendering_subtitle|使用手机自身硬件，无需外部服务器。
+export_ready|你的剪辑已完成！
+save_to_device|保存到设备
+saved|已保存
+saved_to_gallery|已保存到 Movies/ShortsMaker
+publish_on|发布到
+more_apps|更多应用…
+share_with|分享到
+app_not_installed|未安装 %1$s，请选择其他应用。
+back_to_home|返回首页
+export_footer|如果应用打开后没有视频，请在该社交应用内选择“上传”或“相册”：文件已保存在你的设备上。
+error_generic|发生意外错误，请重试。
+error_unreadable_video|无法读取该视频，请尝试其他文件。
+error_video_too_short|视频太短（至少 5 秒）。
+error_no_space|设备可用空间不足。
+error_model_download|无法下载语音模型。请检查网络连接后重试。
+error_model_corrupt|已下载的语音模型已损坏，请重新下载。
+error_transcription|无法在此设备上转写音频。
+error_export|无法渲染视频。请在设置中尝试 720p。
+error_save|无法将视频保存到相册。

@@ -1,0 +1,126 @@
+settings|Paramètres
+back|Retour
+cancel|Annuler
+close|Fermer
+clear|Effacer
+delete|Supprimer
+save|Enregistrer
+retry|Réessayer
+play|Lire
+preview|Aperçu
+export|Exporter
+create_new_clip|Créer un nouveau\nClip IA
+create_new_clip_sub|Transcrit, repère les moments viraux et édite en vertical
+search_projects|Rechercher des projets
+project_history|Historique des projets
+no_projects|Vous n'avez pas encore de projet.\nCréez votre premier clip IA.
+no_results|Aucun résultat pour votre recherche.
+delete_project_title|Supprimer le projet ?
+delete_project_message|« %1$s » et sa vidéo enregistrée sur cet appareil seront supprimés.
+app_language|Langue de l'application
+app_language_hint|S'applique immédiatement à toute l'interface.
+export_resolution|Résolution d'exportation
+voice_models|Modèles vocaux téléchargés
+voice_models_hint|Téléchargés une seule fois (≈40-50 Mo par langue) et utilisables hors ligne.
+no_models_installed|Aucun pour l'instant.
+models_size|Espace utilisé : %1$s
+storage|Stockage
+delete_all_projects|Supprimer tous les projets
+delete_all_projects_message|Tous les projets et vidéos enregistrés sur cet appareil seront supprimés. Cette action est irréversible.
+about|À propos
+version_format|Version %1$s
+affiliation_disclaimer|ShortsMaker Viral est indépendante et n'est affiliée ni à YouTube, ni à TikTok, ni à Instagram, ni à Facebook. Toutes les marques appartiennent à leurs propriétaires.
+ads_privacy_options|Options de confidentialité des annonces
+privacy_policy|Politique de confidentialité
+open_source_licenses|Licences open source
+privacy_policy_body|ShortsMaker Viral traite vos vidéos sur votre appareil.\n\n• Vos vidéos, transcriptions et projets sont stockés uniquement dans le stockage privé de l'application. Ils ne sont envoyés à aucun de nos serveurs.\n• La transcription (Vosk) et la détection de visages (MediaPipe) s'exécutent localement. Les modèles vocaux sont téléchargés une fois depuis alphacephei.com.\n• Si vous collez un lien YouTube, l'application lit sur votre appareil les données publiques de cette page (titre, durée et moments les plus revus). La vidéo YouTube n'est pas téléchargée.\n• Publicité : l'application affiche une bannière Google AdMob sur certains écrans. AdMob peut utiliser l'identifiant publicitaire de votre appareil et des données de l'appareil pour diffuser des annonces et mesurer leurs performances. Lorsque la loi l'exige (EEE, Royaume-Uni), nous demandons votre consentement et vous pouvez le modifier dans Paramètres → Options de confidentialité des annonces. Vous pouvez réinitialiser ou supprimer votre identifiant publicitaire dans les paramètres Android. Plus d'informations : policies.google.com/technologies/ads.\n• Aucun compte ni outil d'analyse propre.\n• La vidéo exportée ne quitte l'application que lorsque vous touchez Enregistrer ou Partager.\n• Vous pouvez supprimer projets et modèles dans les Paramètres à tout moment.\n\nSi vous utilisez des vidéos de tiers, vous devez détenir les droits nécessaires.
+licenses_body|Cette application utilise des logiciels open source :\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose et AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin et kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK et User Messaging Platform – Conditions de Google\n\nLes modèles vocaux Vosk sont distribués sous Apache License 2.0.
+import_title|Importer une vidéo
+paste_youtube_link|Coller un lien YouTube
+upload_from_gallery|Depuis la galerie
+youtube_link|Lien YouTube
+paste|Coller depuis le presse-papiers
+invalid_youtube_link|Ce lien ne semble pas être un lien YouTube valide.
+valid_youtube_link|Lien valide
+youtube_policy_note|Les moments les plus revus de la vidéo YouTube sont analysés. En raison des règles de YouTube et de Google Play, l'application ne télécharge pas les vidéos YouTube : sélectionnez ci-dessous le fichier original de votre propre vidéo.
+select_original_file|Fichier original de votre vidéo
+select_video|Vidéo de votre galerie
+choose_video|Choisir une vidéo
+change_video|Changer de vidéo
+video_language|Langue de la vidéo
+video_language_hint|Aide le modèle d'IA à transcrire avec plus de précision.
+ownership_confirm|Je confirme que cette vidéo m'appartient ou que j'ai l'autorisation de la modifier et de la publier.
+analyze_video|Analyser avec l'IA
+processing_title|Création de vos clips…
+processing_subtitle|Tout se passe sur votre téléphone, sans serveur.
+step_import|Importation de la vidéo
+step_youtube|Lecture des moments les plus revus sur YouTube
+step_model|Téléchargement du modèle vocal (première fois uniquement)
+step_transcribe|Transcription en texte
+step_analyze|Analyse des moments viraux
+keep_app_open|Gardez l'application ouverte pendant le traitement.
+processing_failed|Impossible de traiter la vidéo
+suggested_clips|Clips recommandés
+analysis_with_heatmap|avec données YouTube
+analysis_text_only|analyse du texte
+no_speech_detected|Aucune voix détectée dans la vidéo. Vous pouvez créer un clip manuel.
+viral_score|Score viral
+youtube_peak|Pic YouTube : %1$d%%
+edit_clip|Modifier le clip
+manual_clip|Créer un clip manuel
+manual_clip_title|Clip manuel
+edit_clip_title|Modifier le clip
+tool_styles|Styles
+tool_format|Format
+tool_text|Texte
+tool_frame|Cadrage
+clip_duration|Durée %1$s
+edit_subtitle|Corriger le sous-titre
+no_subtitles_in_clip|Aucun sous-titre dans cette partie.
+style_hormozi|Hormozi
+style_karaoke|Karaoké
+style_classic|Classique
+style_box|Boîte
+style_neon|Néon
+style_minimal|Minimal
+font|Police
+text_color|Couleur du texte
+highlight_color|Surlignage
+text_size|Taille
+position|Position
+pos_top|Haut
+pos_center|Centre
+pos_bottom|Bas
+uppercase|MAJUSCULES
+emojis|Emojis
+auto_face_tracking|Suivi automatique du visage
+face_idle|Prêt à détecter le visage.
+face_running|Détection du visage… %1$d%%
+face_done|Visage détecté : le cadrage le suit.
+face_unavailable|Aucun visage détecté. Le centre est utilisé ; ajustez à la main.
+zoom|Zoom
+move_horizontal|Horizontal
+move_vertical|Vertical
+reset_framing|Réinitialiser le cadrage
+export_title|Exporter
+rendering_title|Rendu de votre clip…
+rendering_subtitle|Utilise le matériel de votre téléphone, sans serveur externe.
+export_ready|Votre clip est prêt !
+save_to_device|Enregistrer sur l'appareil
+saved|Enregistré
+saved_to_gallery|Enregistré dans Films/ShortsMaker
+publish_on|Publier sur
+more_apps|Plus d'applis…
+share_with|Partager avec
+app_not_installed|%1$s n'est pas installée. Choisissez une autre appli.
+back_to_home|Retour à l'accueil
+export_footer|Si l'appli s'ouvre sans la vidéo, choisissez « Importer » ou « Galerie » dans le réseau social : le fichier est déjà enregistré sur votre appareil.
+error_generic|Une erreur inattendue s'est produite. Réessayez.
+error_unreadable_video|Cette vidéo n'a pas pu être lue. Essayez un autre fichier.
+error_video_too_short|La vidéo est trop courte (minimum 5 secondes).
+error_no_space|Espace libre insuffisant sur l'appareil.
+error_model_download|Le modèle vocal n'a pas pu être téléchargé. Vérifiez votre connexion internet et réessayez.
+error_model_corrupt|Le modèle vocal téléchargé est endommagé. Relancez le téléchargement.
+error_transcription|L'audio n'a pas pu être transcrit sur cet appareil.
+error_export|La vidéo n'a pas pu être générée. Essayez 720p dans les Paramètres.
+error_save|La vidéo n'a pas pu être enregistrée dans la galerie.

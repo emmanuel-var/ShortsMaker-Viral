@@ -42,10 +42,27 @@ object TextAnalysis {
         "weniger", "über", "zwischen", "seit", "alle", "haben", "sein", "machen", "nicht", "mit", "ohne", "sich",
         "eine", "einen", "einem", "einer", "noch", "schon", "nur", "oder", "wir", "ihr", "sie", "das", "der", "die",
     )
-    private val STOP_IT = setOf(
-        "per", "ma", "come", "questo", "questa", "questi", "queste", "perché", "perche", "quando", "dove", "allora",
-        "anche", "molto", "più", "meno", "sopra", "tra", "fra", "tutto", "tutta", "tutti", "tutte", "avere", "essere",
-        "fare", "con", "senza", "cosa", "cose", "volta", "volte", "noi", "voi", "loro", "dunque", "poi", "bene",
+    private val STOP_RU = setOf(
+        "этот", "эта", "это", "эти", "того", "этом", "который", "которая", "которые", "когда", "потому", "почему",
+        "очень", "тоже", "также", "если", "чтобы", "только", "после", "перед", "через", "между", "всего", "всех",
+        "есть", "быть", "было", "была", "были", "будет", "могу", "может", "можно", "надо", "нужно", "тогда", "сейчас",
+        "здесь", "там", "вот", "как", "что", "все", "его", "она", "они", "мне", "тебя", "нас", "вас", "для", "при",
+        "свой", "своё", "свои", "ещё", "уже", "просто", "такой", "такая", "такие", "типа", "короче", "значит",
+    )
+    private val STOP_ZH = setOf(
+        "这个", "那个", "这些", "那些", "我们", "你们", "他们", "她们", "自己", "什么", "怎么", "因为", "所以", "但是",
+        "如果", "就是", "还是", "已经", "可以", "没有", "一个", "一些", "不是", "然后", "现在", "这样", "那样", "时候",
+        "知道", "觉得", "可能", "应该", "非常", "比较", "其实", "真的", "东西", "这里", "那里", "一下",
+    )
+    private val STOP_JA = setOf(
+        "これ", "それ", "あれ", "この", "その", "あの", "ここ", "そこ", "あそこ", "ます", "です", "ある", "いる", "する",
+        "なる", "ない", "こと", "もの", "ため", "よう", "という", "から", "ので", "けど", "でも", "しかし", "そして",
+        "まあ", "ちょっと", "とても", "やはり", "ですが", "でした", "ました", "ません",
+    )
+    private val STOP_HI = setOf(
+        "यह", "वह", "ये", "वे", "हैं", "था", "थी", "थे", "होता", "होती", "होते", "करना", "करते", "करती", "किया", "लिए",
+        "साथ", "बहुत", "लेकिन", "क्योंकि", "अगर", "तो", "भी", "ही", "कि", "में", "से", "पर", "को", "का", "की", "के",
+        "और", "या", "नहीं", "कुछ", "सब", "अपने", "अपना", "जब", "तब", "यहाँ", "वहाँ", "अब", "फिर", "बस", "हम", "आप",
     )
 
     private val HOOK_ES = setOf(
@@ -65,6 +82,24 @@ object TextAnalysis {
         "cómo", "como", "qué", "que", "por", "cuál", "cual", "quién", "quien", "cuándo", "cuando", "dónde", "donde",
         "why", "what", "how", "who", "when", "where", "which", "pourquoi", "comment", "warum", "wie", "perché",
         "porquê", "por que",
+    )
+    private val HOOK_RU = setOf(
+        "секрет", "секреты", "никогда", "ошибка", "ошибки", "невероятно", "правда", "деньги", "бесплатно", "лучший",
+        "худший", "страх", "успех", "лайфхак", "никто", "важно", "осторожно", "внимание", "узнай", "смотри",
+        "представь", "история", "миллион", "миллионы", "ключ", "легко", "быстро", "шок", "опасно", "выиграть", "жизнь",
+    )
+    private val HOOK_ZH = setOf(
+        "秘密", "永远", "从不", "错误", "不可思议", "真相", "金钱", "免费", "最好", "最差", "恐惧", "成功", "技巧",
+        "没有人", "重要", "小心", "注意", "发现", "想象", "故事", "百万", "关键", "简单", "快速", "震惊", "危险", "改变", "人生",
+    )
+    private val HOOK_JA = setOf(
+        "秘密", "絶対", "決して", "失敗", "驚き", "真実", "お金", "無料", "最高", "最悪", "恐怖", "成功", "コツ",
+        "誰も", "重要", "注意", "発見", "想像", "物語", "百万", "鍵", "簡単", "速い", "衝撃", "危険", "人生", "変わる",
+    )
+    private val HOOK_HI = setOf(
+        "राज", "राज़", "रहस्य", "कभी", "गलती", "गलतियाँ", "अविश्वसनीय", "सच", "पैसा", "पैसे", "मुफ्त", "सबसे", "बेहतरीन",
+        "डर", "सफलता", "तरीका", "कोई", "ज़रूरी", "जरूरी", "सावधान", "ध्यान", "जानिए", "देखो", "कल्पना", "कहानी",
+        "करोड़", "लाख", "आसान", "तेज़", "खतरा", "जीतो", "ज़िंदगी", "जिंदगी",
     )
     private val EMOTION = setOf(
         "amor", "odio", "miedo", "feliz", "triste", "llorar", "reír", "risa", "enojo", "rabia", "sorpresa",
@@ -90,28 +125,48 @@ object TextAnalysis {
         Language.PT -> STOP_PT
         Language.FR -> STOP_FR
         Language.DE -> STOP_DE
-        Language.IT -> STOP_IT
+        Language.RU -> STOP_RU
+        Language.ZH -> STOP_ZH
+        Language.JA -> STOP_JA
+        Language.HI -> STOP_HI
     }
 
     private fun hooks(lang: Language): Set<String> = when (lang) {
         Language.EN -> HOOK_EN
-        Language.ES, Language.PT, Language.IT, Language.FR, Language.DE -> HOOK_ES + HOOK_EN
+        Language.RU -> HOOK_RU
+        Language.ZH -> HOOK_ZH
+        Language.JA -> HOOK_JA
+        Language.HI -> HOOK_HI
+        Language.ES, Language.PT, Language.FR, Language.DE -> HOOK_ES + HOOK_EN
     }
 
-    /** Limpia puntuación y pasa a minúsculas, conservando letras acentuadas y dígitos. */
+    /** Limpia puntuación y pasa a minúsculas, conservando letras (también CJK/devanagari con sus signos) y dígitos. */
     fun normalize(word: String): String =
-        word.lowercase(Locale.ROOT).filter { it.isLetterOrDigit() || it == '\'' }
+        word.lowercase(Locale.ROOT).filter {
+            it.isLetterOrDigit() || it == '\'' ||
+                Character.getType(it).let { t ->
+                    t == Character.NON_SPACING_MARK.toInt() || t == Character.COMBINING_SPACING_MARK.toInt()
+                }
+        }
+
+    /** Longitud mínima de una palabra clave: en chino/japonés las palabras son cortas. */
+    private fun minKeywordLength(lang: Language) = when (lang) {
+        Language.ZH, Language.JA -> 2
+        Language.HI -> 3
+        else -> 4
+    }
 
     fun stripAccents(s: String): String =
         Normalizer.normalize(s, Normalizer.Form.NFD).replace(Regex("\\p{Mn}+"), "")
 
     /** Palabras más repetidas (≥4 letras, sin palabras vacías), ordenadas por frecuencia y primera aparición. */
     fun topKeywords(words: List<String>, lang: Language, limit: Int = 3): List<String> {
-        val stop = stopWords(lang) + stopWords(Language.ES).takeIf { lang == Language.PT || lang == Language.IT }.orEmpty()
+        val stop = stopWords(lang) + stopWords(Language.ES).takeIf { lang == Language.PT }.orEmpty()
+        val minLen = minKeywordLength(lang)
         val counts = LinkedHashMap<String, Int>()
         for (raw in words) {
             val w = normalize(raw)
-            if (w.length < 4 || w in stop || w.all { it.isDigit() }) continue
+            if (w.length < minLen || w in stop || w.all { it.isDigit() }) continue
             counts[w] = (counts[w] ?: 0) + 1
         }
         return counts.entries
@@ -126,7 +181,7 @@ object TextAnalysis {
         val hooks = hooks(lang)
         return words.count {
             val n = normalize(it)
-            n in hooks || n in EMOTION || n.any(Char::isDigit) || n == "mil" || n == "cien" || n == "millones"
+            n in hooks || n in EMOTION || n.any(Char::isDigit) || n == "mil" || n == "cien" || n == "millones" || n == "миллион" || n == "百万" || n == "万"
         }
     }
 

@@ -12,7 +12,7 @@
 - [x] R8/minify + shrinkResources con reglas para Vosk/JNA/MediaPipe/OkHttp.
 - [x] Sin descarga de videos de YouTube (política *Deceptive Behavior / Intellectual Property* y Términos de YouTube).
 - [x] Aviso de propiedad del contenido (casilla obligatoria en la importación), política de privacidad y licencias de código abierto dentro de la app.
-- [x] Textos en español (por defecto) e inglés.
+- [x] Interfaz en 9 idiomas (es, en, fr, de, pt, zh, ja, ru, hi) con cambio en caliente. Traduce también la ficha de Play (título, descripción, capturas) a los idiomas que quieras ofrecer.
 
 ## Antes de subir (acciones tuyas)
 1. **Firma**: crea un keystore y un `keystore.properties` en la raíz (nunca lo subas a git):
