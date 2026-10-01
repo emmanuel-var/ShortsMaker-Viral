@@ -9,7 +9,7 @@ import android.text.TextPaint
 import com.shortsmaker.viral.domain.SubtitleCue
 import com.shortsmaker.viral.domain.SubtitleMode
 import com.shortsmaker.viral.domain.SubtitleStyle
-import com.shortsmaker.viral.domain.TextAnalysis
+import com.shortsmaker.viral.domain.WordEmphasis
 import kotlin.math.ceil
 import kotlin.math.max
 
@@ -26,8 +26,9 @@ class SubtitleRenderer {
         strokeMiter = 2f
     }
     private val boxPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val emojiPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 
-    private class Piece(val text: String, val highlighted: Boolean, var width: Float = 0f)
+    private class Piece(val text: String, val highlighted: Boolean, val colorOverride: Int? = null, var width: Float = 0f)
 
     /** Índice de la palabra pronunciada en `timeMs` (0 si aún no empezó la primera). */
     fun activeWord(cue: SubtitleCue, timeMs: Long): Int {
@@ -38,10 +39,19 @@ class SubtitleRenderer {
 
     fun render(cue: SubtitleCue, activeWord: Int, style: SubtitleStyle, frameWidth: Int, spaced: Boolean = true): Bitmap? {
         if (cue.words.isEmpty()) return null
+        fun piece(text: String, highlighted: Boolean): Piece {
+            val color = if (style.keywordColors) WordEmphasis.of(text)?.color else null
+            return Piece(display(text, style), highlighted, color)
+        }
         val pieces: List<Piece> = when (style.mode) {
-            SubtitleMode.STATIC -> cue.words.map { Piece(display(it.text, style), false) }
-            SubtitleMode.KARAOKE -> cue.words.mapIndexed { i, w -> Piece(display(w.text, style), i == activeWord) }
-            SubtitleMode.WORD_BY_WORD -> listOf(Piece(display(cue.words[activeWord.coerceIn(0, cue.words.lastIndex)].text, style), true))
+            SubtitleMode.STATIC -> cue.words.map { piece(it.text, false) }
+            SubtitleMode.KARAOKE -> cue.words.mapIndexed { i, w -> piece(w.text, i == activeWord) }
+            SubtitleMode.WORD_BY_WORD -> listOf(piece(cue.words[activeWord.coerceIn(0, cue.words.lastIndex)].text, true))
+        }
+        // Emoji automático ENCIMA del texto: el de la palabra activa (o, en modo estático, el de la primera palabra con emoji).
+        val emojiAbove: String? = if (!style.emojis) null else when (style.mode) {
+            SubtitleMode.STATIC -> cue.words.firstNotNullOfOrNull { WordEmphasis.of(it.text)?.emoji }
+            else -> WordEmphasis.of(cue.words[activeWord.coerceIn(0, cue.words.lastIndex)].text)?.emoji
         }
 
         val scale = frameWidth / 1080f
@@ -72,15 +82,22 @@ class SubtitleRenderer {
         val fm = fill.fontMetrics
         val lineHeight = (fm.descent - fm.ascent) * 1.04f
 
-        val width = ceil(lines.maxOf { lineWidth(it, spaceWidth) } + 2 * pad).toInt().coerceAtLeast(1)
-        val height = ceil(lines.size * lineHeight + 2 * pad).toInt().coerceAtLeast(1)
+        val emojiPx = textPx * 1.35f
+        val emojiRow = if (emojiAbove != null) emojiPx * 1.15f else 0f
+        val width = ceil(max(lines.maxOf { lineWidth(it, spaceWidth) }, if (emojiAbove != null) emojiPx * 1.4f else 0f) + 2 * pad).toInt().coerceAtLeast(1)
+        val height = ceil(emojiRow + lines.size * lineHeight + 2 * pad).toInt().coerceAtLeast(1)
         val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bmp)
+        if (emojiAbove != null) {
+            emojiPaint.textSize = emojiPx
+            emojiPaint.textAlign = Paint.Align.CENTER
+            canvas.drawText(emojiAbove, width / 2f, pad + emojiPx * 0.95f, emojiPaint)
+        }
 
         lines.forEachIndexed { row, line ->
             val lw = lineWidth(line, spaceWidth)
             var x = (width - lw) / 2f
-            val baseline = pad + row * lineHeight - fm.ascent
+            val baseline = pad + emojiRow + row * lineHeight - fm.ascent
             if (style.boxColor != 0) {
                 boxPaint.color = style.boxColor
                 val r = RectF(x - boxPad, baseline + fm.ascent - boxPad * 0.4f, x + lw + boxPad, baseline + fm.descent + boxPad * 0.4f)
@@ -91,7 +108,7 @@ class SubtitleRenderer {
                     stroke.color = style.strokeColor
                     canvas.drawText(piece.text, x, baseline, stroke)
                 }
-                fill.color = if (piece.highlighted) style.highlightColor else style.textColor
+                fill.color = piece.colorOverride ?: if (piece.highlighted) style.highlightColor else style.textColor
                 canvas.drawText(piece.text, x, baseline, fill)
                 x += piece.width + spaceWidth
             }
@@ -122,9 +139,5 @@ class SubtitleRenderer {
         return lines
     }
 
-    private fun display(text: String, style: SubtitleStyle): String {
-        val base = if (style.uppercase) text.uppercase() else text
-        val emoji = if (style.emojis) TextAnalysis.emojiFor(text) else null
-        return if (emoji != null) "$base$emoji" else base
-    }
+    private fun display(text: String, style: SubtitleStyle): String = if (style.uppercase) text.uppercase() else text
 }

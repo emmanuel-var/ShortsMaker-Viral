@@ -59,7 +59,6 @@ step_link|Leyendo datos del enlace
 step_model|Descargando modelo de voz (sólo la primera vez)
 step_transcribe|Transcribiendo a texto
 step_analyze|Analizando momentos virales
-keep_app_open|Mantén la app abierta mientras se procesa.
 processing_failed|No se pudo procesar el video
 suggested_clips|Clips recomendados
 analysis_with_heatmap|con datos de YouTube
@@ -129,3 +128,49 @@ error_model_corrupt|El modelo de voz descargado está dañado. Reintenta la desc
 error_transcription|No se pudo transcribir el audio en este dispositivo.
 error_export|No se pudo renderizar el video. Prueba con 720p en Ajustes.
 error_save|No se pudo guardar el video en la galería.
+step_radar|Analizando el audio (picos de volumen)
+step_motion|Midiendo movimiento del rostro
+channel_progress|Análisis de clips
+channel_progress_desc|Progreso del análisis de video en segundo plano
+notif_done_title|¡Tus clips están listos!
+notif_done_text|«%1$s» ya se puede editar.
+run_in_background|Seguir en segundo plano
+background_hint|El análisis continúa aunque cambies de app; verás su progreso en la notificación.
+analysis_running|Procesando video… %1$d%%
+trim_title|Recortar fragmento
+trim_hint|Elige un fragmento de hasta 15 minutos. El recorte es instantáneo y sin pérdida de calidad.
+trim_use_segment|Usar este fragmento
+trim_selected|Fragmento: %1$s – %2$s
+trim_change|Cambiar
+trim_remove|Quitar
+long_video_title|Este video es muy largo
+long_video_message|Este video dura %1$s. Procesarlo completo puede agotar la memoria y la batería. Te recomendamos recortar antes un fragmento de hasta 15 minutos.
+long_video_trim|Recortar (máx. 15 min)
+long_video_force|Forzar procesamiento completo
+fast_mode_warning|Se aplicará el modo rápido: la precisión y la cantidad de clips pueden bajar drásticamente.
+long_video_inline_warning|Dura más de 15 minutos: recórtalo o se usará el modo rápido.
+error_trim|No se pudo recortar este video. Prueba con otro formato (MP4).
+tool_extras|Extras
+layout_title|Diseño
+layout_full|Normal 9:16
+layout_split_gameplay|Dividida: rostro + gameplay
+layout_split_broll|Dividida: rostro + B-roll
+broll_pick|Elegir video B-roll
+broll_change|Cambiar B-roll
+broll_importing|Importando B-roll…
+extra_auto_zoom|Auto-zoom (punch-in)
+extra_auto_zoom_desc|Acerca el rostro 1-2 s en picos de audio y palabras clave.
+extra_sfx|Efectos de sonido
+extra_sfx_desc|Pop y whoosh locales en los zooms y palabras clave.
+extra_pop_in|Animación pop-in
+extra_keyword_colors|Resaltado automático
+extra_keyword_colors_desc|Pinta palabras como «dinero» o «fuego» y añade emojis.
+extra_progress_bar|Barra de progreso
+extra_progress_color|Color de la barra
+transcribing_segment|Transcribiendo el fragmento… %1$d%%
+transcribe_too_long|Recorta un fragmento de hasta 5 minutos para generar subtítulos.
+signal_audio|Pico de audio
+signal_motion|Movimiento
+signal_chat|Chat en llamas
+fast_mode_note|Modo rápido: sólo se analizaron las ventanas de mayor volumen del video.
+channel_done|Análisis completado

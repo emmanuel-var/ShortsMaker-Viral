@@ -59,7 +59,6 @@ step_link|Reading link data
 step_model|Downloading voice model (first time only)
 step_transcribe|Transcribing to text
 step_analyze|Analyzing viral moments
-keep_app_open|Keep the app open while processing.
 processing_failed|Couldn't process the video
 suggested_clips|Recommended clips
 analysis_with_heatmap|with YouTube data
@@ -129,3 +128,49 @@ error_model_corrupt|The downloaded voice model is corrupted. Retry the download.
 error_transcription|Audio couldn't be transcribed on this device.
 error_export|The video couldn't be rendered. Try 720p in Settings.
 error_save|The video couldn't be saved to the gallery.
+step_radar|Analyzing audio (volume peaks)
+step_motion|Measuring face movement
+channel_progress|Clip analysis
+channel_progress_desc|Background video analysis progress
+notif_done_title|Your clips are ready!
+notif_done_text|“%1$s” is ready to edit.
+run_in_background|Keep going in background
+background_hint|Analysis continues even if you switch apps; follow its progress in the notification.
+analysis_running|Processing video… %1$d%%
+trim_title|Trim segment
+trim_hint|Choose a segment of up to 15 minutes. Trimming is instant and lossless.
+trim_use_segment|Use this segment
+trim_selected|Segment: %1$s – %2$s
+trim_change|Change
+trim_remove|Remove
+long_video_title|This video is very long
+long_video_message|This video is %1$s long. Processing it in full may exhaust memory and battery. We recommend trimming a segment of up to 15 minutes first.
+long_video_trim|Trim (max 15 min)
+long_video_force|Force full processing
+fast_mode_warning|Fast mode will be applied: accuracy and the number of clips may drop drastically.
+long_video_inline_warning|Longer than 15 minutes: trim it or fast mode will be used.
+error_trim|This video couldn't be trimmed. Try another format (MP4).
+tool_extras|Extras
+layout_title|Layout
+layout_full|Normal 9:16
+layout_split_gameplay|Split: face + gameplay
+layout_split_broll|Split: face + B-roll
+broll_pick|Choose B-roll video
+broll_change|Change B-roll
+broll_importing|Importing B-roll…
+extra_auto_zoom|Auto-zoom (punch-in)
+extra_auto_zoom_desc|Zooms into the face for 1-2 s on audio peaks and keywords.
+extra_sfx|Sound effects
+extra_sfx_desc|Local pop and whoosh sounds on zooms and keywords.
+extra_pop_in|Pop-in animation
+extra_keyword_colors|Automatic highlighting
+extra_keyword_colors_desc|Colors words like “money” or “fire” and adds emojis.
+extra_progress_bar|Progress bar
+extra_progress_color|Bar color
+transcribing_segment|Transcribing segment… %1$d%%
+transcribe_too_long|Trim a segment of up to 5 minutes to generate subtitles.
+signal_audio|Audio peak
+signal_motion|Movement
+signal_chat|Chat on fire
+fast_mode_note|Fast mode: only the loudest windows of the video were analyzed.
+channel_done|Analysis complete

@@ -14,6 +14,9 @@
 - [x] Aviso de propiedad del contenido (casilla obligatoria en la importación), política de privacidad y licencias de código abierto dentro de la app.
 - [x] Interfaz en 9 idiomas (es, en, fr, de, pt, zh, ja, ru, hi) con cambio en caliente. Traduce también la ficha de Play (título, descripción, capturas) a los idiomas que quieras ofrecer.
 
+## Servicios en primer plano (Fase 2)
+El análisis en segundo plano usa un servicio en primer plano de WorkManager (`dataSync|mediaProcessing`) y los permisos `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_DATA_SYNC`, `FOREGROUND_SERVICE_MEDIA_PROCESSING` y `POST_NOTIFICATIONS` (opcional). En Play Console → *Contenido de la app → Permisos de servicios en primer plano* debes declarar ambos tipos, con la descripción "análisis local de video/audio iniciado por el usuario" y un video corto que muestre la notificación de progreso. El tipo `mediaProcessing` tiene un límite de ~6 h por día en Android 15+ (WorkManager lo gestiona cancelando el trabajo).
+
 ## Antes de subir (acciones tuyas)
 1. **Firma**: crea un keystore y un `keystore.properties` en la raíz (nunca lo subas a git):
    ```properties
@@ -41,6 +44,8 @@
 - **Tiempos del overlay de subtítulos** en un export de 720p y 1080p (los tiempos son relativos al inicio del clip recortado).
 - **TikTok / Instagram / Facebook**: sólo se garantiza abrir la app destino con el video adjunto (intent de compartir). Cada app decide qué pantalla muestra.
 - **Dispositivos de gama baja**: prueba con un video de 10+ minutos (la transcripción de Vosk es en tiempo casi real ≈1× la duración del audio) y el export en 720p.
+
+- **Fase 2 en dispositivo real**: (1) el split screen (`VideoCompositorSettings`) y la mezcla de audio SFX con `Composition`; (2) subtítulos y barra en el render dividido; (3) notificación y foreground en Android 12-15 con la app en segundo plano; (4) modo rápido con un video de varias horas; (5) `VideoTrimmer` con distintos códecs (WebM/VP9 puede no aceptarlo el muxer MP4).
 
 ## Riesgos de política que debes conocer
 - Leer datos de las páginas de YouTube, Twitch o Kick **no es una API oficial** y podría contravenir sus Términos. Está aislado en `YouTubeClient`/`AnalysisPipeline` para poder desactivarlo sin afectar al resto.

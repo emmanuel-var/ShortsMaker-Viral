@@ -4,6 +4,12 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+fun AnalyzerConfig.clamped(durationMs: Long) = copy(
+    minClipMs = minOf(minClipMs, durationMs),
+    maxClipMs = minOf(maxClipMs, durationMs),
+    targetClipMs = minOf(targetClipMs, durationMs),
+)
+
 data class AnalyzerConfig(
     val minClipMs: Long = 15_000,
     val maxClipMs: Long = 60_000,

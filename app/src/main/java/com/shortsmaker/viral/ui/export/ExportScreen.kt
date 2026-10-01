@@ -69,8 +69,10 @@ import androidx.media3.ui.PlayerView
 import com.shortsmaker.viral.AppContainer
 import com.shortsmaker.viral.R
 import com.shortsmaker.viral.data.AppException
+import com.shortsmaker.viral.data.ExportJob
 import com.shortsmaker.viral.data.MediaSaver
 import com.shortsmaker.viral.data.ShareTarget
+import com.shortsmaker.viral.domain.AudioProfile
 import com.shortsmaker.viral.domain.ClipEdit
 import com.shortsmaker.viral.domain.FaceTrack
 import com.shortsmaker.viral.domain.Language
@@ -121,16 +123,24 @@ class ExportViewModel(
                 dir.listFiles()?.forEach { it.delete() } // sólo se conserva el último render
                 val out = File(dir, "ShortsMaker_${System.currentTimeMillis()}.mp4")
 
+                // Audio Radar (para el auto-zoom en picos de audio) y B-roll opcional, ambos guardados en el proyecto.
+                val audio = container.projects.loadEnergy(projectId)?.let(::AudioProfile)
+                val broll = edit.brollFile?.let { File(container.projects.dir(projectId), it) }?.takeIf { it.exists() }
+
                 container.exporter.export(
-                    source = container.projects.sourceFile(project),
-                    srcWidth = project.width,
-                    srcHeight = project.height,
-                    edit = edit,
-                    cues = project.cues,
-                    faceTrack = track,
-                    resolution = resolution,
-                    spaced = Language.fromCode(project.language)?.spaced ?: true,
-                    output = out,
+                    ExportJob(
+                        source = container.projects.sourceFile(project),
+                        srcWidth = project.width,
+                        srcHeight = project.height,
+                        edit = edit,
+                        cues = project.cues,
+                        faceTrack = track,
+                        audio = audio,
+                        broll = broll,
+                        resolution = resolution,
+                        spaced = Language.fromCode(project.language)?.spaced ?: true,
+                        output = out,
+                    ),
                 ) { _state.value = ExportState.Rendering(it) }
 
                 val slug = project.name.replace(Regex("[^A-Za-z0-9]+"), "_").trim('_').take(30).ifEmpty { "clip" }

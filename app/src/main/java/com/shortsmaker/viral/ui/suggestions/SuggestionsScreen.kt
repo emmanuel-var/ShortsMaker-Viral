@@ -24,6 +24,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -178,6 +181,9 @@ fun SuggestionsScreen(projectId: String, onBack: () -> Unit, onEdit: (clipId: St
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
+                                if (p.fastMode) {
+                                    Text(stringResource(R.string.fast_mode_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
+                                }
                                 if (p.words.isEmpty()) {
                                     Text(stringResource(R.string.no_speech_detected), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                                 }
@@ -257,6 +263,13 @@ private fun ClipCard(
                         }
                     }
                 }
+                if (clip.audioScore >= 60 || clip.motionScore >= 60 || clip.chatScore >= 60) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (clip.audioScore >= 60) SignalChip(R.string.signal_audio, Icons.AutoMirrored.Filled.VolumeUp)
+                        if (clip.motionScore >= 60) SignalChip(R.string.signal_motion, Icons.Filled.Face)
+                        if (clip.chatScore >= 60) SignalChip(R.string.signal_chat, Icons.Filled.Forum)
+                    }
+                }
                 if (clip.heatScore >= 60) {
                     AssistChip(
                         onClick = {},
@@ -274,6 +287,15 @@ private fun ClipCard(
             }
         }
     }
+}
+
+@Composable
+private fun SignalChip(label: Int, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    AssistChip(
+        onClick = {},
+        label = { Text(stringResource(label)) },
+        leadingIcon = { Icon(icon, null, modifier = Modifier.size(18.dp)) },
+    )
 }
 
 /** Vista previa rápida del clip (sin entrar al editor): reproduce sólo el tramo sugerido en bucle. */

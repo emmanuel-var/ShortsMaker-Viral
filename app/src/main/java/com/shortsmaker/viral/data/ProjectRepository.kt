@@ -1,6 +1,8 @@
 package com.shortsmaker.viral.data
 
 import android.content.Context
+import com.shortsmaker.viral.domain.AudioEnergyAccumulator
+import com.shortsmaker.viral.domain.AudioEnergyTrack
 import com.shortsmaker.viral.domain.Project
 import com.shortsmaker.viral.domain.ProjectSummary
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +36,16 @@ class ProjectRepository(context: Context) {
     fun thumbnailFile(id: String, name: String?) = name?.let { File(dir(id), it) }
 
     fun createDir(id: String): File = dir(id).apply { mkdirs() }
+
+    /** Audio Radar: energía por trozos de 100 ms (1 byte cada uno) para reutilizarla en el editor y el render. */
+    suspend fun saveEnergy(id: String, track: AudioEnergyTrack) = withContext(Dispatchers.IO) {
+        File(createDir(id), ENERGY_FILE).writeBytes(track.toBytes())
+    }
+
+    suspend fun loadEnergy(id: String): AudioEnergyTrack? = withContext(Dispatchers.IO) {
+        val f = File(dir(id), ENERGY_FILE)
+        if (f.exists()) AudioEnergyTrack(AudioEnergyAccumulator.DEFAULT_HOP_MS, f.readBytes()) else null
+    }
 
     suspend fun refresh() = withContext(Dispatchers.IO) {
         mutex.withLock {
@@ -94,5 +106,6 @@ class ProjectRepository(context: Context) {
     private companion object {
         const val PROJECT_FILE = "project.json"
         const val SUMMARY_FILE = "summary.json"
+        const val ENERGY_FILE = "energy.bin"
     }
 }

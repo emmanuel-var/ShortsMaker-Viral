@@ -47,6 +47,35 @@ Ventanas de 15-60 s alineadas a frases, puntuadas (0-1) con: densidad de habla r
 ### Modo manual
 El botón fijo de Sugerencias navega a `manual/{id}` (`ui/manual/ManualClipEntryScreen.kt`), que crea un clip con el **video completo** (hasta 10 min) y salta a `editor/{id}/{clip}` sacando `manual/{id}` de la pila (Atrás vuelve a Sugerencias). En el editor se recorta con la línea de tiempo (más saltos de ±1 s / ±10 s para videos largos). La transcripción de Vosk ya cubre todo el video, y el auto-encuadre de MediaPipe se calcula **sobre el tramo recortado** (se reanaliza al soltar el control, sólo para tramos ≤ 2 min; el resultado se guarda por clip).
 
+## Fase 2: análisis multimedia, videos largos y render avanzado
+
+### Análisis multimedia (`domain/`)
+`MultimediaClipGenerator` amplía `LocalTextClipGenerator` (que sigue siendo el componente de **texto**) con:
+
+| Señal | Peso | Cómo se mide |
+|---|---|---|
+| **Audio Radar** (`AudioRadar.kt`) | **40 %** | Energía RMS por trozos de 100 ms (1 byte cada uno, guardada en `energy.bin`). Picos = por encima de la mediana +10 dB y del percentil 95; *contrastes* = ≥ 0.6 s de silencio (≤ mediana −8 dB) seguido de un salto ≥ 18 dB. Densidad de picos 40 % + contrastes 35 % + pico máximo 25 % |
+| Texto | 30 % | densidad de habla, preguntas/exclamaciones, temas repetidos, ganchos |
+| **Movimiento del rostro** (`MotionAnalysis.kt`) | 15 % | velocidad de desplazamiento del rostro + cambio de tamaño (acercarse/alejarse) entre muestras de MediaPipe |
+| **Chat** (`ChatAnalysis.kt`) | 15 % | ráfagas de mensajes por ventanas de 5 s, con más peso para LUL/KEKW/jajaja/emotes… |
+
+Lo que no esté disponible se ignora y su peso pasa al texto (el audio conserva su 40 %). Para ahorrar batería es en **dos etapas**: (A) se puntúan todas las ventanas con texto + audio + chat (barato) y (B) sólo en las 10 mejores se muestrea el rostro con MediaPipe (1 fotograma / 1.5 s) y se calcula el puntaje final. Sin voz (p. ej. gameplay) se recorre el video con ventanas uniformes puntuadas por audio/chat.
+
+**Chat de Twitch/Kick:** si `LinkMetadataClient` obtiene el VOD, `ChatDomParser` busca en el DOM mensajes con marca de tiempo. Es *best effort* (las webs virtualizan el chat y sus selectores cambian): si no aparecen ≥ 30 mensajes, se ignora en silencio.
+
+### Videos largos (`AnalysisPipeline`, `VideoTrimmer`, `FastMode.kt`)
+- ≤ **15 min**: flujo normal. > 15 min: diálogo con tres salidas: **recortar** (UI con `RangeSlider` + saltos ±10 s/±1 min; el recorte es un *remux* sin recodificar, casi instantáneo), **forzar procesamiento completo** (muestra un Toast avisando del modo rápido) o cancelar.
+- **Modo rápido**: sólo se decodifica la energía del audio (sin remuestrear), se toman los **5 picos** más fuertes (separados ≥ 2 min) y Vosk + MediaPipe corren **únicamente en ventanas de 2 min** alrededor de ellos. En el editor, si recortas a mano un tramo no analizado (≤ 5 min), se transcribe bajo demanda.
+- **Foreground Service + WorkManager** (`work/AnalysisWorker.kt`, `AnalysisNotifications.kt`): el análisis se ejecuta como `CoroutineWorker` con `setForeground` y una notificación persistente con barra de progreso y botón Cancelar. Tipo de servicio: `mediaProcessing` en Android 15+, `dataSync` en Android 10-14. La petición se guarda en disco (`PendingRequestStore`) para poder reanudar, el progreso llega a la UI con `setProgress`, y la pantalla de inicio muestra los análisis en curso. Al terminar, una notificación abre las sugerencias.
+
+### Editor y render (`data/VideoExporter.kt`)
+- **Diseño**: Normal 9:16, **dividida rostro + gameplay** (mismo video, mitad inferior original) o **rostro + B-roll** (segundo video local en bucle). Se implementa con una `Composition` de dos `EditedMediaItemSequence` y un `VideoCompositorSettings` que coloca cada textura de 1080×960 en la mitad superior/inferior; el audio sale sólo del video principal. Los subtítulos y la barra se dibujan una sola vez con `Composition.setEffects`.
+- **Auto-zoom (punch-in)**: +12 % durante 1.6 s (rampa 180 ms / 420 ms) en picos de audio y palabras clave, aplicado en el `MatrixTransformation` (`FramingMath` con `extraZoom`), así el rostro sigue centrado.
+- **Subtítulos Hormozi**: el color cambia en el fotograma en que Vosk marca el inicio de cada palabra (la precisión es la del fotograma, ~33 ms a 30 fps) y cada palabra/bloque entra con *pop-in* (`PopAnimation`: escala 0.6→1.18→1.0 + fade) vía `OverlaySettings` por fotograma.
+- **Énfasis automático** (`WordEmphasis`): diccionario local en memoria (dinero/fuego/error/peligro/gratis en varios idiomas…): rojo o verde y un emoji **encima** del texto.
+- **Retención**: barra de progreso fina en el borde (preview en Compose y quemada en el render) y **mezcla de audio** con efectos locales (`res/raw/sfx_pop.wav`, `sfx_whoosh.wav`) en una secuencia de audio con silencios exactos (`addGap`) que Media3 mezcla con el audio original.
+- Sin SFX ni split, el render usa el mismo `EditedMediaItem` de la Fase 1 (sin `Composition`).
+
 ## Idiomas
 
 La interfaz se puede cambiar **en caliente** (Ajustes → Idioma de la app, sin reiniciar) entre: español, inglés, francés, alemán, portugués, chino, japonés, ruso e hindi (`ui/Localization.kt`).

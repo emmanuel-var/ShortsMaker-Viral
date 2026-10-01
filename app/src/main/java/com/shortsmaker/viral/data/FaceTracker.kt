@@ -58,6 +58,7 @@ class FaceTracker(private val context: Context) {
                                 timeMs = t,
                                 x = (box.centerX() / bmp.width).coerceIn(0f, 1f),
                                 y = (box.centerY() / bmp.height).coerceIn(0f, 1f),
+                                size = (box.width() / bmp.width).coerceIn(0f, 1f),
                             )
                         }
                     } finally {

@@ -3,6 +3,8 @@ package com.shortsmaker.viral.data
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import com.shortsmaker.viral.domain.AudioEnergyAccumulator
+import com.shortsmaker.viral.domain.AudioEnergyTrack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -12,17 +14,61 @@ import java.nio.ByteOrder
 class NoAudioTrackException : Exception("El archivo no contiene pista de audio")
 
 /**
- * Decodifica la pista de audio de un video a PCM de 16 bits, mono y 16 kHz (formato que espera Vosk),
- * usando los códecs de hardware del teléfono. Trabaja en streaming: nunca carga todo el audio en memoria.
+ * Decodifica la pista de audio de un video con los códecs de hardware del teléfono, en streaming (nunca carga
+ * todo el audio en memoria). Dos salidas:
+ *  - [decode]: PCM de 16 bits, mono y 16 kHz (formato de Vosk), opcionalmente sólo de un rango de tiempo.
+ *  - [decodeEnergy]: sólo la energía por trozos de 100 ms (Audio Radar). Es mucho más rápido: no remuestrea.
  */
 object AudioDecoder {
     const val TARGET_RATE = 16_000
     private const val TIMEOUT_US = 10_000L
 
+    /** PCM 16 kHz mono para Vosk. `startMs`/`endMs` limitan el rango (los tiempos del resultado son relativos a `startMs`). */
     suspend fun decode(
         file: File,
         onChunk: (bytes: ByteArray, length: Int) -> Unit,
         onProgress: (Float) -> Unit,
+        startMs: Long = 0,
+        endMs: Long = Long.MAX_VALUE,
+    ) {
+        var resampler: LinearResampler? = null
+        var lastRate = -1
+        decodeRaw(file, startMs, endMs, onProgress) { mono, rate ->
+            if (rate != lastRate) { resampler = LinearResampler(rate, TARGET_RATE); lastRate = rate }
+            val resampled = resampler!!.process(mono)
+            if (resampled.isNotEmpty()) {
+                val bytes = ByteArray(resampled.size * 2)
+                for (i in resampled.indices) {
+                    bytes[2 * i] = (resampled[i].toInt() and 0xFF).toByte()
+                    bytes[2 * i + 1] = ((resampled[i].toInt() shr 8) and 0xFF).toByte()
+                }
+                onChunk(bytes, bytes.size)
+            }
+        }
+    }
+
+    /** Energía de audio (Audio Radar) de todo el archivo, en trozos de `hopMs` ms. */
+    suspend fun decodeEnergy(file: File, hopMs: Int = AudioEnergyAccumulator.DEFAULT_HOP_MS, onProgress: (Float) -> Unit): AudioEnergyTrack {
+        var acc: AudioEnergyAccumulator? = null
+        var lastRate = -1
+        decodeRaw(file, 0, Long.MAX_VALUE, onProgress) { mono, rate ->
+            if (acc == null || rate != lastRate) {
+                // Si cambiara la frecuencia a mitad del archivo (muy raro) se conserva lo acumulado hasta ahora.
+                acc = acc ?: AudioEnergyAccumulator(rate, hopMs)
+                lastRate = rate
+            }
+            acc!!.addSamples(mono)
+        }
+        return acc?.finish() ?: throw NoAudioTrackException()
+    }
+
+    /** Núcleo: entrega PCM mono (promedio de canales) con la frecuencia nativa del decodificador. */
+    private suspend fun decodeRaw(
+        file: File,
+        startMs: Long,
+        endMs: Long,
+        onProgress: (Float) -> Unit,
+        sink: (mono: ShortArray, sampleRate: Int) -> Unit,
     ) = withContext(Dispatchers.Default) {
         val extractor = MediaExtractor()
         var codec: MediaCodec? = null
@@ -34,10 +80,15 @@ object AudioDecoder {
             extractor.selectTrack(track)
             val format = extractor.getTrackFormat(track)
             val mime = format.getString(MediaFormat.KEY_MIME)!!
-            val durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else 0L
+            val fullDurationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else 0L
+
+            val startUs = startMs * 1000
+            val endUs = if (endMs == Long.MAX_VALUE) Long.MAX_VALUE else endMs * 1000
+            if (startUs > 0) extractor.seekTo(startUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+            val spanUs = (if (endUs == Long.MAX_VALUE) fullDurationUs else minOf(endUs, fullDurationUs)) - startUs
 
             var channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-            var resampler = LinearResampler(format.getInteger(MediaFormat.KEY_SAMPLE_RATE), TARGET_RATE)
+            var rate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
 
             val decoder = MediaCodec.createDecoderByType(mime)
             codec = decoder
@@ -54,11 +105,12 @@ object AudioDecoder {
                     if (inIndex >= 0) {
                         val inBuf = decoder.getInputBuffer(inIndex)!!
                         val size = extractor.readSampleData(inBuf, 0)
-                        if (size < 0) {
+                        val t = extractor.sampleTime
+                        if (size < 0 || t >= endUs) {
                             decoder.queueInputBuffer(inIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
                             inputDone = true
                         } else {
-                            decoder.queueInputBuffer(inIndex, 0, size, extractor.sampleTime, 0)
+                            decoder.queueInputBuffer(inIndex, 0, size, t, 0)
                             extractor.advance()
                         }
                     }
@@ -69,27 +121,20 @@ object AudioDecoder {
                     outIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                         val f = decoder.outputFormat
                         channels = f.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-                        resampler = LinearResampler(f.getInteger(MediaFormat.KEY_SAMPLE_RATE), TARGET_RATE)
+                        rate = f.getInteger(MediaFormat.KEY_SAMPLE_RATE)
                     }
                     outIndex >= 0 -> {
                         val outBuf = decoder.getOutputBuffer(outIndex)
-                        if (outBuf != null && info.size > 0) {
+                        // Tras el seek al sync previo hay que descartar lo anterior al inicio pedido.
+                        if (outBuf != null && info.size > 0 && info.presentationTimeUs >= startUs) {
                             outBuf.position(info.offset)
                             outBuf.limit(info.offset + info.size)
                             val shorts = outBuf.order(ByteOrder.LITTLE_ENDIAN).asShortBuffer()
                             val pcm = ShortArray(shorts.remaining())
                             shorts.get(pcm)
-                            val resampled = resampler.process(downmix(pcm, channels))
-                            if (resampled.isNotEmpty()) {
-                                val bytes = ByteArray(resampled.size * 2)
-                                for (i in resampled.indices) {
-                                    bytes[2 * i] = (resampled[i].toInt() and 0xFF).toByte()
-                                    bytes[2 * i + 1] = ((resampled[i].toInt() shr 8) and 0xFF).toByte()
-                                }
-                                onChunk(bytes, bytes.size)
-                            }
+                            sink(downmix(pcm, channels), rate)
                         }
-                        if (durationUs > 0) onProgress((info.presentationTimeUs.toFloat() / durationUs).coerceIn(0f, 1f))
+                        if (spanUs > 0) onProgress(((info.presentationTimeUs - startUs).toFloat() / spanUs).coerceIn(0f, 1f))
                         decoder.releaseOutputBuffer(outIndex, false)
                         if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) outputDone = true
                     }

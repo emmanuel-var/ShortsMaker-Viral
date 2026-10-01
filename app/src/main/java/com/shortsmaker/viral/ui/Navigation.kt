@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,8 +61,15 @@ private val clipArg = navArgument("clip") { type = NavType.StringType }
  * donde hay botones y gestos cerca y podrían provocar toques accidentales (política de AdMob).
  */
 @Composable
-fun AppNavigation() {
+fun AppNavigation(openProjectId: String? = null, onOpenProjectHandled: () -> Unit = {}) {
     val nav = rememberNavController()
+    // Toque en la notificación "clips listos": abre directamente las sugerencias de ese proyecto.
+    LaunchedEffect(openProjectId) {
+        if (openProjectId != null) {
+            nav.navigate(Routes.suggestions(openProjectId)) { popUpTo(Routes.HOME) }
+            onOpenProjectHandled()
+        }
+    }
     val ads = LocalContext.current.container.ads
     val canShowAds by ads.canShowAds.collectAsStateWithLifecycle()
     val route = nav.currentBackStackEntryAsState().value?.destination?.route
@@ -91,6 +99,7 @@ private fun AppNavHost(nav: androidx.navigation.NavHostController) {
             HomeScreen(
                 onCreate = { nav.navigate(Routes.IMPORT) },
                 onOpenProject = { nav.navigate(Routes.suggestions(it)) },
+                onOpenProcessing = { nav.navigate(Routes.processing(it)) },
                 onSettings = { nav.navigate(Routes.SETTINGS) },
             )
         }

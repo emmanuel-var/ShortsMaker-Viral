@@ -11,6 +11,7 @@ import com.shortsmaker.viral.data.VideoExporter
 import com.shortsmaker.viral.data.VoskModelManager
 import com.shortsmaker.viral.data.VoskTranscriber
 import com.shortsmaker.viral.data.LinkMetadataClient
+import com.shortsmaker.viral.data.PendingRequestStore
 import com.shortsmaker.viral.domain.Language
 import com.shortsmaker.viral.domain.MediaLink
 import kotlinx.coroutines.CoroutineScope
@@ -20,13 +21,24 @@ import okhttp3.OkHttpClient
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
-/** Datos que viajan de la pantalla de importación a la de procesamiento. */
+enum class ProcessingMode {
+    /** Transcribe todo el video y analiza texto + audio + movimiento (+ chat). */
+    NORMAL,
+    /** Video largo forzado (> 15 min): Audio Radar → 5 picos → Vosk/MediaPipe sólo en ventanas de 2 min. */
+    FAST,
+}
+
+/** Datos que viajan de la pantalla de importación al procesamiento (y se guardan en disco para el WorkManager). */
 data class ImportRequest(
     val sourceUri: Uri,
     val displayName: String?,
     val language: Language,
     /** Enlace opcional (YouTube/Twitch/Kick). Sin enlace = flujo de video local con análisis sólo por transcripción. */
     val link: MediaLink?,
+    val mode: ProcessingMode = ProcessingMode.NORMAL,
+    /** Si no es null, el video se recorta (sin recodificar) a este tramo al importarlo. */
+    val trimStartMs: Long? = null,
+    val trimEndMs: Long? = null,
 )
 
 /** Inyección de dependencias manual (suficiente para esta app, sin KSP/Hilt). */
@@ -47,7 +59,8 @@ class AppContainer(val app: Application) {
     val transcriber = VoskTranscriber()
     val faceTracker = FaceTracker(app)
     val exporter = VideoExporter(app)
-    val pipeline = AnalysisPipeline(app, projects, modelManager, linkMetadata, transcriber)
+    val pipeline = AnalysisPipeline(app, projects, modelManager, linkMetadata, transcriber, faceTracker)
+    val pendingRequests = PendingRequestStore(app)
 
     val pendingImports = ConcurrentHashMap<String, ImportRequest>()
 }

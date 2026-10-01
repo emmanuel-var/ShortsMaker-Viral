@@ -103,6 +103,8 @@ data class SourceMeta(
     val title: String?,
     val durationMs: Long?,
     val heatmap: List<HeatPoint>,
+    /** Mensajes del chat del VOD (Twitch/Kick) si aparecían en el DOM; vacío si no. */
+    val chat: List<ChatMessage> = emptyList(),
 )
 
 data class PageMeta(val title: String?, val durationMs: Long?)

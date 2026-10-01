@@ -59,7 +59,6 @@ step_link|正在读取链接数据
 step_model|正在下载语音模型（仅首次）
 step_transcribe|正在转写为文字
 step_analyze|正在分析爆款片段
-keep_app_open|处理过程中请保持应用打开。
 processing_failed|无法处理该视频
 suggested_clips|推荐剪辑
 analysis_with_heatmap|含 YouTube 数据
@@ -129,3 +128,49 @@ error_model_corrupt|已下载的语音模型已损坏，请重新下载。
 error_transcription|无法在此设备上转写音频。
 error_export|无法渲染视频。请在设置中尝试 720p。
 error_save|无法将视频保存到相册。
+step_radar|正在分析音频（音量峰值）
+step_motion|正在测量人脸运动
+channel_progress|剪辑分析
+channel_progress_desc|后台视频分析进度
+notif_done_title|你的剪辑已完成！
+notif_done_text|“%1$s”现在可以编辑了。
+run_in_background|在后台继续
+background_hint|即使切换应用，分析也会继续；可在通知中查看进度。
+analysis_running|正在处理视频… %1$d%%
+trim_title|裁剪片段
+trim_hint|选择最长 15 分钟的片段。裁剪即时完成且不损失画质。
+trim_use_segment|使用此片段
+trim_selected|片段：%1$s – %2$s
+trim_change|更改
+trim_remove|移除
+long_video_title|此视频很长
+long_video_message|此视频时长 %1$s。完整处理可能耗尽内存和电量。建议先裁剪出最长 15 分钟的片段。
+long_video_trim|裁剪（最长 15 分钟）
+long_video_force|强制完整处理
+fast_mode_warning|将使用快速模式：准确度和剪辑数量可能大幅下降。
+long_video_inline_warning|时长超过 15 分钟：请先裁剪，否则将使用快速模式。
+error_trim|无法裁剪此视频。请尝试其他格式（MP4）。
+tool_extras|附加功能
+layout_title|布局
+layout_full|常规 9:16
+layout_split_gameplay|分屏：人脸 + 游戏画面
+layout_split_broll|分屏：人脸 + B-roll
+broll_pick|选择 B-roll 视频
+broll_change|更换 B-roll
+broll_importing|正在导入 B-roll…
+extra_auto_zoom|自动缩放（冲击放大）
+extra_auto_zoom_desc|在音频峰值和关键词处将人脸放大 1–2 秒。
+extra_sfx|音效
+extra_sfx_desc|在缩放和关键词处加入本地“啵”和“嗖”音效。
+extra_pop_in|弹出动画
+extra_keyword_colors|自动高亮
+extra_keyword_colors_desc|为“钱”“火”等词上色并添加表情符号。
+extra_progress_bar|进度条
+extra_progress_color|进度条颜色
+transcribing_segment|正在转写片段… %1$d%%
+transcribe_too_long|请裁剪出最长 5 分钟的片段以生成字幕。
+signal_audio|音频峰值
+signal_motion|运动
+signal_chat|聊天爆发
+fast_mode_note|快速模式：仅分析了视频中音量最大的时间段。
+channel_done|分析完成

@@ -110,6 +110,8 @@ dependencies {
     implementation(libs.media3.transformer)
     implementation(libs.media3.effect)
 
+    implementation(libs.androidx.work.runtime) // análisis en segundo plano (Foreground Service)
+
     implementation(libs.okhttp)
 
     // Anuncios (AdMob) + formulario de consentimiento UMP (GDPR/EEE/Reino Unido)

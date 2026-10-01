@@ -1,6 +1,20 @@
 package com.shortsmaker.viral.ui.editor
 
 import android.net.Uri
+import android.os.SystemClock
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.drawscope.scale
+import com.shortsmaker.viral.data.VideoInfo
+import com.shortsmaker.viral.domain.ComposeLayout
+import com.shortsmaker.viral.domain.PopAnimation
+import com.shortsmaker.viral.domain.ProgressBarMath
+import com.shortsmaker.viral.domain.PunchIn
+import com.shortsmaker.viral.domain.SubtitleMode
 import android.view.TextureView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -129,6 +143,7 @@ private enum class EditorTool(val label: Int, val icon: ImageVector) {
     FORMAT(R.string.tool_format, Icons.Filled.Palette),
     TEXT(R.string.tool_text, Icons.Filled.TextFields),
     FRAME(R.string.tool_frame, Icons.Filled.Crop),
+    EXTRAS(R.string.tool_extras, Icons.Filled.AutoAwesome),
 }
 
 private val SWATCHES = listOf(
@@ -167,17 +182,50 @@ fun EditorScreen(projectId: String, clipId: String, onBack: () -> Unit, onExport
     DisposableEffect(player) { onDispose { player.release() } }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { player.pause() }
 
+    // --- Modo dividido: segundo reproductor (mudo) para la mitad inferior (gameplay original o B-roll).
+    val brollFile = edit.brollFile?.let { File(vm.projectDir, it) }
+    val isSplit = edit.layout == ComposeLayout.SPLIT_GAMEPLAY ||
+        (edit.layout == ComposeLayout.SPLIT_BROLL && brollFile != null && state.brollInfo != null)
+    val bottomPlayer = remember { ExoPlayer.Builder(context).build().apply { volume = 0f } }
+    DisposableEffect(bottomPlayer) { onDispose { bottomPlayer.release() } }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { bottomPlayer.pause() }
+
     var positionMs by remember { mutableLongStateOf(edit.startMs) }
     var isPlaying by remember { mutableStateOf(false) }
+    val currentEdit by rememberUpdatedState(edit)
+    val splitNow by rememberUpdatedState(isSplit)
+    val brollDurationMs = state.brollInfo?.durationMs ?: 0L
+
+    /** Posición que debe tener el reproductor inferior para ir sincronizado con el principal. */
+    fun bottomTarget(mainMs: Long): Long =
+        if (currentEdit.layout == ComposeLayout.SPLIT_BROLL && brollDurationMs > 0) (mainMs - currentEdit.startMs).coerceAtLeast(0) % brollDurationMs
+        else mainMs
+
+    LaunchedEffect(edit.layout, edit.brollFile, isSplit) {
+        if (!isSplit) {
+            bottomPlayer.pause()
+            bottomPlayer.clearMediaItems()
+            return@LaunchedEffect
+        }
+        val broll = edit.layout == ComposeLayout.SPLIT_BROLL
+        bottomPlayer.setMediaItem(MediaItem.fromUri(Uri.fromFile(if (broll) brollFile!! else source)))
+        bottomPlayer.repeatMode = if (broll) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
+        bottomPlayer.prepare()
+        bottomPlayer.seekTo(bottomTarget(player.currentPosition))
+        bottomPlayer.playWhenReady = player.isPlaying
+    }
     DisposableEffect(player) {
         val listener = object : Player.Listener {
-            override fun onIsPlayingChanged(playing: Boolean) { isPlaying = playing }
+            override fun onIsPlayingChanged(playing: Boolean) {
+                isPlaying = playing
+                if (splitNow) bottomPlayer.playWhenReady = playing
+            }
         }
         player.addListener(listener)
         onDispose { player.removeListener(listener) }
     }
-    val currentEdit by rememberUpdatedState(edit)
     LaunchedEffect(player) {
+        var lastSync = 0L
         while (true) {
             withFrameNanos { }
             val e = currentEdit
@@ -185,8 +233,16 @@ fun EditorScreen(projectId: String, clipId: String, onBack: () -> Unit, onExport
             if (player.isPlaying && (p >= e.endMs || p < e.startMs - 300)) {
                 player.seekTo(e.startMs)
                 positionMs = e.startMs
+                if (splitNow) bottomPlayer.seekTo(bottomTarget(e.startMs))
             } else {
                 positionMs = p
+            }
+            // Re-sincroniza la mitad inferior cada ~250 ms si se desvía más de 300 ms (pausas, saltos, bucle).
+            val now = SystemClock.uptimeMillis()
+            if (splitNow && now - lastSync > 250) {
+                lastSync = now
+                val target = bottomTarget(p)
+                if (kotlin.math.abs(bottomPlayer.currentPosition - target) > 300) bottomPlayer.seekTo(target)
             }
         }
     }
@@ -205,6 +261,16 @@ fun EditorScreen(projectId: String, clipId: String, onBack: () -> Unit, onExport
         project.cues.withIndex().filter { it.value.words.isNotEmpty() && it.value.endMs > edit.startMs && it.value.startMs < edit.endMs }
     }
 
+    // Punch-in (auto-zoom): picos de audio + palabras clave dentro del tramo.
+    val clipWords = remember(visibleCues) { visibleCues.flatMap { it.value.words } }
+    val punches = remember(edit.autoZoom, edit.startMs, edit.endMs, clipWords, state.audio) {
+        if (edit.autoZoom) PunchIn.plan(edit.startMs, edit.endMs, state.audio, clipWords) else emptyList()
+    }
+
+    // Segundo video (B-roll) desde la galería, sin permisos (Photo Picker).
+    val brollPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> uri?.let(vm::importBroll) }
+    fun pickBroll() = brollPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly))
+
     var tool by rememberSaveable { mutableStateOf(EditorTool.STYLES) }
     var editingCue by remember { mutableStateOf<Int?>(null) }
 
@@ -218,7 +284,7 @@ fun EditorScreen(projectId: String, clipId: String, onBack: () -> Unit, onExport
                     }
                 },
                 actions = {
-                    val detecting = state.faceStatus is FaceStatus.Running
+                    val detecting = state.faceStatus is FaceStatus.Running || state.transcribeStatus is TranscribeStatus.Running
                     if (detecting) CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
                     Button(
                         onClick = { player.pause(); vm.saveAndThen(onExport) },
@@ -236,6 +302,10 @@ fun EditorScreen(projectId: String, clipId: String, onBack: () -> Unit, onExport
                 val h = min(maxHeight.value, maxWidth.value * 16f / 9f)
                 VerticalPreview(
                     player = player,
+                    bottomPlayer = bottomPlayer,
+                    split = isSplit,
+                    brollInfo = state.brollInfo,
+                    punchZoom = PunchIn.zoomAt(punches, positionMs),
                     project = project,
                     edit = edit,
                     visibleCues = visibleCues,
@@ -249,6 +319,24 @@ fun EditorScreen(projectId: String, clipId: String, onBack: () -> Unit, onExport
                 )
             }
 
+            when (val ts = state.transcribeStatus) {
+                is TranscribeStatus.Running -> Text(
+                    stringResource(R.string.transcribing_segment, (ts.progress * 100).toInt()),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                TranscribeStatus.TooLong -> Text(
+                    stringResource(R.string.transcribe_too_long),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                TranscribeStatus.Failed -> Text(
+                    stringResource(R.string.error_transcription),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                TranscribeStatus.Idle -> Unit
+            }
             if (state.clip?.manual == true) {
                 Text(
                     stringResource(R.string.manual_hint),
@@ -278,7 +366,18 @@ fun EditorScreen(projectId: String, clipId: String, onBack: () -> Unit, onExport
                         cues = visibleCues,
                         onSelect = { index, cue -> player.pause(); player.seekTo(max(cue.startMs, edit.startMs)); editingCue = index },
                     )
-                    EditorTool.FRAME -> FramePanel(edit.framing, state.faceStatus, vm::setFraming, vm::retryFaceDetection)
+                    EditorTool.FRAME -> FramePanel(
+                        framing = edit.framing,
+                        face = state.faceStatus,
+                        layout = edit.layout,
+                        brollReady = brollFile != null && state.brollInfo != null,
+                        brollImporting = state.brollImporting,
+                        onChange = vm::setFraming,
+                        onRetry = vm::retryFaceDetection,
+                        onLayout = { l -> if (l == ComposeLayout.SPLIT_BROLL && (brollFile == null || state.brollInfo == null)) pickBroll() else vm.setLayout(l) },
+                        onPickBroll = ::pickBroll,
+                    )
+                    EditorTool.EXTRAS -> ExtrasPanel(edit, vm::setAutoZoom, vm::setProgressBar, vm::setProgressColor, vm::setSfx, vm::setStyle)
                 }
             }
 
@@ -324,6 +423,10 @@ fun EditorScreen(projectId: String, clipId: String, onBack: () -> Unit, onExport
 @Composable
 private fun VerticalPreview(
     player: ExoPlayer,
+    bottomPlayer: ExoPlayer,
+    split: Boolean,
+    brollInfo: VideoInfo?,
+    punchZoom: Float,
     project: Project,
     edit: ClipEdit,
     visibleCues: List<IndexedValue<SubtitleCue>>,
@@ -336,42 +439,71 @@ private fun VerticalPreview(
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
+    val style = edit.effectiveStyle() // en modo dividido los subtítulos van en la costura central
     val spaced = remember(project.language) { Language.fromCode(project.language)?.spaced ?: true }
     BoxWithConstraints(modifier.clip(RoundedCornerShape(16.dp)).background(Color.Black)) {
         val boxW = constraints.maxWidth.toFloat()
         val boxH = constraints.maxHeight.toFloat()
         val srcAspect = project.width.toFloat() / project.height.toFloat()
-        val vh = boxH
-        val vw = boxH * srcAspect
-        val base = max(1f, boxW / vw) // videos más estrechos que 9:16 se amplían para cubrir el lienzo
-        val t = FramingMath.transform(project.width, project.height, edit.framing, faceTrack?.xAt(positionMs), faceTrack?.yAt(positionMs))
-
-        AndroidView(
-            factory = { ctx -> TextureView(ctx).also { player.setVideoTextureView(it) } },
-            onRelease = { view -> try { player.clearVideoTextureView(view) } catch (_: Exception) { } },
-            modifier = Modifier
-                .align(Alignment.Center)
-                .requiredSize(with(density) { vw.toDp() }, with(density) { vh.toDp() })
-                .graphicsLayer {
-                    scaleX = base * t.scale
-                    scaleY = base * t.scale
-                    translationX = base * vw / 2f * t.tx
-                    translationY = -base * vh / 2f * t.ty
-                },
+        val areaH = if (split) boxH / 2f else boxH               // alto de la zona del rostro
+        val aspect = if (split) FramingMath.SPLIT_ASPECT else FramingMath.TARGET_ASPECT
+        val vh = areaH
+        val vw = areaH * srcAspect
+        val base = max(1f, boxW / vw) // videos más estrechos que la ventana se amplían para cubrirla
+        // El mismo cálculo que usa el exportador: encuadre del rostro + auto-zoom (punch-in).
+        val t = FramingMath.transform(
+            project.width, project.height, edit.framing, faceTrack?.xAt(positionMs), faceTrack?.yAt(positionMs),
+            aspect = aspect, extraZoom = punchZoom,
         )
 
-        // Subtítulo activo, dibujado con el mismo renderizador que usa la exportación.
+        // --- Zona superior (o toda la pantalla): el video principal recortado alrededor del rostro.
+        Box(Modifier.align(Alignment.TopCenter).fillMaxWidth().height(with(density) { areaH.toDp() }).clipToBounds()) {
+            AndroidView(
+                factory = { ctx -> TextureView(ctx).also { player.setVideoTextureView(it) } },
+                onRelease = { view -> try { player.clearVideoTextureView(view) } catch (_: Exception) { } },
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .requiredSize(with(density) { vw.toDp() }, with(density) { vh.toDp() })
+                    .graphicsLayer {
+                        scaleX = base * t.scale
+                        scaleY = base * t.scale
+                        translationX = base * vw / 2f * t.tx
+                        translationY = -base * vh / 2f * t.ty
+                    },
+            )
+        }
+
+        // --- Zona inferior: gameplay original o B-roll, rellenando (recorte centrado).
+        if (split) {
+            val bAspect = if (edit.layout == ComposeLayout.SPLIT_BROLL && brollInfo != null) brollInfo.width.toFloat() / brollInfo.height else srcAspect
+            val bw = max(boxW, areaH * bAspect)
+            val bh = bw / bAspect
+            Box(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(with(density) { areaH.toDp() }).clipToBounds()) {
+                AndroidView(
+                    factory = { ctx -> TextureView(ctx).also { bottomPlayer.setVideoTextureView(it) } },
+                    onRelease = { view -> try { bottomPlayer.clearVideoTextureView(view) } catch (_: Exception) { } },
+                    modifier = Modifier.align(Alignment.Center).requiredSize(with(density) { bw.toDp() }, with(density) { bh.toDp() }),
+                )
+            }
+        }
+
+        // --- Subtítulo activo: mismo renderizador que la exportación, con animación pop-in.
         val active = visibleCues.firstOrNull { positionMs >= it.value.startMs && positionMs < it.value.endMs }
         val word = active?.let { renderer.activeWord(it.value, positionMs) } ?: -1
-        val subtitle: ImageBitmap? = remember(active?.index, word, edit.style, active?.value?.text, boxW, spaced) {
-            active?.let { renderer.render(it.value, word, edit.style, boxW.toInt(), spaced)?.asImageBitmap() }
+        val subtitle: ImageBitmap? = remember(active?.index, word, style, active?.value?.text, boxW, spaced) {
+            active?.let { renderer.render(it.value, word, style, boxW.toInt(), spaced)?.asImageBitmap() }
         }
         val subtitleRect: Rect? = subtitle?.let {
-            val top = (boxH * edit.style.position.centerYFraction - it.height / 2f).coerceIn(0f, max(0f, boxH - it.height))
+            val top = (boxH * style.position.centerYFraction - it.height / 2f).coerceIn(0f, max(0f, boxH - it.height))
             Rect(Offset((boxW - it.width) / 2f, top), Size(it.width.toFloat(), it.height.toFloat()))
         }
+        val sinceMs = if (active == null || word < 0) 0L
+        else positionMs - if (style.mode == SubtitleMode.WORD_BY_WORD) active.value.words[word].startMs else active.value.startMs
+        val pop = if (style.popIn && active != null) PopAnimation.scale(sinceMs) else 1f
+        val popAlpha = if (style.popIn && active != null) PopAnimation.alpha(sinceMs) else 1f
         val currentRect by rememberUpdatedState(subtitleRect)
         val currentActive by rememberUpdatedState(active?.index)
+        val progress = ProgressBarMath.progress(positionMs - edit.startMs, edit.endMs - edit.startMs)
 
         Canvas(
             Modifier.fillMaxSize().pointerInput(Unit) {
@@ -383,7 +515,13 @@ private fun VerticalPreview(
             },
         ) {
             if (subtitle != null && subtitleRect != null) {
-                drawImage(subtitle, topLeft = subtitleRect.topLeft)
+                scale(pop, pivot = subtitleRect.center) {
+                    drawImage(subtitle, topLeft = subtitleRect.topLeft, alpha = popAlpha)
+                }
+            }
+            // Barra de progreso fina en el borde superior (se quema igual en el render).
+            if (edit.progressBar) {
+                drawRect(Color(edit.progressColor), Offset.Zero, Size(size.width * progress, max(4f, size.width / 120f)))
             }
         }
 
@@ -607,8 +745,38 @@ private fun TextPanel(cues: List<IndexedValue<SubtitleCue>>, onSelect: (Int, Sub
 }
 
 @Composable
-private fun FramePanel(framing: Framing, face: FaceStatus, onChange: (Framing) -> Unit, onRetry: () -> Unit) {
+private fun FramePanel(
+    framing: Framing,
+    face: FaceStatus,
+    layout: ComposeLayout,
+    brollReady: Boolean,
+    brollImporting: Boolean,
+    onChange: (Framing) -> Unit,
+    onRetry: () -> Unit,
+    onLayout: (ComposeLayout) -> Unit,
+    onPickBroll: () -> Unit,
+) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp)) {
+        // --- Plantillas de composición.
+        Text(stringResource(R.string.layout_title), style = MaterialTheme.typography.labelLarge)
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(selected = layout == ComposeLayout.FULL, onClick = { onLayout(ComposeLayout.FULL) }, label = { Text(stringResource(R.string.layout_full)) })
+            FilterChip(selected = layout == ComposeLayout.SPLIT_GAMEPLAY, onClick = { onLayout(ComposeLayout.SPLIT_GAMEPLAY) }, label = { Text(stringResource(R.string.layout_split_gameplay)) })
+            FilterChip(selected = layout == ComposeLayout.SPLIT_BROLL, onClick = { onLayout(ComposeLayout.SPLIT_BROLL) }, label = { Text(stringResource(R.string.layout_split_broll)) })
+        }
+        if (layout == ComposeLayout.SPLIT_BROLL || brollImporting) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                OutlinedButton(onClick = onPickBroll, enabled = !brollImporting) {
+                    Text(stringResource(if (brollReady) R.string.broll_change else R.string.broll_pick))
+                }
+                if (brollImporting) {
+                    CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.padding(start = 12.dp).size(20.dp))
+                    Text(stringResource(R.string.broll_importing), modifier = Modifier.padding(start = 8.dp), style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+
+        // --- Seguimiento del rostro y encuadre manual.
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.auto_face_tracking), fontWeight = FontWeight.SemiBold)
@@ -632,6 +800,37 @@ private fun FramePanel(framing: Framing, face: FaceStatus, onChange: (Framing) -
         LabeledSlider(R.string.move_horizontal, framing.offsetX, -1f..1f) { onChange(framing.copy(offsetX = it)) }
         LabeledSlider(R.string.move_vertical, framing.offsetY, -1f..1f) { onChange(framing.copy(offsetY = it)) }
         OutlinedButton(onClick = { onChange(Framing(autoTrack = framing.autoTrack)) }) { Text(stringResource(R.string.reset_framing)) }
+    }
+}
+
+/** Extras de retención: auto-zoom, barra de progreso, efectos de sonido, pop-in y resaltado automático. */
+@Composable
+private fun ExtrasPanel(
+    edit: ClipEdit,
+    onAutoZoom: (Boolean) -> Unit,
+    onProgressBar: (Boolean) -> Unit,
+    onProgressColor: (Int) -> Unit,
+    onSfx: (Boolean) -> Unit,
+    onStyle: (SubtitleStyle) -> Unit,
+) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp)) {
+        ToggleRow(R.string.extra_auto_zoom, R.string.extra_auto_zoom_desc, edit.autoZoom, onAutoZoom)
+        ToggleRow(R.string.extra_sfx, R.string.extra_sfx_desc, edit.sfx, onSfx)
+        ToggleRow(R.string.extra_pop_in, null, edit.style.popIn) { onStyle(edit.style.copy(popIn = it)) }
+        ToggleRow(R.string.extra_keyword_colors, R.string.extra_keyword_colors_desc, edit.style.keywordColors) { onStyle(edit.style.copy(keywordColors = it)) }
+        ToggleRow(R.string.extra_progress_bar, null, edit.progressBar, onProgressBar)
+        if (edit.progressBar) SwatchRow(R.string.extra_progress_color, edit.progressColor, onProgressColor)
+    }
+}
+
+@Composable
+private fun ToggleRow(title: Int, desc: Int?, checked: Boolean, onChange: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(title), fontWeight = FontWeight.SemiBold)
+            if (desc != null) Text(stringResource(desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(checked = checked, onCheckedChange = onChange)
     }
 }
 

@@ -14,9 +14,12 @@ data class CropTransform(val scale: Float, val tx: Float, val ty: Float)
 object FramingMath {
     const val TARGET_ASPECT = 9f / 16f
 
+    /** Relación de aspecto de cada mitad en el modo dividido (1080×960). */
+    const val SPLIT_ASPECT = 1080f / 960f
+
     /** Fracción del ancho / alto del fotograma que ocupa la ventana 9:16 con zoom 1. */
-    fun baseWindow(srcW: Int, srcH: Int): Pair<Float, Float> {
-        val cw = (srcH * TARGET_ASPECT) / srcW
+    fun baseWindow(srcW: Int, srcH: Int, aspect: Float = TARGET_ASPECT): Pair<Float, Float> {
+        val cw = (srcH * aspect) / srcW
         return min(1f, cw) to min(1f, 1f / cw)
     }
 
@@ -24,9 +27,18 @@ object FramingMath {
      * @param faceX centro horizontal del rostro (0..1) en el instante actual, o null si no hay seguimiento.
      * @param faceY centro vertical del rostro (0..1) o null.
      */
-    fun transform(srcW: Int, srcH: Int, framing: Framing, faceX: Float?, faceY: Float?): CropTransform {
-        val s = framing.zoom.coerceIn(1f, 4f)
-        val (wx0, wy0) = baseWindow(srcW, srcH)
+    fun transform(
+        srcW: Int,
+        srcH: Int,
+        framing: Framing,
+        faceX: Float?,
+        faceY: Float?,
+        aspect: Float = TARGET_ASPECT,
+        /** Factor extra de zoom (punch-in), se multiplica con el zoom manual. */
+        extraZoom: Float = 1f,
+    ): CropTransform {
+        val s = (framing.zoom * extraZoom).coerceIn(1f, 4f)
+        val (wx0, wy0) = baseWindow(srcW, srcH, aspect)
         val wx = wx0 / s
         val wy = wy0 / s
         val maxPanX = max(0f, 1f - wx)

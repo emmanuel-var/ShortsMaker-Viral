@@ -31,11 +31,22 @@ object LocalTextClipGenerator {
         config: AnalyzerConfig = AnalyzerConfig(),
     ): List<ClipSuggestion> {
         if (words.size < 8 || durationMs <= 0) return emptyList()
-        val cfg = config.copy(
-            minClipMs = min(config.minClipMs, durationMs),
-            maxClipMs = min(config.maxClipMs, durationMs),
-            targetClipMs = min(config.targetClipMs, durationMs),
-        )
+        val cfg = config.clamped(durationMs)
+        val candidates = scoredCandidates(words, durationMs, lang, cfg)
+        return ClipAnalyzer.toSuggestions(ClipAnalyzer.pickBest(candidates, cfg), words, lang)
+    }
+
+    /**
+     * Todas las ventanas candidatas (alineadas a frases, 15-60 s) con su puntaje de TEXTO en `Candidate.score`.
+     * Lo reutiliza `MultimediaClipGenerator` como componente de texto del puntaje multimedia.
+     */
+    internal fun scoredCandidates(
+        words: List<WordTiming>,
+        durationMs: Long,
+        lang: Language,
+        cfg: AnalyzerConfig,
+    ): List<ClipAnalyzer.Candidate> {
+        if (words.size < 8 || durationMs <= 0) return emptyList()
         val sentences = ClipAnalyzer.buildSentences(words)
         if (sentences.isEmpty()) return emptyList()
         val ctx = Context.build(words, sentences, lang)
@@ -54,7 +65,7 @@ object LocalTextClipGenerator {
                 j++
             }
         }
-        return ClipAnalyzer.toSuggestions(ClipAnalyzer.pickBest(candidates, cfg), words, lang)
+        return candidates
     }
 
     /** Datos globales del video, calculados una sola vez. */

@@ -3,16 +3,26 @@ package com.shortsmaker.viral.ui.editor
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shortsmaker.viral.AppContainer
+import com.shortsmaker.viral.data.MediaUtils
+import com.shortsmaker.viral.data.VideoInfo
+import com.shortsmaker.viral.domain.AudioProfile
 import com.shortsmaker.viral.domain.ClipEdit
+import com.shortsmaker.viral.domain.ComposeLayout
 import com.shortsmaker.viral.domain.ClipSuggestion
+import com.shortsmaker.viral.domain.CueBuilder
 import com.shortsmaker.viral.domain.FacePoint
+import com.shortsmaker.viral.domain.Language
+import com.shortsmaker.viral.domain.WordTiming
 import com.shortsmaker.viral.domain.TimeSpan
 import com.shortsmaker.viral.domain.FaceTrack
 import com.shortsmaker.viral.domain.Framing
 import com.shortsmaker.viral.domain.Project
 import com.shortsmaker.viral.domain.SubtitleStyle
 import com.shortsmaker.viral.domain.SubtitleTemplates
+import android.net.Uri
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +42,14 @@ sealed interface FaceStatus {
     data object TooLong : FaceStatus
 }
 
+/** Transcripción bajo demanda del tramo recortado (sólo proyectos en modo rápido). */
+sealed interface TranscribeStatus {
+    data object Idle : TranscribeStatus
+    data class Running(val progress: Float) : TranscribeStatus
+    data object TooLong : TranscribeStatus
+    data object Failed : TranscribeStatus
+}
+
 data class EditorUiState(
     val loading: Boolean = true,
     val missing: Boolean = false,
@@ -40,6 +58,11 @@ data class EditorUiState(
     val edit: ClipEdit? = null,
     val faceTrack: FaceTrack? = null,
     val faceStatus: FaceStatus = FaceStatus.Idle,
+    /** Audio Radar del video (picos de audio para el auto-zoom y los efectos de sonido). */
+    val audio: AudioProfile? = null,
+    val brollInfo: VideoInfo? = null,
+    val brollImporting: Boolean = false,
+    val transcribeStatus: TranscribeStatus = TranscribeStatus.Idle,
 )
 
 class EditorViewModel(
@@ -54,8 +77,12 @@ class EditorViewModel(
     var sourceFile: File? = null
         private set
 
+    /** Carpeta del proyecto (aquí vive el B-roll importado). */
+    val projectDir: File get() = repo.dir(projectId)
+
     private var saveJob: Job? = null
     private var faceDebounce: Job? = null
+    private var transcribeJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -77,8 +104,14 @@ class EditorViewModel(
                 faceTrack = raw?.let { FaceTrack(it) },
                 faceStatus = if (raw != null) FaceStatus.Done(raw.size) else FaceStatus.Idle,
             )
+            repo.loadEnergy(projectId)?.let { track -> _state.update { it.copy(audio = AudioProfile(track)) } }
+            edit.brollFile?.let { name ->
+                val info = withContext(Dispatchers.IO) { MediaUtils.probe(File(repo.dir(projectId), name)) }
+                _state.update { it.copy(brollInfo = info) }
+            }
             // Clips sugeridos: se analiza el rostro de inmediato. Modo manual (video completo): al recortar.
             if (edit.framing.autoTrack) scheduleFaceDetection(immediate = !clip.manual)
+            scheduleTranscription()
         }
     }
 
@@ -87,9 +120,35 @@ class EditorViewModel(
         // El auto-encuadre debe seguir funcionando sobre el fragmento que el usuario recorta, así que se
         // (re)analiza el rostro del nuevo tramo cuando deja de arrastrar.
         scheduleFaceDetection()
+        scheduleTranscription()
     }
 
     fun setStyle(style: SubtitleStyle) = updateEdit { it.copy(style = style) }
+
+    fun setLayout(layout: ComposeLayout) = updateEdit { it.copy(layout = layout) }
+    fun setAutoZoom(value: Boolean) = updateEdit { it.copy(autoZoom = value) }
+    fun setProgressBar(value: Boolean) = updateEdit { it.copy(progressBar = value) }
+    fun setProgressColor(color: Int) = updateEdit { it.copy(progressColor = color) }
+    fun setSfx(value: Boolean) = updateEdit { it.copy(sfx = value) }
+
+    /** Copia el B-roll elegido (segundo video local) a la carpeta del proyecto y activa el diseño dividido. */
+    fun importBroll(uri: Uri) {
+        viewModelScope.launch {
+            _state.update { it.copy(brollImporting = true) }
+            val ok = withContext(Dispatchers.IO) {
+                try {
+                    val target = File(repo.createDir(projectId), BROLL_NAME)
+                    container.app.contentResolver.openInputStream(uri)?.use { input -> target.outputStream().use { input.copyTo(it) } } ?: return@withContext null
+                    MediaUtils.probe(target)
+                } catch (_: Exception) { null }
+            }
+            _state.update { st ->
+                if (ok == null) st.copy(brollImporting = false)
+                else st.copy(brollImporting = false, brollInfo = ok, edit = st.edit?.copy(brollFile = BROLL_NAME, layout = ComposeLayout.SPLIT_BROLL))
+            }
+            if (ok != null) scheduleSave()
+        }
+    }
 
     fun setFraming(framing: Framing) {
         val wasAuto = _state.value.edit?.framing?.autoTrack ?: false
@@ -124,6 +183,7 @@ class EditorViewModel(
         viewModelScope.launch {
             // Si el usuario acaba de recortar, se espera a que termine el análisis del rostro del nuevo tramo.
             faceDebounce?.join()
+            transcribeJob?.join()
             persist(_state.value)
             then()
         }
@@ -216,6 +276,63 @@ class EditorViewModel(
         scheduleSave()
     }
 
+    // ------------------------------------------------------------------ transcripción bajo demanda (modo rápido)
+
+    private fun scheduleTranscription() {
+        val st = _state.value
+        val project = st.project ?: return
+        val edit = st.edit ?: return
+        if (!project.fastMode) return
+        transcribeJob?.cancel()
+        if (project.transcribedSpans.any { it.covers(edit.startMs, edit.endMs) }) {
+            _state.update { it.copy(transcribeStatus = TranscribeStatus.Idle) }
+            return
+        }
+        if (edit.endMs - edit.startMs > MAX_TRANSCRIBE_MS) {
+            _state.update { it.copy(transcribeStatus = TranscribeStatus.TooLong) }
+            return
+        }
+        _state.update { it.copy(transcribeStatus = TranscribeStatus.Running(0f)) }
+        transcribeJob = viewModelScope.launch {
+            delay(TRANSCRIBE_DEBOUNCE_MS)
+            runTranscription()
+        }
+    }
+
+    private suspend fun runTranscription() {
+        val st = _state.value
+        val project = st.project ?: return
+        val edit = st.edit ?: return
+        val source = sourceFile ?: return
+        val lang = Language.fromCode(project.language) ?: Language.ES
+        val start = edit.startMs
+        val end = edit.endMs
+        try {
+            val modelDir = container.modelManager.ensureInstalled(lang) { }
+            val words = container.transcriber.transcribeRanges(source, modelDir, listOf(start to end)) { _, f ->
+                _state.update { s -> if (s.transcribeStatus is TranscribeStatus.Running) s.copy(transcribeStatus = TranscribeStatus.Running(f)) else s }
+            }
+            val outside = { w: WordTiming -> w.endMs <= start || w.startMs >= end }
+            val cues = CueBuilder.build(words, wide = !lang.spaced)
+            _state.update { s ->
+                val p = s.project ?: return@update s
+                s.copy(
+                    transcribeStatus = TranscribeStatus.Idle,
+                    project = p.copy(
+                        words = (p.words.filter(outside) + words).sortedBy { it.startMs },
+                        cues = (p.cues.filter { c -> c.endMs <= start || c.startMs >= end } + cues).sortedBy { it.startMs },
+                        transcribedSpans = TimeSpan.merge(p.transcribedSpans + TimeSpan(start, end)),
+                    ),
+                )
+            }
+            scheduleSave()
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            _state.update { it.copy(transcribeStatus = TranscribeStatus.Failed) }
+        }
+    }
+
     private fun updateEdit(block: (ClipEdit) -> ClipEdit) {
         _state.update { st -> st.edit?.let { st.copy(edit = block(it)) } ?: st }
         scheduleSave()
@@ -242,6 +359,10 @@ class EditorViewModel(
     }
 
     private companion object {
+        const val BROLL_NAME = "broll.mp4"
+        const val TRANSCRIBE_DEBOUNCE_MS = 1_500L
+        /** Máximo de tramo recortado que se transcribe bajo demanda. */
+        const val MAX_TRANSCRIBE_MS = 300_000L
         const val FACE_MARGIN_MS = 2_000L
         const val FACE_DEBOUNCE_MS = 1_200L
         const val FACE_STEP_MS = 700L

@@ -29,8 +29,11 @@ fun ProvideAppLanguage(language: Language, content: @Composable () -> Unit) {
     )
 }
 
+/** Contexto con los recursos del idioma elegido (para notificaciones y trabajos en segundo plano, fuera de Compose). */
+fun Context.withLanguage(language: Language): Context = LocalizedContext(this, Locale.forLanguageTag(language.code))
+
 /** Mantiene la cadena de ContextWrapper (para poder encontrar la Activity) pero con recursos del idioma elegido. */
-private class LocalizedContext(base: Context, locale: Locale) : ContextWrapper(base) {
+internal class LocalizedContext(base: Context, locale: Locale) : ContextWrapper(base) {
     private val localizedResources: Resources = base.createConfigurationContext(
         Configuration(base.resources.configuration).apply {
             setLocale(locale)

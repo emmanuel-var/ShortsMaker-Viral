@@ -59,7 +59,6 @@ step_link|Чтение данных по ссылке
 step_model|Загрузка голосовой модели (только в первый раз)
 step_transcribe|Расшифровка в текст
 step_analyze|Анализ вирусных моментов
-keep_app_open|Не закрывайте приложение во время обработки.
 processing_failed|Не удалось обработать видео
 suggested_clips|Рекомендуемые клипы
 analysis_with_heatmap|с данными YouTube
@@ -129,3 +128,49 @@ error_model_corrupt|Скачанная голосовая модель повр�
 error_transcription|Не удалось расшифровать аудио на этом устройстве.
 error_export|Не удалось отрендерить видео. Попробуйте 720p в настройках.
 error_save|Не удалось сохранить видео в галерею.
+step_radar|Анализ аудио (пики громкости)
+step_motion|Измерение движения лица
+channel_progress|Анализ клипов
+channel_progress_desc|Ход анализа видео в фоне
+notif_done_title|Ваши клипы готовы!
+notif_done_text|«%1$s» можно редактировать.
+run_in_background|Продолжить в фоне
+background_hint|Анализ продолжится, даже если вы переключитесь в другое приложение; ход виден в уведомлении.
+analysis_running|Обработка видео… %1$d%%
+trim_title|Обрезать фрагмент
+trim_hint|Выберите фрагмент до 15 минут. Обрезка мгновенная и без потери качества.
+trim_use_segment|Использовать фрагмент
+trim_selected|Фрагмент: %1$s – %2$s
+trim_change|Изменить
+trim_remove|Убрать
+long_video_title|Это очень длинное видео
+long_video_message|Длительность видео — %1$s. Полная обработка может исчерпать память и батарею. Рекомендуем сначала обрезать фрагмент до 15 минут.
+long_video_trim|Обрезать (макс. 15 мин)
+long_video_force|Принудительно обработать целиком
+fast_mode_warning|Будет применён быстрый режим: точность и количество клипов могут резко снизиться.
+long_video_inline_warning|Длиннее 15 минут: обрежьте видео, иначе будет использован быстрый режим.
+error_trim|Не удалось обрезать это видео. Попробуйте другой формат (MP4).
+tool_extras|Эффекты
+layout_title|Макет
+layout_full|Обычный 9:16
+layout_split_gameplay|Разделение: лицо + геймплей
+layout_split_broll|Разделение: лицо + B-roll
+broll_pick|Выбрать B-roll
+broll_change|Сменить B-roll
+broll_importing|Импорт B-roll…
+extra_auto_zoom|Автозум (punch-in)
+extra_auto_zoom_desc|Приближает лицо на 1–2 с на пиках звука и ключевых словах.
+extra_sfx|Звуковые эффекты
+extra_sfx_desc|Локальные звуки «поп» и «вжух» при зумах и ключевых словах.
+extra_pop_in|Анимация pop-in
+extra_keyword_colors|Автовыделение
+extra_keyword_colors_desc|Окрашивает слова вроде «деньги» или «огонь» и добавляет эмодзи.
+extra_progress_bar|Индикатор прогресса
+extra_progress_color|Цвет индикатора
+transcribing_segment|Расшифровка фрагмента… %1$d%%
+transcribe_too_long|Обрежьте фрагмент до 5 минут, чтобы создать субтитры.
+signal_audio|Пик звука
+signal_motion|Движение
+signal_chat|Чат в огне
+fast_mode_note|Быстрый режим: проанализированы только самые громкие участки видео.
+channel_done|Анализ завершён

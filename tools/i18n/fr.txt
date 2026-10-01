@@ -59,7 +59,6 @@ step_link|Lecture des données du lien
 step_model|Téléchargement du modèle vocal (première fois uniquement)
 step_transcribe|Transcription en texte
 step_analyze|Analyse des moments viraux
-keep_app_open|Gardez l'application ouverte pendant le traitement.
 processing_failed|Impossible de traiter la vidéo
 suggested_clips|Clips recommandés
 analysis_with_heatmap|avec données YouTube
@@ -129,3 +128,49 @@ error_model_corrupt|Le modèle vocal téléchargé est endommagé. Relancez le t
 error_transcription|L'audio n'a pas pu être transcrit sur cet appareil.
 error_export|La vidéo n'a pas pu être générée. Essayez 720p dans les Paramètres.
 error_save|La vidéo n'a pas pu être enregistrée dans la galerie.
+step_radar|Analyse de l'audio (pics de volume)
+step_motion|Mesure du mouvement du visage
+channel_progress|Analyse des clips
+channel_progress_desc|Progression de l'analyse vidéo en arrière-plan
+notif_done_title|Vos clips sont prêts !
+notif_done_text|« %1$s » est prêt à être modifié.
+run_in_background|Continuer en arrière-plan
+background_hint|L'analyse continue même si vous changez d'appli ; suivez sa progression dans la notification.
+analysis_running|Traitement de la vidéo… %1$d%%
+trim_title|Découper un extrait
+trim_hint|Choisissez un extrait de 15 minutes maximum. Le découpage est instantané et sans perte.
+trim_use_segment|Utiliser cet extrait
+trim_selected|Extrait : %1$s – %2$s
+trim_change|Modifier
+trim_remove|Retirer
+long_video_title|Cette vidéo est très longue
+long_video_message|Cette vidéo dure %1$s. La traiter en entier peut épuiser la mémoire et la batterie. Nous vous conseillons de découper d'abord un extrait de 15 minutes maximum.
+long_video_trim|Découper (15 min max)
+long_video_force|Forcer le traitement complet
+fast_mode_warning|Le mode rapide sera appliqué : la précision et le nombre de clips peuvent baisser fortement.
+long_video_inline_warning|Plus de 15 minutes : découpez-la ou le mode rapide sera utilisé.
+error_trim|Impossible de découper cette vidéo. Essayez un autre format (MP4).
+tool_extras|Extras
+layout_title|Disposition
+layout_full|Normal 9:16
+layout_split_gameplay|Divisé : visage + gameplay
+layout_split_broll|Divisé : visage + B-roll
+broll_pick|Choisir la vidéo B-roll
+broll_change|Changer le B-roll
+broll_importing|Importation du B-roll…
+extra_auto_zoom|Zoom auto (punch-in)
+extra_auto_zoom_desc|Zoome sur le visage 1-2 s sur les pics audio et les mots-clés.
+extra_sfx|Effets sonores
+extra_sfx_desc|Sons « pop » et « whoosh » locaux sur les zooms et mots-clés.
+extra_pop_in|Animation pop-in
+extra_keyword_colors|Mise en évidence auto
+extra_keyword_colors_desc|Colore des mots comme « argent » ou « feu » et ajoute des emojis.
+extra_progress_bar|Barre de progression
+extra_progress_color|Couleur de la barre
+transcribing_segment|Transcription de l'extrait… %1$d%%
+transcribe_too_long|Découpez un extrait de 5 minutes maximum pour générer des sous-titres.
+signal_audio|Pic audio
+signal_motion|Mouvement
+signal_chat|Chat en feu
+fast_mode_note|Mode rapide : seules les fenêtres les plus fortes de la vidéo ont été analysées.
+channel_done|Analyse terminée

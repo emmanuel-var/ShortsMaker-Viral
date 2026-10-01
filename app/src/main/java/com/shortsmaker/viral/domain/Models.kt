@@ -70,11 +70,25 @@ data class SubtitleCue(val startMs: Long, val endMs: Long, val words: List<WordT
 data class HeatPoint(val startMs: Long, val endMs: Long, val value: Float)
 
 @Serializable
-data class TimeSpan(val startMs: Long, val endMs: Long)
+data class TimeSpan(val startMs: Long, val endMs: Long) {
+    fun covers(startMs: Long, endMs: Long) = this.startMs <= startMs && this.endMs >= endMs
+
+    companion object {
+        /** Une los tramos que se solapan o se tocan, ordenados. */
+        fun merge(spans: List<TimeSpan>): List<TimeSpan> {
+            val out = ArrayList<TimeSpan>()
+            for (s in spans.sortedBy { it.startMs }) {
+                val last = out.lastOrNull()
+                if (last != null && s.startMs <= last.endMs) out[out.lastIndex] = TimeSpan(last.startMs, maxOf(last.endMs, s.endMs)) else out += s
+            }
+            return out
+        }
+    }
+}
 
 /** Posición normalizada (0..1) del rostro principal en un instante del video. */
 @Serializable
-data class FacePoint(val timeMs: Long, val x: Float, val y: Float)
+data class FacePoint(val timeMs: Long, val x: Float, val y: Float, val size: Float = 0f)
 
 @Serializable
 data class ClipSuggestion(
@@ -87,6 +101,10 @@ data class ClipSuggestion(
     val preview: String = "",
     val keywords: List<String> = emptyList(),
     val manual: Boolean = false,
+    /** Señales multimedia 0..100 (0 = no disponible): audio, movimiento del rostro y chat. */
+    val audioScore: Int = 0,
+    val motionScore: Int = 0,
+    val chatScore: Int = 0,
 ) {
     val durationMs: Long get() = endMs - startMs
 }
@@ -125,11 +143,17 @@ data class SubtitleStyle(
     val emojis: Boolean = true,
     val mode: SubtitleMode = SubtitleMode.WORD_BY_WORD,
     val position: SubtitlePosition = SubtitlePosition.BOTTOM,
+    /** Animación de entrada "pop-in" en cada palabra/bloque. */
+    val popIn: Boolean = true,
+    /** Pinta de color (rojo/dorado…) las palabras del diccionario local de énfasis (dinero, fuego…). */
+    val keywordColors: Boolean = true,
 )
 
 object SubtitleTemplates {
     val all: List<SubtitleStyle> = listOf(
-        SubtitleStyle(templateId = "hormozi"),
+        SubtitleStyle(
+            templateId = "hormozi", highlightColor = 0xFFFFE600.toInt(), textSize = 72f, mode = SubtitleMode.KARAOKE,
+        ),
         SubtitleStyle(
             templateId = "karaoke", font = FontChoice.BOLD, textColor = 0xFFFFFFFF.toInt(),
             highlightColor = 0xFF00E5FF.toInt(), strokeRatio = 0.14f, textSize = 64f,
@@ -139,11 +163,13 @@ object SubtitleTemplates {
             templateId = "classic", font = FontChoice.BOLD, textColor = 0xFFFFFFFF.toInt(),
             highlightColor = 0xFFFFFFFF.toInt(), strokeRatio = 0.12f, textSize = 58f,
             uppercase = false, emojis = false, mode = SubtitleMode.STATIC, position = SubtitlePosition.BOTTOM,
+            popIn = false, keywordColors = false,
         ),
         SubtitleStyle(
             templateId = "box", font = FontChoice.BOLD, textColor = 0xFFFFFFFF.toInt(),
             highlightColor = 0xFFFFEB3B.toInt(), strokeRatio = 0f, boxColor = 0xCC000000.toInt(),
             textSize = 56f, uppercase = false, emojis = false, mode = SubtitleMode.KARAOKE,
+            popIn = false, keywordColors = false,
         ),
         SubtitleStyle(
             templateId = "neon", font = FontChoice.CONDENSED, textColor = 0xFFFF2D95.toInt(),
@@ -155,6 +181,7 @@ object SubtitleTemplates {
             templateId = "minimal", font = FontChoice.SERIF, textColor = 0xFFFFFFFF.toInt(),
             highlightColor = 0xFFFFC107.toInt(), strokeRatio = 0.08f, textSize = 52f,
             uppercase = false, emojis = false, mode = SubtitleMode.STATIC, position = SubtitlePosition.BOTTOM,
+            popIn = false, keywordColors = false,
         ),
     )
 
@@ -171,6 +198,16 @@ data class Framing(
 )
 
 /** Estado de edición de un clip (se guarda en el proyecto para poder re-editar). */
+/** Composición del video final 9:16. */
+enum class ComposeLayout {
+    /** Un solo video recortado a 9:16 (con seguimiento del rostro). */
+    FULL,
+    /** Arriba el rostro (seguido por MediaPipe) y abajo el video original completo (gameplay). */
+    SPLIT_GAMEPLAY,
+    /** Arriba el rostro y abajo un segundo video local (B-roll: "Subway Surfers", satisfying…), en bucle. */
+    SPLIT_BROLL,
+}
+
 @Serializable
 data class ClipEdit(
     val clipId: String,
@@ -178,7 +215,21 @@ data class ClipEdit(
     val endMs: Long,
     val style: SubtitleStyle = SubtitleStyle(),
     val framing: Framing = Framing(),
-)
+    val layout: ComposeLayout = ComposeLayout.FULL,
+    /** Nombre (dentro de la carpeta del proyecto) del video B-roll para `SPLIT_BROLL`. */
+    val brollFile: String? = null,
+    /** Punch-in: zoom corto de 1-2 s en picos de audio y palabras clave. */
+    val autoZoom: Boolean = false,
+    /** Barra de progreso fina en el borde superior, quemada en el render. */
+    val progressBar: Boolean = false,
+    val progressColor: Int = 0xFFFFD60A.toInt(),
+    /** Efectos de sonido locales (pop / whoosh) mezclados con el audio. */
+    val sfx: Boolean = false,
+) {
+    /** En el modo dividido los subtítulos van en la costura central, entre el rostro y el video inferior. */
+    fun effectiveStyle(): SubtitleStyle =
+        if (layout == ComposeLayout.FULL) style else style.copy(position = SubtitlePosition.CENTER)
+}
 
 @Serializable
 data class Project(
@@ -204,6 +255,13 @@ data class Project(
     val faceTracks: Map<String, List<FacePoint>> = emptyMap(),
     /** Tramo del video (por clip) cuyo rostro ya se analizó; evita repetir la detección. */
     val faceCoverage: Map<String, TimeSpan> = emptyMap(),
+    /** Procesado en modo rápido (video muy largo): sólo se analizaron las ventanas de `transcribedSpans`. */
+    val fastMode: Boolean = false,
+    /** Tramos cuya transcripción existe en `words`/`cues`. Vacío = todo el video. */
+    val transcribedSpans: List<TimeSpan> = emptyList(),
+    /** Existe `energy.bin` (Audio Radar) en la carpeta del proyecto. */
+    val hasEnergy: Boolean = false,
+    val hasChat: Boolean = false,
 ) {
     fun toSummary() = ProjectSummary(
         id = id, name = name, createdAt = createdAt, updatedAt = updatedAt,

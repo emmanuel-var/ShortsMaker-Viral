@@ -59,7 +59,6 @@ step_link|Link-Daten werden gelesen
 step_model|Sprachmodell wird heruntergeladen (nur beim ersten Mal)
 step_transcribe|Transkription in Text
 step_analyze|Virale Momente werden analysiert
-keep_app_open|Lass die App während der Verarbeitung geöffnet.
 processing_failed|Das Video konnte nicht verarbeitet werden
 suggested_clips|Empfohlene Clips
 analysis_with_heatmap|mit YouTube-Daten
@@ -129,3 +128,49 @@ error_model_corrupt|Das heruntergeladene Sprachmodell ist beschädigt. Lade es e
 error_transcription|Das Audio konnte auf diesem Gerät nicht transkribiert werden.
 error_export|Das Video konnte nicht gerendert werden. Versuche 720p in den Einstellungen.
 error_save|Das Video konnte nicht in der Galerie gespeichert werden.
+step_radar|Audio wird analysiert (Lautstärkespitzen)
+step_motion|Gesichtsbewegung wird gemessen
+channel_progress|Clip-Analyse
+channel_progress_desc|Fortschritt der Videoanalyse im Hintergrund
+notif_done_title|Deine Clips sind fertig!
+notif_done_text|„%1$s“ kann jetzt bearbeitet werden.
+run_in_background|Im Hintergrund fortsetzen
+background_hint|Die Analyse läuft weiter, auch wenn du die App wechselst; den Fortschritt siehst du in der Benachrichtigung.
+analysis_running|Video wird verarbeitet… %1$d%%
+trim_title|Abschnitt zuschneiden
+trim_hint|Wähle einen Abschnitt von bis zu 15 Minuten. Das Zuschneiden geht sofort und verlustfrei.
+trim_use_segment|Diesen Abschnitt verwenden
+trim_selected|Abschnitt: %1$s – %2$s
+trim_change|Ändern
+trim_remove|Entfernen
+long_video_title|Dieses Video ist sehr lang
+long_video_message|Dieses Video ist %1$s lang. Die vollständige Verarbeitung kann Speicher und Akku erschöpfen. Wir empfehlen, zuerst einen Abschnitt von bis zu 15 Minuten zuzuschneiden.
+long_video_trim|Zuschneiden (max. 15 Min.)
+long_video_force|Vollständige Verarbeitung erzwingen
+fast_mode_warning|Der Schnellmodus wird angewendet: Genauigkeit und Anzahl der Clips können stark sinken.
+long_video_inline_warning|Länger als 15 Minuten: Schneide es zu, sonst wird der Schnellmodus verwendet.
+error_trim|Dieses Video konnte nicht zugeschnitten werden. Versuche ein anderes Format (MP4).
+tool_extras|Extras
+layout_title|Layout
+layout_full|Normal 9:16
+layout_split_gameplay|Geteilt: Gesicht + Gameplay
+layout_split_broll|Geteilt: Gesicht + B-Roll
+broll_pick|B-Roll-Video wählen
+broll_change|B-Roll ändern
+broll_importing|B-Roll wird importiert…
+extra_auto_zoom|Auto-Zoom (Punch-in)
+extra_auto_zoom_desc|Zoomt 1–2 s auf das Gesicht bei Audiospitzen und Schlüsselwörtern.
+extra_sfx|Soundeffekte
+extra_sfx_desc|Lokale Pop- und Whoosh-Sounds bei Zooms und Schlüsselwörtern.
+extra_pop_in|Pop-in-Animation
+extra_keyword_colors|Automatische Hervorhebung
+extra_keyword_colors_desc|Färbt Wörter wie „Geld“ oder „Feuer“ und fügt Emojis hinzu.
+extra_progress_bar|Fortschrittsbalken
+extra_progress_color|Balkenfarbe
+transcribing_segment|Abschnitt wird transkribiert… %1$d%%
+transcribe_too_long|Schneide einen Abschnitt von bis zu 5 Minuten zu, um Untertitel zu erzeugen.
+signal_audio|Audiospitze
+signal_motion|Bewegung
+signal_chat|Chat brennt
+fast_mode_note|Schnellmodus: Nur die lautesten Fenster des Videos wurden analysiert.
+channel_done|Analyse abgeschlossen

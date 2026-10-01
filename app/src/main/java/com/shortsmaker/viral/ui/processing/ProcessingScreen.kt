@@ -52,67 +52,69 @@ import com.shortsmaker.viral.R
 import com.shortsmaker.viral.data.AppException
 import com.shortsmaker.viral.data.PipelineProgress
 import com.shortsmaker.viral.data.PipelineStep
-import com.shortsmaker.viral.ui.common.KeepScreenOn
+import com.shortsmaker.viral.work.AnalysisWorker
+import com.shortsmaker.viral.work.labelRes
 import com.shortsmaker.viral.ui.common.appViewModel
 import com.shortsmaker.viral.ui.theme.BrandGradient
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 data class ProcessingUiState(
     val progress: PipelineProgress? = null,
     val error: AppException? = null,
     val finished: Boolean = false,
+    /** El trabajo fue cancelado (por el usuario o por el sistema). */
+    val cancelled: Boolean = false,
 )
 
+/**
+ * El análisis NO se ejecuta aquí sino en un `AnalysisWorker` (WorkManager + Foreground Service con notificación
+ * persistente), de modo que sigue aunque el usuario salga de esta pantalla o cambie de aplicación. Este
+ * ViewModel sólo lo encola y observa su progreso.
+ */
 class ProcessingViewModel(private val container: AppContainer, private val projectId: String) : ViewModel() {
-    private val _state = MutableStateFlow(ProcessingUiState())
-    val state: StateFlow<ProcessingUiState> = _state.asStateFlow()
+    private val app = container.app
+    private var lastRequest: ImportRequest? = container.pendingImports.remove(projectId)
 
-    private var request: ImportRequest? = container.pendingImports.remove(projectId)
-    private var job: Job? = null
+    val state: StateFlow<ProcessingUiState> = WorkManager.getInstance(app)
+        .getWorkInfosForUniqueWorkFlow(AnalysisWorker.uniqueName(projectId))
+        .map { infos -> infos.firstOrNull()?.toUiState() ?: ProcessingUiState() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProcessingUiState())
 
     init {
-        start()
+        // Primera vez: se guarda la petición en disco (para poder reanudar) y se encola el trabajo.
+        lastRequest?.let { enqueue(it) }
     }
 
-    fun start() {
-        val req = request
-        if (req == null) {
-            _state.value = ProcessingUiState(error = AppException(R.string.error_generic))
-            return
+    private fun enqueue(request: ImportRequest) {
+        container.pendingRequests.save(projectId, request)
+        AnalysisWorker.enqueue(app, projectId)
+    }
+
+    fun retry() {
+        val req = lastRequest ?: return
+        enqueue(req)
+    }
+
+    fun cancel() {
+        AnalysisWorker.cancel(app, projectId)
+        container.pendingRequests.delete(projectId)
+    }
+
+    private fun WorkInfo.toUiState(): ProcessingUiState = when (state) {
+        WorkInfo.State.SUCCEEDED -> ProcessingUiState(finished = true)
+        WorkInfo.State.CANCELLED -> ProcessingUiState(cancelled = true)
+        WorkInfo.State.FAILED -> {
+            val res = outputData.getInt(AnalysisWorker.KEY_ERROR_RES, R.string.error_generic)
+            val args = outputData.getStringArray(AnalysisWorker.KEY_ERROR_ARGS)?.toList().orEmpty()
+            ProcessingUiState(error = AppException(res, args))
         }
-        job?.cancel()
-        _state.value = ProcessingUiState()
-        job = viewModelScope.launch {
-            try {
-                container.pipeline.run(projectId, req) { p -> _state.update { it.copy(progress = p) } }
-                _state.update { it.copy(finished = true) }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: AppException) {
-                _state.update { it.copy(error = e) }
-            } catch (e: Exception) {
-                _state.update { it.copy(error = AppException(R.string.error_generic, cause = e)) }
-            }
-        }
+        else -> ProcessingUiState(progress = with(AnalysisWorker) { progress.toPipelineProgress() })
     }
-
-    override fun onCleared() {
-        job?.cancel()
-    }
-}
-
-private fun stepLabel(step: PipelineStep): Int = when (step) {
-    PipelineStep.IMPORT -> R.string.step_import
-    PipelineStep.LINK -> R.string.step_link
-    PipelineStep.MODEL -> R.string.step_model
-    PipelineStep.TRANSCRIBE -> R.string.step_transcribe
-    PipelineStep.ANALYZE -> R.string.step_analyze
 }
 
 @Composable
@@ -121,8 +123,8 @@ fun ProcessingScreen(projectId: String, onDone: () -> Unit, onExit: () -> Unit) 
     val state by vm.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    KeepScreenOn()
     LaunchedEffect(state.finished) { if (state.finished) onDone() }
+    LaunchedEffect(state.cancelled) { if (state.cancelled) onExit() }
 
     Scaffold { padding ->
         Column(
@@ -140,7 +142,7 @@ fun ProcessingScreen(projectId: String, onDone: () -> Unit, onExit: () -> Unit) 
                 Spacer(Modifier.height(24.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedButton(onClick = onExit) { Text(stringResource(R.string.back)) }
-                    Button(onClick = vm::start) { Text(stringResource(R.string.retry)) }
+                    Button(onClick = vm::retry) { Text(stringResource(R.string.retry)) }
                 }
                 return@Column
             }
@@ -169,7 +171,7 @@ fun ProcessingScreen(projectId: String, onDone: () -> Unit, onExit: () -> Unit) 
                     val currentIdx = progress?.let { steps.indexOf(it.current) } ?: 0
                     val idx = steps.indexOf(step)
                     StepRow(
-                        label = stringResource(stepLabel(step)),
+                        label = stringResource(step.labelRes),
                         done = idx < currentIdx,
                         active = idx == currentIdx,
                         fraction = if (idx == currentIdx) progress?.stepFraction ?: 0f else 0f,
@@ -178,9 +180,13 @@ fun ProcessingScreen(projectId: String, onDone: () -> Unit, onExit: () -> Unit) 
             }
 
             Spacer(Modifier.height(28.dp))
-            OutlinedButton(onClick = onExit) { Text(stringResource(R.string.cancel)) }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                // Salir sin cancelar: el análisis sigue en segundo plano con su notificación.
+                Button(onClick = onExit) { Text(stringResource(R.string.run_in_background)) }
+                OutlinedButton(onClick = { vm.cancel(); onExit() }) { Text(stringResource(R.string.cancel)) }
+            }
             Text(
-                stringResource(R.string.keep_app_open),
+                stringResource(R.string.background_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

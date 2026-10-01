@@ -1,6 +1,11 @@
 package com.shortsmaker.viral.ui.importer
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,8 +23,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -36,6 +43,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -54,11 +65,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.shortsmaker.viral.AppContainer
 import com.shortsmaker.viral.ImportRequest
+import com.shortsmaker.viral.ProcessingMode
 import com.shortsmaker.viral.R
 import com.shortsmaker.viral.data.MediaUtils
 import com.shortsmaker.viral.data.VideoInfo
 import com.shortsmaker.viral.data.formatTime
 import com.shortsmaker.viral.domain.Language
+import com.shortsmaker.viral.domain.LongVideo
+import com.shortsmaker.viral.domain.TimeSpan
 import com.shortsmaker.viral.domain.MediaLink
 import com.shortsmaker.viral.domain.MediaLinks
 import com.shortsmaker.viral.ui.common.appViewModel
@@ -71,6 +85,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
+enum class ImportDialog { NONE, LONG_VIDEO, TRIM }
+
 data class ImportUiState(
     /** Texto del enlace OPCIONAL (YouTube, Twitch o Kick). Vacío = sólo video local. */
     val linkText: String = "",
@@ -80,7 +96,11 @@ data class ImportUiState(
     val readError: Boolean = false,
     val language: Language = Language.ES,
     val ownership: Boolean = false,
+    /** Fragmento elegido en el recortador previo (videos largos). */
+    val trim: TimeSpan? = null,
+    val dialog: ImportDialog = ImportDialog.NONE,
 ) {
+    val isLongVideo: Boolean get() = videoInfo?.let { LongVideo.isLong(it.durationMs) } == true
     val link: MediaLink? get() = MediaLinks.parse(linkText)
     val linkInvalid: Boolean get() = linkText.isNotBlank() && link == null
 
@@ -102,12 +122,35 @@ class ImportViewModel(private val container: AppContainer) : ViewModel() {
             val (info, name) = withContext(Dispatchers.IO) {
                 MediaUtils.probe(container.app, uri) to MediaUtils.displayName(container.app, uri)
             }
-            _state.update { it.copy(videoUri = if (info != null) uri else null, videoName = name, videoInfo = info, readError = info == null) }
+            _state.update {
+                it.copy(videoUri = if (info != null) uri else null, videoName = name, videoInfo = info, readError = info == null, trim = null)
+            }
         }
     }
 
-    /** Prepara la petición y devuelve el id del proyecto que se va a crear. */
-    fun start(): String? {
+    /**
+     * Pulsar "Analizar". Si el video dura más de 15 min y no se ha recortado, muestra el aviso en vez de empezar.
+     * @return true si se puede empezar ya.
+     */
+    fun onAnalyzeClicked(): Boolean {
+        val s = _state.value
+        if (!s.canContinue) return false
+        if (s.isLongVideo && s.trim == null) {
+            _state.update { it.copy(dialog = ImportDialog.LONG_VIDEO) }
+            return false
+        }
+        return true
+    }
+
+    fun showTrim() = _state.update { it.copy(dialog = ImportDialog.TRIM) }
+    fun dismissDialog() = _state.update { it.copy(dialog = ImportDialog.NONE) }
+    fun setTrim(span: TimeSpan?) = _state.update { it.copy(trim = span, dialog = ImportDialog.NONE) }
+
+    /**
+     * Prepara la petición y devuelve el id del proyecto. `FAST` = video largo forzado sin recortar
+     * (Audio Radar → 5 picos → Vosk/MediaPipe sólo en ventanas de 2 min).
+     */
+    fun start(forceFast: Boolean = false): String? {
         val s = _state.value
         if (!s.canContinue) return null
         container.settings.setVideoLanguage(s.language) // se recuerda como idioma por defecto del próximo video
@@ -117,7 +160,11 @@ class ImportViewModel(private val container: AppContainer) : ViewModel() {
             displayName = s.videoName,
             language = s.language,
             link = s.link,
+            mode = if (forceFast && s.trim == null) ProcessingMode.FAST else ProcessingMode.NORMAL,
+            trimStartMs = s.trim?.startMs,
+            trimEndMs = s.trim?.endMs,
         )
+        _state.update { it.copy(dialog = ImportDialog.NONE) }
         return id
     }
 }
@@ -129,6 +176,19 @@ fun ImportScreen(onBack: () -> Unit, onStart: (String) -> Unit) {
     val state by vm.state.collectAsStateWithLifecycle()
     val clipboard = LocalClipboardManager.current
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { vm.onVideoPicked(it) }
+    val context = LocalContext.current
+
+    // Android 13+: permiso para mostrar la notificación de progreso. El análisis funciona igual si se deniega.
+    var pendingStart by remember { mutableStateOf<(() -> Unit)?>(null) }
+    val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        pendingStart?.invoke(); pendingStart = null
+    }
+    fun begin(forceFast: Boolean) {
+        val go = { vm.start(forceFast)?.let(onStart); Unit }
+        val needsAsk = Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        if (needsAsk) { pendingStart = go; notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS) } else go()
+    }
 
     Scaffold(
         topBar = {
@@ -164,6 +224,19 @@ fun ImportScreen(onBack: () -> Unit, onStart: (String) -> Unit) {
                             "${state.videoName ?: ""}\n${formatTime(info.durationMs)} · ${info.width}×${info.height}",
                             style = MaterialTheme.typography.bodySmall,
                         )
+                    }
+                    if (state.isLongVideo) {
+                        Text(
+                            stringResource(if (state.trim == null) R.string.long_video_inline_warning else R.string.trim_selected, formatTime(state.trim?.startMs ?: 0), formatTime(state.trim?.endMs ?: 0)),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (state.trim == null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                        )
+                        if (state.trim != null) {
+                            Row {
+                                TextButton(onClick = vm::showTrim) { Text(stringResource(R.string.trim_change)) }
+                                TextButton(onClick = { vm.setTrim(null) }) { Text(stringResource(R.string.trim_remove)) }
+                            }
+                        }
                     }
                     if (state.readError) {
                         Text(stringResource(R.string.error_unreadable_video), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
@@ -241,10 +314,43 @@ fun ImportScreen(onBack: () -> Unit, onStart: (String) -> Unit) {
             }
 
             Button(
-                onClick = { vm.start()?.let(onStart) },
+                onClick = { if (vm.onAnalyzeClicked()) begin(forceFast = false) },
                 enabled = state.canContinue,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
             ) { Text(stringResource(R.string.analyze_video), fontWeight = FontWeight.Bold) }
         }
+    }
+
+    // --- Video de más de 15 min: aviso con las tres salidas (recortar / forzar modo rápido / cancelar).
+    val info = state.videoInfo
+    if (state.dialog == ImportDialog.LONG_VIDEO && info != null) {
+        AlertDialog(
+            onDismissRequest = vm::dismissDialog,
+            icon = { Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+            title = { Text(stringResource(R.string.long_video_title)) },
+            text = { Text(stringResource(R.string.long_video_message, formatTime(info.durationMs))) },
+            confirmButton = {
+                Button(onClick = vm::showTrim) { Text(stringResource(R.string.long_video_trim)) }
+            },
+            dismissButton = {
+                Column(horizontalAlignment = Alignment.End) {
+                    TextButton(onClick = {
+                        // Advertencia explícita antes de continuar con el video completo.
+                        Toast.makeText(context, R.string.fast_mode_warning, Toast.LENGTH_LONG).show()
+                        vm.dismissDialog()
+                        begin(forceFast = true)
+                    }) { Text(stringResource(R.string.long_video_force), color = MaterialTheme.colorScheme.error) }
+                    TextButton(onClick = vm::dismissDialog) { Text(stringResource(R.string.cancel)) }
+                }
+            },
+        )
+    }
+    if (state.dialog == ImportDialog.TRIM && info != null) {
+        TrimRangeDialog(
+            durationMs = info.durationMs,
+            initial = state.trim,
+            onConfirm = { span -> vm.setTrim(span); begin(forceFast = false) },
+            onDismiss = vm::dismissDialog,
+        )
     }
 }

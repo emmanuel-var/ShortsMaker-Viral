@@ -37,6 +37,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -63,7 +64,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import com.shortsmaker.viral.work.AnalysisWorker
+import com.shortsmaker.viral.work.labelRes
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import androidx.lifecycle.viewModelScope
 import com.shortsmaker.viral.AppContainer
 import com.shortsmaker.viral.R
@@ -77,8 +87,27 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 
+/** Análisis en curso (WorkManager), para el aviso de la pantalla de inicio. */
+data class ActiveAnalysis(val projectId: String, val percent: Int, val stepRes: Int?)
+
 class HomeViewModel(private val container: AppContainer) : ViewModel() {
     val projects: StateFlow<List<ProjectSummary>> = container.projects.summaries
+
+    val active: StateFlow<List<ActiveAnalysis>> = WorkManager.getInstance(container.app)
+        .getWorkInfosByTagFlow(AnalysisWorker.TAG_ANALYSIS)
+        .map { infos ->
+            infos.filter { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }.mapNotNull { info ->
+                val id = info.tags.firstOrNull { it.startsWith(AnalysisWorker.PROJECT_TAG_PREFIX) }
+                    ?.removePrefix(AnalysisWorker.PROJECT_TAG_PREFIX) ?: return@mapNotNull null
+                val p = with(AnalysisWorker) { info.progress.toPipelineProgress() }
+                ActiveAnalysis(id, ((p?.overall ?: 0f) * 100).toInt(), p?.current?.labelRes)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun reload() {
+        viewModelScope.launch { container.projects.refresh() }
+    }
 
     init {
         viewModelScope.launch { container.projects.refresh() }
@@ -93,9 +122,12 @@ class HomeViewModel(private val container: AppContainer) : ViewModel() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onCreate: () -> Unit, onOpenProject: (String) -> Unit, onSettings: () -> Unit) {
+fun HomeScreen(onCreate: () -> Unit, onOpenProject: (String) -> Unit, onOpenProcessing: (String) -> Unit, onSettings: () -> Unit) {
     val vm = appViewModel { HomeViewModel(it) }
     val projects by vm.projects.collectAsStateWithLifecycle()
+    val active by vm.active.collectAsStateWithLifecycle()
+    // Al volver (p. ej. desde la notificación) se refresca la lista: un análisis en segundo plano pudo terminar.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { vm.reload() }
     var query by rememberSaveable { mutableStateOf("") }
     var pendingDelete by remember { mutableStateOf<ProjectSummary?>(null) }
 
@@ -132,6 +164,19 @@ fun HomeScreen(onCreate: () -> Unit, onOpenProject: (String) -> Unit, onSettings
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) { CreateButton(onCreate) }
+            items(active, key = { "active-" + it.projectId }, span = { GridItemSpan(maxLineSpan) }) { a ->
+                Card(
+                    onClick = { onOpenProcessing(a.projectId) },
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    shape = RoundedCornerShape(20.dp),
+                ) {
+                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(stringResource(R.string.analysis_running, a.percent), fontWeight = FontWeight.Bold)
+                        a.stepRes?.let { Text(stringResource(it), style = MaterialTheme.typography.bodySmall) }
+                        LinearProgressIndicator(progress = { a.percent / 100f }, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+            }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 OutlinedTextField(
                     value = query,

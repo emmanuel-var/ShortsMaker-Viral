@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.shortsmaker.viral.domain.ChatDomParser
+import com.shortsmaker.viral.domain.LinkKind
 import com.shortsmaker.viral.domain.MediaLink
 import com.shortsmaker.viral.domain.PageMetaParser
 import com.shortsmaker.viral.domain.Platform
@@ -45,6 +47,7 @@ class LinkMetadataClient(private val context: Context, private val http: OkHttpC
                 title = rendered.title ?: direct.title,
                 durationMs = rendered.durationMs ?: direct.durationMs,
                 heatmap = rendered.heatmap.ifEmpty { direct.heatmap },
+                chat = rendered.chat.ifEmpty { direct.chat },
             )
         }
     }
@@ -58,7 +61,11 @@ class LinkMetadataClient(private val context: Context, private val http: OkHttpC
 
     private fun parse(link: MediaLink, html: String): SourceMeta = when (link.platform) {
         Platform.YOUTUBE -> YouTubeHtmlParser.parse(link.id, html)
-        Platform.TWITCH, Platform.KICK -> PageMetaParser.parse(html).let { SourceMeta(link.id, it.title, it.durationMs, emptyList()) }
+        Platform.TWITCH, Platform.KICK -> PageMetaParser.parse(html).let {
+            // El chat sólo se intenta en VODs; si no aparece en el DOM se ignora en silencio.
+            val chat = if (link.kind == LinkKind.VOD) try { ChatDomParser.parse(html) } catch (_: Exception) { emptyList() } else emptyList()
+            SourceMeta(link.id, it.title, it.durationMs, emptyList(), chat)
+        }
     }
 
     private suspend fun fetchDirect(link: MediaLink): SourceMeta? = withContext(Dispatchers.IO) {
@@ -116,7 +123,7 @@ class LinkMetadataClient(private val context: Context, private val http: OkHttpC
 
     private companion object {
         const val WEBVIEW_TIMEOUT_MS = 25_000L
-        const val RENDER_WAIT_MS = 3_000L
+        const val RENDER_WAIT_MS = 4_000L
         const val DESKTOP_UA =
             "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
     }
