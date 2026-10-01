@@ -11,6 +11,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        // Consentimiento (UMP) antes de pedir anuncios.
+        (application as ShortsMakerApp).container.ads.gatherConsent(this)
         setContent {
             ShortsMakerTheme {
                 AppNavigation()

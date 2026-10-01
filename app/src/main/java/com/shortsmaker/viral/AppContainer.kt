@@ -2,6 +2,7 @@ package com.shortsmaker.viral
 
 import android.app.Application
 import android.net.Uri
+import com.shortsmaker.viral.ads.AdsManager
 import com.shortsmaker.viral.data.AnalysisPipeline
 import com.shortsmaker.viral.data.FaceTracker
 import com.shortsmaker.viral.data.ProjectRepository
@@ -36,6 +37,7 @@ class AppContainer(val app: Application) {
         .readTimeout(60, TimeUnit.SECONDS)
         .build()
 
+    val ads = AdsManager(app)
     val settings = SettingsRepository(app)
     val projects = ProjectRepository(app)
     val modelManager = VoskModelManager(app, http)

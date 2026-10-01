@@ -6,7 +6,8 @@
 - [x] Permisos mínimos: `INTERNET` y `WRITE_EXTERNAL_STORAGE` (sólo `maxSdkVersion=28`). El video de entrada llega por **Photo Picker** (sin `READ_MEDIA_VIDEO`, que Play restringe).
 - [x] Guardado con **MediaStore** (Android 10+ sin permisos) y compartir con **FileProvider** + permisos temporales de lectura.
 - [x] `<queries>` limitado a TikTok / Instagram / Facebook (no se usa `QUERY_ALL_PACKAGES`).
-- [x] Sin anuncios, SDKs de analítica ni trackers. `allowBackup=false` y `dataExtractionRules` que excluyen todo.
+- [x] Un único SDK publicitario (Google AdMob, banner adaptable) + formulario de consentimiento **UMP**; sin analíticas ni otros trackers. `allowBackup=false` y `dataExtractionRules` que excluyen todo.
+- [x] Anuncios sin engaño (políticas de AdMob/Play): banner anclado abajo, separado del contenido, **sólo** en inicio/ajustes/sugerencias; nunca en editor, exportación, importación ni procesamiento; sin etiquetas, colores ni textos que lo hagan pasar por contenido de la app; no se piden anuncios hasta tener consentimiento; permiso `AD_ID` declarado.
 - [x] Tráfico sólo HTTPS (`usesCleartextTraffic=false`).
 - [x] R8/minify + shrinkResources con reglas para Vosk/JNA/MediaPipe/OkHttp.
 - [x] Sin descarga de videos de YouTube (política *Deceptive Behavior / Intellectual Property* y Términos de YouTube).
@@ -25,8 +26,10 @@
 2. **Build**: `./gradlew :app:bundleRelease` → `app/build/outputs/bundle/release/app-release.aab`.
 3. **Id de aplicación**: cambia `com.shortsmaker.viral` en `app/build.gradle.kts` si quieres uno propio (no se puede cambiar después de publicar).
 4. **Política de privacidad**: publica `PRIVACY_POLICY.md` en una URL pública (p. ej. GitHub Pages), rellena tu correo y pega la URL en la ficha de Play.
-5. **Seguridad de los datos (Data safety)**: declara *no se recopilan datos* ni se comparten. Los datos tratados (video, audio, rostros) se procesan **sólo en el dispositivo** y no salen de él. Marca que la app no recopila datos de usuario.
-6. **Clasificación de contenido**: cuestionario IARC, categoría *Reproductores y editores de video*. No hay contenido generado por el servidor.
+5. **Seguridad de los datos (Data safety)**: video, audio y rostros se procesan **sólo en el dispositivo** (no se declaran). Por AdMob debes declarar como *recopilados y compartidos con terceros* (finalidad: Publicidad o marketing / Analíticas): **ID de dispositivo u otros (ID de publicidad)**, **Interacciones con la app/Datos de diagnóstico** y **ubicación aproximada** (derivada de la IP) — revisa la guía vigente de Google: https://developers.google.com/admob/android/privacy/play-data-disclosure.
+5b. **Declaración de ID de publicidad** en Play Console → Contenido de la app: *Sí, la app usa ID de publicidad*, finalidad *Publicidad*.
+5c. **AdMob**: crea la app y la unidad de banner en admob.google.com, **reemplaza los IDs de prueba** en `app/build.gradle.kts` (`admobAppId` y `ADMOB_BANNER_ID`), configura el mensaje de consentimiento GDPR en *Privacidad y mensajería*, enlaza la app con su ficha de Play y no hagas clic en tus propios anuncios reales (usa dispositivos de prueba).
+6. **Clasificación de contenido**: cuestionario IARC, categoría *Reproductores y editores de video*; indica que la app contiene anuncios. Público objetivo: 13+ / adultos (no es una app para niños, por lo que no aplica la política Familias).
 7. **Declaración de contenido generado por IA / UGC**: la app edita contenido del propio usuario; no genera medios con IA generativa.
 8. **Ficha**: capturas de pantalla (teléfono y, si quieres, tablet 7"/10"), icono 512×512, gráfico destacado 1024×500. No uses logos de YouTube/TikTok/Instagram/Facebook ni sugieras afiliación.
 9. **Pruebas cerradas**: las cuentas personales nuevas deben hacer una prueba cerrada con ≥12 testers durante 14 días antes de pasar a producción.

@@ -1,7 +1,7 @@
 # ShortsMaker Viral
 
 App Android (Kotlin + Jetpack Compose) para convertir videos largos en clips verticales 9:16 listos para TikTok, Instagram Reels y Facebook.
-**Todo se procesa en el teléfono: sin servidores propios y sin APIs de pago.**
+**Todo se procesa en el teléfono: sin servidores propios y sin APIs de pago.** Se monetiza con un banner de Google AdMob (IDs de prueba por ahora; ver `PLAY_STORE.md`).
 
 ## Flujo (6 pantallas)
 

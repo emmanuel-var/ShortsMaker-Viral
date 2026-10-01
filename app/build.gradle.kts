@@ -24,6 +24,11 @@ android {
         versionCode = 1
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // AdMob: IDs DE PRUEBA de Google. Antes de publicar reemplázalos por tus IDs reales
+        // (AdMob → Apps → ID de la app / Unidades de anuncio) y NUNCA hagas clic en tus propios anuncios reales.
+        manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+        buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
     }
 
     androidResources {
@@ -106,6 +111,10 @@ dependencies {
     implementation(libs.media3.effect)
 
     implementation(libs.okhttp)
+
+    // Anuncios (AdMob) + formulario de consentimiento UMP (GDPR/EEE/Reino Unido)
+    implementation(libs.play.services.ads)
+    implementation(libs.user.messaging.platform)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
 

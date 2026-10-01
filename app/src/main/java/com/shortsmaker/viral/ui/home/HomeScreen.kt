@@ -3,6 +3,7 @@
 package com.shortsmaker.viral.ui.home
 
 import android.text.format.DateFormat
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -104,7 +106,16 @@ fun HomeScreen(onCreate: () -> Unit, onOpenProject: (String) -> Unit, onSettings
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_name), fontWeight = FontWeight.Black) },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Image(
+                            painterResource(R.drawable.ic_logo),
+                            contentDescription = null,
+                            modifier = Modifier.size(34.dp).clip(RoundedCornerShape(9.dp)),
+                        )
+                        Text(stringResource(R.string.app_name), fontWeight = FontWeight.Black)
+                    }
+                },
                 actions = {
                     IconButton(onClick = onSettings) {
                         Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.settings))

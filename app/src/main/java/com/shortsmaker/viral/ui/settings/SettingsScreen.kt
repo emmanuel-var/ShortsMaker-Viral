@@ -42,6 +42,7 @@ import com.shortsmaker.viral.R
 import com.shortsmaker.viral.domain.ExportResolution
 import com.shortsmaker.viral.domain.Language
 import com.shortsmaker.viral.ui.common.container
+import com.shortsmaker.viral.ui.common.findActivity
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 
@@ -52,6 +53,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val container = context.container
     val settings by container.settings.settings.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val privacyOptionsRequired by container.ads.privacyOptionsRequired.collectAsStateWithLifecycle()
 
     var modelsVersion by remember { mutableIntStateOf(0) }
     var showPrivacy by remember { mutableStateOf(false) }
@@ -127,6 +129,11 @@ fun SettingsScreen(onBack: () -> Unit) {
             Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(stringResource(R.string.version_format, BuildConfig.VERSION_NAME))
                 TextButton(onClick = { showPrivacy = true }) { Text(stringResource(R.string.privacy_policy)) }
+                if (privacyOptionsRequired) {
+                    TextButton(onClick = { context.findActivity()?.let(container.ads::showPrivacyOptions) }) {
+                        Text(stringResource(R.string.ads_privacy_options))
+                    }
+                }
                 TextButton(onClick = { showLicenses = true }) { Text(stringResource(R.string.open_source_licenses)) }
                 Text(
                     stringResource(R.string.affiliation_disclaimer),

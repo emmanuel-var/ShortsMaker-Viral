@@ -3,6 +3,8 @@
 
     <!-- Descarga única del modelo de voz y lectura de datos públicos de YouTube. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- ID de publicidad (obligatorio con targetSdk 33+ para AdMob). Los usuarios pueden restablecerlo/borrarlo en Ajustes de Android. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <!-- Sólo Android 9 o inferior: guardar el video exportado en la galería. En 10+ se usa MediaStore sin permisos. -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -28,6 +30,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ShortsMaker"
         android:usesCleartextTraffic="false">
+
+        <!-- AdMob App ID (de prueba por ahora; se define en app/build.gradle.kts). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
 
         <activity
             android:name=".MainActivity"

@@ -2,7 +2,7 @@
 
 _Última actualización: 2026-10-01_
 
-**Resumen:** ShortsMaker Viral procesa tus videos en tu propio dispositivo. No tenemos servidores, cuentas, anuncios ni analíticas.
+**Resumen:** ShortsMaker Viral procesa tus videos en tu propio dispositivo. No tenemos servidores ni cuentas. La app muestra un banner de **Google AdMob**.
 
 ## Datos que la app trata
 | Dato | Para qué | Dónde queda |
@@ -18,11 +18,17 @@ _Última actualización: 2026-10-01_
 - Consulta de la página pública de YouTube cuando pegas un enlace.
 Ninguna de estas conexiones incluye identificadores personales nuestros; los servidores de terceros pueden ver tu dirección IP como en cualquier navegación.
 
+## Publicidad (Google AdMob)
+La app muestra un banner de anuncios de Google AdMob en las pantallas de inicio, ajustes y sugerencias (nunca en el editor ni al exportar). AdMob, como tercero, puede recopilar y usar datos del dispositivo (ID de publicidad, dirección IP, información del dispositivo e interacciones con anuncios) para mostrar anuncios, medir su rendimiento y prevenir fraude. Más información: https://policies.google.com/technologies/ads y https://support.google.com/admob/answer/6128543.
+- En el Espacio Económico Europeo y el Reino Unido pedimos tu consentimiento con el formulario de Google (UMP) antes de solicitar anuncios, y puedes cambiarlo en **Ajustes → Opciones de privacidad de anuncios**.
+- Puedes restablecer o eliminar tu ID de publicidad en los ajustes de Android (Google → Anuncios).
+- La app no está dirigida a menores de 13 años.
+
 ## Lo que NO hacemos
-No recopilamos datos personales, no usamos publicidad, no hacemos seguimiento ni analíticas, no vendemos ni compartimos datos, no pedimos cuenta ni acceso a tus contactos, ubicación, micrófono o cámara.
+No recopilamos datos personales por nuestra cuenta, no hacemos analíticas propias, no vendemos datos, no pedimos cuenta ni acceso a tus contactos, ubicación, micrófono o cámara.
 
 ## Permisos
-`INTERNET` (descarga del modelo y lectura de YouTube). En Android 9 o inferior, `WRITE_EXTERNAL_STORAGE` sólo para guardar el video exportado en la galería.
+`INTERNET` (descarga del modelo, lectura de YouTube y anuncios) y `AD_ID` (ID de publicidad para AdMob). En Android 9 o inferior, `WRITE_EXTERNAL_STORAGE` sólo para guardar el video exportado en la galería.
 
 ## Tus controles
 Puedes eliminar proyectos y modelos de voz en **Ajustes**. Al desinstalar la app se borran todos sus datos.
