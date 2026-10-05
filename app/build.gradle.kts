@@ -25,8 +25,8 @@ android {
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // AdMob: IDs DE PRUEBA de Google. Antes de publicar reemplázalos por tus IDs reales
-        // (AdMob → Apps → ID de la app / Unidades de anuncio) y NUNCA hagas clic en tus propios anuncios reales.
+        // AdMob: por defecto (debug) se usan los IDs DE PRUEBA de Google, para no generar tráfico inválido con tus IDs reales.
+        // Los IDs reales van sólo en el build de release (ver `buildTypes.release`).
         manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
         buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
     }
@@ -49,6 +49,9 @@ android {
 
     buildTypes {
         release {
+            // AdMob: IDs REALES (sólo release). Nunca hagas clic en tus propios anuncios; prueba con los builds debug.
+            manifestPlaceholders["admobAppId"] = "ca-app-pub-5065513980633271~1960158272"
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-5065513980633271/1037783834\"")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
