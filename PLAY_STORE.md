@@ -9,13 +9,13 @@
 - [x] Un único SDK publicitario (Google AdMob, banner adaptable) + formulario de consentimiento **UMP**; sin analíticas ni otros trackers. `allowBackup=false` y `dataExtractionRules` que excluyen todo.
 - [x] Anuncios sin engaño (políticas de AdMob/Play): banner anclado abajo, separado del contenido, **sólo** en inicio/ajustes/sugerencias; nunca en editor, exportación, importación ni procesamiento; sin etiquetas, colores ni textos que lo hagan pasar por contenido de la app; no se piden anuncios hasta tener consentimiento; permiso `AD_ID` declarado.
 - [x] Tráfico sólo HTTPS (`usesCleartextTraffic=false`).
-- [x] R8/minify + shrinkResources con reglas para Vosk/JNA/MediaPipe/OkHttp.
+- [x] R8/minify + shrinkResources con reglas para Vosk/JNA/OkHttp.
 - [x] Sin descarga de videos de YouTube (política *Deceptive Behavior / Intellectual Property* y Términos de YouTube).
 - [x] Aviso de propiedad del contenido (casilla obligatoria en la importación), política de privacidad y licencias de código abierto dentro de la app.
 - [x] Interfaz en 9 idiomas (es, en, fr, de, pt, zh, ja, ru, hi) con cambio en caliente. Traduce también la ficha de Play (título, descripción, capturas) a los idiomas que quieras ofrecer.
 
-## Servicios en primer plano (Fase 2)
-El análisis en segundo plano usa un servicio en primer plano de WorkManager (`dataSync|mediaProcessing`) y los permisos `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_DATA_SYNC`, `FOREGROUND_SERVICE_MEDIA_PROCESSING` y `POST_NOTIFICATIONS` (opcional). En Play Console → *Contenido de la app → Permisos de servicios en primer plano* debes declarar ambos tipos, con la descripción "análisis local de video/audio iniciado por el usuario" y un video corto que muestre la notificación de progreso. El tipo `mediaProcessing` tiene un límite de ~6 h por día en Android 15+ (WorkManager lo gestiona cancelando el trabajo).
+## Servicios en primer plano
+La app **no** usa servicios en primer plano ni `POST_NOTIFICATIONS`: el análisis corre en la app con un aviso de no cambiar de app. Si ya declaraste esos permisos en Play Console, deja de ser necesario cuando el AAB activo ya no los incluya.
 
 ## Antes de subir (acciones tuyas)
 1. **Firma**: crea un keystore y un `keystore.properties` en la raíz (nunca lo subas a git):
@@ -38,14 +38,14 @@ El análisis en segundo plano usa un servicio en primer plano de WorkManager (`d
 9. **Pruebas cerradas**: las cuentas personales nuevas deben hacer una prueba cerrada con ≥12 testers durante 14 días antes de pasar a producción.
 
 ## Puntos que debes verificar en un dispositivo real
-- **Páginas de 16 KB** (obligatorio para apps con código nativo que apuntan a Android 15+): ejecuta `zipalign -c -P 16 -v 4 app-release.aab`/`check_elf_alignment.sh` sobre el APK generado y comprueba que `libvosk.so`, `libjnidispatch.so` y las libs de MediaPipe estén alineadas. Si alguna no lo está, actualiza esa dependencia.
+- **Páginas de 16 KB** (obligatorio para apps con código nativo que apuntan a Android 15+): ejecuta `zipalign -c -P 16 -v 4 app-release.aab`/`check_elf_alignment.sh` sobre el APK generado y comprueba que `libvosk.so`, `libjnidispatch.so` estén alineadas (MediaPipe se eliminó: la detección de rostros usa `android.media.FaceDetector`). Si alguna no lo está, actualiza esa dependencia.
 - **Twitch / Kick**: sólo se leen título y duración (si aparecen); Kick suele estar tras Cloudflare y puede bloquear la lectura (el flujo sigue con el análisis local). Prueba VODs, clips y canales reales.
 - **Heatmap de YouTube**: pega varios enlaces reales. Es una lectura de página pública (no API oficial), puede fallar si YouTube cambia su HTML o muestra una pantalla de consentimiento; en ese caso la app cae a análisis de texto.
 - **Tiempos del overlay de subtítulos** en un export de 720p y 1080p (los tiempos son relativos al inicio del clip recortado).
 - **TikTok / Instagram / Facebook**: sólo se garantiza abrir la app destino con el video adjunto (intent de compartir). Cada app decide qué pantalla muestra.
 - **Dispositivos de gama baja**: prueba con un video de 10+ minutos (la transcripción de Vosk es en tiempo casi real ≈1× la duración del audio) y el export en 720p.
 
-- **Fase 2 en dispositivo real**: (1) el split screen (`VideoCompositorSettings`) y la mezcla de audio SFX con `Composition`; (2) subtítulos y barra en el render dividido; (3) notificación y foreground en Android 12-15 con la app en segundo plano; (4) modo rápido con un video de varias horas; (5) `VideoTrimmer` con distintos códecs (WebM/VP9 puede no aceptarlo el muxer MP4).
+- **Fase 2 en dispositivo real**: (1) el split screen (`VideoCompositorSettings`) y la mezcla de audio SFX con `Composition`; (2) subtítulos y barra en el render dividido; (3) detección de rostros con `FaceDetector` en varios dispositivos; (4) modo rápido con un video de varias horas; (5) `VideoTrimmer` con distintos códecs (WebM/VP9 puede no aceptarlo el muxer MP4).
 
 ## Riesgos de política que debes conocer
 - Leer datos de las páginas de YouTube, Twitch o Kick **no es una API oficial** y podría contravenir sus Términos. Está aislado en `YouTubeClient`/`AnalysisPipeline` para poder desactivarlo sin afectar al resto.

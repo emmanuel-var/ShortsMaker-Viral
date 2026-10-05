@@ -11,11 +11,9 @@ okhttp = "4.12.0"
 serialization = "1.8.1"
 coroutines = "1.10.2"
 vosk = "0.3.75"
-mediapipe = "0.10.21"
 junit = "4.13.2"
 playServicesAds = "23.6.0"
 ump = "3.1.0"
-work = "2.10.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
@@ -40,10 +38,8 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 vosk-android = { module = "com.alphacephei:vosk-android", version.ref = "vosk" }
-mediapipe-tasks-vision = { module = "com.google.mediapipe:tasks-vision", version.ref = "mediapipe" }
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 user-messaging-platform = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
-androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "work" }
 junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]

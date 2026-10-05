@@ -202,7 +202,7 @@ data class Framing(
 enum class ComposeLayout {
     /** Un solo video recortado a 9:16 (con seguimiento del rostro). */
     FULL,
-    /** Arriba el rostro (seguido por MediaPipe) y abajo el video original completo (gameplay). */
+    /** Arriba el rostro (seguido por el detector de rostros) y abajo el video original completo (gameplay). */
     SPLIT_GAMEPLAY,
     /** Arriba el rostro y abajo un segundo video local (B-roll: "Subway Surfers", satisfying…), en bucle. */
     SPLIT_BROLL,

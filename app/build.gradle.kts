@@ -21,8 +21,8 @@ android {
         applicationId = "com.shortsmaker.viral"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // AdMob: por defecto (debug) se usan los IDs DE PRUEBA de Google, para no generar tráfico inválido con tus IDs reales.
@@ -33,7 +33,6 @@ android {
 
     androidResources {
         localeFilters += listOf("es", "en", "fr", "de", "pt", "zh", "ja", "ru", "hi")
-        noCompress += "tflite" // MediaPipe mapea el modelo directamente desde assets
     }
 
     signingConfigs {
@@ -71,7 +70,7 @@ android {
 
     packaging {
         resources.excludes += setOf("/META-INF/{AL2.0,LGPL2.1}", "META-INF/DEPENDENCIES")
-        // Las librerías nativas (Vosk/JNA/MediaPipe) se empaquetan sin comprimir y alineadas a 16 KB.
+        // Las librerías nativas (Vosk/JNA) se empaquetan sin comprimir y alineadas a 16 KB.
         jniLibs.useLegacyPackaging = false
     }
 
@@ -113,7 +112,6 @@ dependencies {
     implementation(libs.media3.transformer)
     implementation(libs.media3.effect)
 
-    implementation(libs.androidx.work.runtime) // análisis en segundo plano (Foreground Service)
 
     implementation(libs.okhttp)
 
@@ -125,7 +123,6 @@ dependencies {
 
     // IA 100 % on-device (sin servidores propios)
     implementation(libs.vosk.android)            // transcripción offline (Apache 2.0)
-    implementation(libs.mediapipe.tasks.vision)  // detección de rostros (Apache 2.0)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.core)

@@ -1,11 +1,7 @@
 package com.shortsmaker.viral.ui.importer
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -148,7 +144,7 @@ class ImportViewModel(private val container: AppContainer) : ViewModel() {
 
     /**
      * Prepara la petición y devuelve el id del proyecto. `FAST` = video largo forzado sin recortar
-     * (Audio Radar → 5 picos → Vosk/MediaPipe sólo en ventanas de 2 min).
+     * (Audio Radar → 5 picos → Vosk + detector de rostros sólo en ventanas de 2 min).
      */
     fun start(forceFast: Boolean = false): String? {
         val s = _state.value
@@ -178,16 +174,8 @@ fun ImportScreen(onBack: () -> Unit, onStart: (String) -> Unit) {
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { vm.onVideoPicked(it) }
     val context = LocalContext.current
 
-    // Android 13+: permiso para mostrar la notificación de progreso. El análisis funciona igual si se deniega.
-    var pendingStart by remember { mutableStateOf<(() -> Unit)?>(null) }
-    val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
-        pendingStart?.invoke(); pendingStart = null
-    }
     fun begin(forceFast: Boolean) {
-        val go = { vm.start(forceFast)?.let(onStart); Unit }
-        val needsAsk = Build.VERSION.SDK_INT >= 33 &&
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-        if (needsAsk) { pendingStart = go; notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS) } else go()
+        vm.start(forceFast)?.let(onStart)
     }
 
     Scaffold(
@@ -318,6 +306,11 @@ fun ImportScreen(onBack: () -> Unit, onStart: (String) -> Unit) {
                 enabled = state.canContinue,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
             ) { Text(stringResource(R.string.analyze_video), fontWeight = FontWeight.Bold) }
+            Text(
+                stringResource(R.string.keep_app_open_warning),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 

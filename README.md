@@ -19,7 +19,7 @@ App Android (Kotlin + Jetpack Compose) para convertir videos largos en clips ver
 | Función | Solución | Dónde |
 |---|---|---|
 | Voz → texto con tiempos por palabra | **Vosk** (Kaldi, Apache 2.0). El modelo pequeño (~40-50 MB) se descarga una vez por idioma | `data/VoskModelManager.kt`, `data/AudioDecoder.kt`, `data/VoskTranscriber.kt` |
-| Auto-encuadre de rostro | **MediaPipe Face Detector** (BlazeFace, incluido en `assets/`, 100 % offline) + suavizado de cámara | `data/FaceTracker.kt`, `domain/Framing.kt` |
+| Auto-encuadre de rostro | **`android.media.FaceDetector`** (incluido en Android, sin librerías nativas propias ni modelos, 100 % offline) + suavizado de cámara | `data/FaceTracker.kt`, `domain/Framing.kt` |
 | “Heatmap” de momentos más vistos | Lectura de la página pública del video desde el cliente (HTTP + WebView invisible como respaldo) | `data/YouTubeClient.kt`, `domain/YouTube.kt` |
 | Algoritmo de clips y puntaje viral | Lógica propia (frases, heatmap, palabras gancho, ritmo, duración) | `domain/ClipAnalyzer.kt` |
 | Títulos sugeridos | Palabras clave más repetidas + plantillas por idioma | `domain/TextAnalysis.kt`, `domain/TitleGenerator.kt` |
@@ -45,7 +45,7 @@ En ningún caso se descarga el video ni el directo: el usuario selecciona siempr
 Ventanas de 15-60 s alineadas a frases, puntuadas (0-1) con: densidad de habla relativa al video y poco silencio (30 %), preguntas/exclamaciones (20 %; Vosk no emite puntuación, así que se infiere por palabras interrogativas y énfasis), palabras clave repetidas de todo el video (25 %), ganchos (15 %) y duración (10 %). Se eligen los mejores sin solaparse (máx. 25 %).
 
 ### Modo manual
-El botón fijo de Sugerencias navega a `manual/{id}` (`ui/manual/ManualClipEntryScreen.kt`), que crea un clip con el **video completo** (hasta 10 min) y salta a `editor/{id}/{clip}` sacando `manual/{id}` de la pila (Atrás vuelve a Sugerencias). En el editor se recorta con la línea de tiempo (más saltos de ±1 s / ±10 s para videos largos). La transcripción de Vosk ya cubre todo el video, y el auto-encuadre de MediaPipe se calcula **sobre el tramo recortado** (se reanaliza al soltar el control, sólo para tramos ≤ 2 min; el resultado se guarda por clip).
+El botón fijo de Sugerencias navega a `manual/{id}` (`ui/manual/ManualClipEntryScreen.kt`), que crea un clip con el **video completo** (hasta 10 min) y salta a `editor/{id}/{clip}` sacando `manual/{id}` de la pila (Atrás vuelve a Sugerencias). En el editor se recorta con la línea de tiempo (más saltos de ±1 s / ±10 s para videos largos). La transcripción de Vosk ya cubre todo el video, y el auto-encuadre de el detector de rostros se calcula **sobre el tramo recortado** (se reanaliza al soltar el control, sólo para tramos ≤ 2 min; el resultado se guarda por clip).
 
 ## Fase 2: análisis multimedia, videos largos y render avanzado
 
@@ -56,17 +56,17 @@ El botón fijo de Sugerencias navega a `manual/{id}` (`ui/manual/ManualClipEntry
 |---|---|---|
 | **Audio Radar** (`AudioRadar.kt`) | **40 %** | Energía RMS por trozos de 100 ms (1 byte cada uno, guardada en `energy.bin`). Picos = por encima de la mediana +10 dB y del percentil 95; *contrastes* = ≥ 0.6 s de silencio (≤ mediana −8 dB) seguido de un salto ≥ 18 dB. Densidad de picos 40 % + contrastes 35 % + pico máximo 25 % |
 | Texto | 30 % | densidad de habla, preguntas/exclamaciones, temas repetidos, ganchos |
-| **Movimiento del rostro** (`MotionAnalysis.kt`) | 15 % | velocidad de desplazamiento del rostro + cambio de tamaño (acercarse/alejarse) entre muestras de MediaPipe |
+| **Movimiento del rostro** (`MotionAnalysis.kt`) | 15 % | velocidad de desplazamiento del rostro + cambio de tamaño (acercarse/alejarse) entre muestras de el detector de rostros |
 | **Chat** (`ChatAnalysis.kt`) | 15 % | ráfagas de mensajes por ventanas de 5 s, con más peso para LUL/KEKW/jajaja/emotes… |
 
-Lo que no esté disponible se ignora y su peso pasa al texto (el audio conserva su 40 %). Para ahorrar batería es en **dos etapas**: (A) se puntúan todas las ventanas con texto + audio + chat (barato) y (B) sólo en las 10 mejores se muestrea el rostro con MediaPipe (1 fotograma / 1.5 s) y se calcula el puntaje final. Sin voz (p. ej. gameplay) se recorre el video con ventanas uniformes puntuadas por audio/chat.
+Lo que no esté disponible se ignora y su peso pasa al texto (el audio conserva su 40 %). Para ahorrar batería es en **dos etapas**: (A) se puntúan todas las ventanas con texto + audio + chat (barato) y (B) sólo en las 10 mejores se muestrea el rostro con el detector de rostros (1 fotograma / 1.5 s) y se calcula el puntaje final. Sin voz (p. ej. gameplay) se recorre el video con ventanas uniformes puntuadas por audio/chat.
 
 **Chat de Twitch/Kick:** si `LinkMetadataClient` obtiene el VOD, `ChatDomParser` busca en el DOM mensajes con marca de tiempo. Es *best effort* (las webs virtualizan el chat y sus selectores cambian): si no aparecen ≥ 30 mensajes, se ignora en silencio.
 
 ### Videos largos (`AnalysisPipeline`, `VideoTrimmer`, `FastMode.kt`)
 - ≤ **15 min**: flujo normal. > 15 min: diálogo con tres salidas: **recortar** (UI con `RangeSlider` + saltos ±10 s/±1 min; el recorte es un *remux* sin recodificar, casi instantáneo), **forzar procesamiento completo** (muestra un Toast avisando del modo rápido) o cancelar.
-- **Modo rápido**: sólo se decodifica la energía del audio (sin remuestrear), se toman los **5 picos** más fuertes (separados ≥ 2 min) y Vosk + MediaPipe corren **únicamente en ventanas de 2 min** alrededor de ellos. En el editor, si recortas a mano un tramo no analizado (≤ 5 min), se transcribe bajo demanda.
-- **Foreground Service + WorkManager** (`work/AnalysisWorker.kt`, `AnalysisNotifications.kt`): el análisis se ejecuta como `CoroutineWorker` con `setForeground` y una notificación persistente con barra de progreso y botón Cancelar. Tipo de servicio: `mediaProcessing` en Android 15+, `dataSync` en Android 10-14. La petición se guarda en disco (`PendingRequestStore`) para poder reanudar, el progreso llega a la UI con `setProgress`, y la pantalla de inicio muestra los análisis en curso. Al terminar, una notificación abre las sugerencias.
+- **Modo rápido**: sólo se decodifica la energía del audio (sin remuestrear), se toman los **5 picos** más fuertes (separados ≥ 2 min) y Vosk + el detector de rostros corren **únicamente en ventanas de 2 min** alrededor de ellos. En el editor, si recortas a mano un tramo no analizado (≤ 5 min), se transcribe bajo demanda.
+- **Análisis en la propia app** (`data/AnalysisRunner.kt`): se ejecuta en un ámbito de aplicación (sobrevive a salir de la pantalla de procesamiento, no a que Android cierre la app), con pantalla encendida y un aviso de **no cambiar de app**. No usa servicios en primer plano ni permisos especiales (no hay que rellenar la declaración de Play Console).
 
 ### Editor y render (`data/VideoExporter.kt`)
 - **Diseño**: Normal 9:16, **dividida rostro + gameplay** (mismo video, mitad inferior original) o **rostro + B-roll** (segundo video local en bucle). Se implementa con una `Composition` de dos `EditedMediaItemSequence` y un `VideoCompositorSettings` que coloca cada textura de 1080×960 en la mitad superior/inferior; el audio sale sólo del video principal. Los subtítulos y la barra se dibujan una sola vez con `Composition.setEffects`.
@@ -120,6 +120,6 @@ Consulta **[PLAY_STORE.md](PLAY_STORE.md)** para la lista de verificación de pu
 ```
 app/src/main/java/com/shortsmaker/viral/
 ├── domain/   Lógica pura (testeada en JVM): modelos, análisis viral, subtítulos, YouTube, encuadre
-├── data/     Android: repositorios, Vosk, MediaPipe, Media3, MediaStore/compartir
+├── data/     Android: repositorios, Vosk, Media3, MediaStore/compartir
 └── ui/       Compose: tema, navegación y las 6 pantallas
 ```

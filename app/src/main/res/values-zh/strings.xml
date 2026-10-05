@@ -35,8 +35,8 @@
     <string name="ads_privacy_options">广告隐私选项</string>
     <string name="privacy_policy">隐私政策</string>
     <string name="open_source_licenses">开源许可</string>
-    <string name="privacy_policy_body">ShortsMaker Viral 在你的设备上处理你的视频。\n\n• 你的视频、转写文本和项目仅保存在应用的私有存储中，不会上传到我们的任何服务器。\n• 语音转写（Vosk）和人脸检测（MediaPipe）均在本地运行。语音模型只会从 alphacephei.com 下载一次。\n• 如果你粘贴 YouTube、Twitch 或 Kick 链接，应用会在你的设备上读取该页面的公开数据（标题、时长，以及 YouTube 上回放最多的片段）。不会下载任何视频或直播：你编辑的始终是你自己选择的文件。没有链接时，全部分析仅基于本地转写文本。\n• 广告：应用在部分页面显示 Google AdMob 横幅广告。AdMob 可能使用你设备的广告 ID 和设备数据来投放广告并衡量效果。在法律要求的地区（欧洲经济区、英国），我们会征求你的同意，你可以在“设置 → 广告隐私选项”中更改。你可以在 Android 设置中重置或删除广告 ID。详情：policies.google.com/technologies/ads。\n• 没有账号，也没有自有的数据分析。\n• 只有当你点击“保存”或“分享”时，导出的视频才会离开应用。\n• 你可以随时在设置中删除项目和模型。\n\n使用第三方视频时，你需自行确保拥有必要的权利。</string>
-    <string name="licenses_body">本应用使用以下开源软件：\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose 和 AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin 和 kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK 和 User Messaging Platform – Google 条款\n\nVosk 语音模型采用 Apache License 2.0 发布。</string>
+    <string name="privacy_policy_body">ShortsMaker Viral 在你的设备上处理你的视频。\n\n• 你的视频、转写文本和项目仅保存在应用的私有存储中，不会上传到我们的任何服务器。\n• 语音转写（Vosk）和人脸检测（Android）均在本地运行。语音模型只会从 alphacephei.com 下载一次。\n• 如果你粘贴 YouTube、Twitch 或 Kick 链接，应用会在你的设备上读取该页面的公开数据（标题、时长，以及 YouTube 上回放最多的片段）。不会下载任何视频或直播：你编辑的始终是你自己选择的文件。没有链接时，全部分析仅基于本地转写文本。\n• 广告：应用在部分页面显示 Google AdMob 横幅广告。AdMob 可能使用你设备的广告 ID 和设备数据来投放广告并衡量效果。在法律要求的地区（欧洲经济区、英国），我们会征求你的同意，你可以在“设置 → 广告隐私选项”中更改。你可以在 Android 设置中重置或删除广告 ID。详情：policies.google.com/technologies/ads。\n• 没有账号，也没有自有的数据分析。\n• 只有当你点击“保存”或“分享”时，导出的视频才会离开应用。\n• 你可以随时在设置中删除项目和模型。\n\n使用第三方视频时，你需自行确保拥有必要的权利。</string>
+    <string name="licenses_body">本应用使用以下开源软件：\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose 和 AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin 和 kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK 和 User Messaging Platform – Google 条款\n\nVosk 语音模型采用 Apache License 2.0 发布。</string>
     <string name="import_title">导入视频</string>
     <string name="video_required_hint">这是唯一必需的步骤。对于 Twitch/Kick 直播，请选择你已下载的文件。</string>
     <string name="link_title">链接（可选）</string>
@@ -132,12 +132,7 @@
     <string name="error_save">无法将视频保存到相册。</string>
     <string name="step_radar">正在分析音频（音量峰值）</string>
     <string name="step_motion">正在测量人脸运动</string>
-    <string name="channel_progress">剪辑分析</string>
-    <string name="channel_progress_desc">后台视频分析进度</string>
-    <string name="notif_done_title">你的剪辑已完成！</string>
-    <string name="notif_done_text">“%1$s”现在可以编辑了。</string>
-    <string name="run_in_background">在后台继续</string>
-    <string name="background_hint">即使切换应用，分析也会继续；可在通知中查看进度。</string>
+    <string name="keep_app_open_warning">分析期间请勿切换到其他应用或锁屏，否则分析会中断。</string>
     <string name="analysis_running">正在处理视频… %1$d%%</string>
     <string name="trim_title">裁剪片段</string>
     <string name="trim_hint">选择最长 15 分钟的片段。裁剪即时完成且不损失画质。</string>
@@ -175,7 +170,6 @@
     <string name="signal_motion">运动</string>
     <string name="signal_chat">聊天爆发</string>
     <string name="fast_mode_note">快速模式：仅分析了视频中音量最大的时间段。</string>
-    <string name="channel_done">分析完成</string>
     <plurals name="clip_count">
         <item quantity="other">%1$d 个剪辑</item>
     </plurals>

@@ -23,6 +23,8 @@ import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -52,69 +54,34 @@ import com.shortsmaker.viral.R
 import com.shortsmaker.viral.data.AppException
 import com.shortsmaker.viral.data.PipelineProgress
 import com.shortsmaker.viral.data.PipelineStep
-import com.shortsmaker.viral.work.AnalysisWorker
-import com.shortsmaker.viral.work.labelRes
+import com.shortsmaker.viral.data.AnalysisState
+import com.shortsmaker.viral.data.labelRes
+import com.shortsmaker.viral.ui.common.KeepScreenOn
 import com.shortsmaker.viral.ui.common.appViewModel
 import com.shortsmaker.viral.ui.theme.BrandGradient
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-data class ProcessingUiState(
-    val progress: PipelineProgress? = null,
-    val error: AppException? = null,
-    val finished: Boolean = false,
-    /** El trabajo fue cancelado (por el usuario o por el sistema). */
-    val cancelled: Boolean = false,
-)
-
 /**
- * El análisis NO se ejecuta aquí sino en un `AnalysisWorker` (WorkManager + Foreground Service con notificación
- * persistente), de modo que sigue aunque el usuario salga de esta pantalla o cambie de aplicación. Este
- * ViewModel sólo lo encola y observa su progreso.
+ * El análisis lo ejecuta el `AnalysisRunner` de la app (no depende de esta pantalla): se puede salir y volver a verlo
+ * desde la pantalla de inicio. Este ViewModel sólo lo arranca y observa su estado.
  */
 class ProcessingViewModel(private val container: AppContainer, private val projectId: String) : ViewModel() {
-    private val app = container.app
-    private var lastRequest: ImportRequest? = container.pendingImports.remove(projectId)
+    private val lastRequest: ImportRequest? = container.pendingImports.remove(projectId)
 
-    val state: StateFlow<ProcessingUiState> = WorkManager.getInstance(app)
-        .getWorkInfosForUniqueWorkFlow(AnalysisWorker.uniqueName(projectId))
-        .map { infos -> infos.firstOrNull()?.toUiState() ?: ProcessingUiState() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProcessingUiState())
+    val state: StateFlow<AnalysisState> = container.analysis.state(projectId)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, AnalysisState())
 
     init {
-        // Primera vez: se guarda la petición en disco (para poder reanudar) y se encola el trabajo.
-        lastRequest?.let { enqueue(it) }
-    }
-
-    private fun enqueue(request: ImportRequest) {
-        container.pendingRequests.save(projectId, request)
-        AnalysisWorker.enqueue(app, projectId)
+        lastRequest?.let { container.analysis.start(projectId, it) }
     }
 
     fun retry() {
-        val req = lastRequest ?: return
-        enqueue(req)
+        lastRequest?.let { container.analysis.start(projectId, it) }
     }
 
-    fun cancel() {
-        AnalysisWorker.cancel(app, projectId)
-        container.pendingRequests.delete(projectId)
-    }
-
-    private fun WorkInfo.toUiState(): ProcessingUiState = when (state) {
-        WorkInfo.State.SUCCEEDED -> ProcessingUiState(finished = true)
-        WorkInfo.State.CANCELLED -> ProcessingUiState(cancelled = true)
-        WorkInfo.State.FAILED -> {
-            val res = outputData.getInt(AnalysisWorker.KEY_ERROR_RES, R.string.error_generic)
-            val args = outputData.getStringArray(AnalysisWorker.KEY_ERROR_ARGS)?.toList().orEmpty()
-            ProcessingUiState(error = AppException(res, args))
-        }
-        else -> ProcessingUiState(progress = with(AnalysisWorker) { progress.toPipelineProgress() })
-    }
+    fun cancel() = container.analysis.cancel(projectId)
 }
 
 @Composable
@@ -123,6 +90,7 @@ fun ProcessingScreen(projectId: String, onDone: () -> Unit, onExit: () -> Unit) 
     val state by vm.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    KeepScreenOn() // la pantalla encendida evita que el sistema pause el análisis
     LaunchedEffect(state.finished) { if (state.finished) onDone() }
     LaunchedEffect(state.cancelled) { if (state.cancelled) onExit() }
 
@@ -147,6 +115,14 @@ fun ProcessingScreen(projectId: String, onDone: () -> Unit, onExit: () -> Unit) 
                 return@Column
             }
 
+            // Aviso: el análisis vive en la app; si el usuario cambia de app Android puede detenerlo.
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer), modifier = Modifier.fillMaxWidth()) {
+                Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.onErrorContainer)
+                    Text(stringResource(R.string.keep_app_open_warning), color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+            Spacer(Modifier.height(20.dp))
             PulsingOrb()
             Spacer(Modifier.height(24.dp))
             Text(stringResource(R.string.processing_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
@@ -180,18 +156,7 @@ fun ProcessingScreen(projectId: String, onDone: () -> Unit, onExit: () -> Unit) 
             }
 
             Spacer(Modifier.height(28.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                // Salir sin cancelar: el análisis sigue en segundo plano con su notificación.
-                Button(onClick = onExit) { Text(stringResource(R.string.run_in_background)) }
-                OutlinedButton(onClick = { vm.cancel(); onExit() }) { Text(stringResource(R.string.cancel)) }
-            }
-            Text(
-                stringResource(R.string.background_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 12.dp),
-            )
+            OutlinedButton(onClick = { vm.cancel(); onExit() }) { Text(stringResource(R.string.cancel)) }
         }
     }
 }

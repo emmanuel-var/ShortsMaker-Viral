@@ -33,8 +33,8 @@ affiliation_disclaimer|ShortsMaker Viral est indépendante et n'est affiliée ni
 ads_privacy_options|Options de confidentialité des annonces
 privacy_policy|Politique de confidentialité
 open_source_licenses|Licences open source
-privacy_policy_body|ShortsMaker Viral traite vos vidéos sur votre appareil.\n\n• Vos vidéos, transcriptions et projets sont stockés uniquement dans le stockage privé de l'application. Ils ne sont envoyés à aucun de nos serveurs.\n• La transcription (Vosk) et la détection de visages (MediaPipe) s'exécutent localement. Les modèles vocaux sont téléchargés une fois depuis alphacephei.com.\n• Si vous collez un lien YouTube, Twitch ou Kick, l'application lit sur votre appareil les données publiques de cette page (titre, durée et, sur YouTube, moments les plus revus). Aucune vidéo ni aucun direct n'est téléchargé : vous modifiez toujours le fichier que vous choisissez. Sans lien, toute l'analyse repose sur la transcription locale.\n• Publicité : l'application affiche une bannière Google AdMob sur certains écrans. AdMob peut utiliser l'identifiant publicitaire de votre appareil et des données de l'appareil pour diffuser des annonces et mesurer leurs performances. Lorsque la loi l'exige (EEE, Royaume-Uni), nous demandons votre consentement et vous pouvez le modifier dans Paramètres → Options de confidentialité des annonces. Vous pouvez réinitialiser ou supprimer votre identifiant publicitaire dans les paramètres Android. Plus d'informations : policies.google.com/technologies/ads.\n• Aucun compte ni outil d'analyse propre.\n• La vidéo exportée ne quitte l'application que lorsque vous touchez Enregistrer ou Partager.\n• Vous pouvez supprimer projets et modèles dans les Paramètres à tout moment.\n\nSi vous utilisez des vidéos de tiers, vous devez détenir les droits nécessaires.
-licenses_body|Cette application utilise des logiciels open source :\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose et AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin et kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK et User Messaging Platform – Conditions de Google\n\nLes modèles vocaux Vosk sont distribués sous Apache License 2.0.
+privacy_policy_body|ShortsMaker Viral traite vos vidéos sur votre appareil.\n\n• Vos vidéos, transcriptions et projets sont stockés uniquement dans le stockage privé de l'application. Ils ne sont envoyés à aucun de nos serveurs.\n• La transcription (Vosk) et la détection de visages (Android) s'exécutent localement. Les modèles vocaux sont téléchargés une fois depuis alphacephei.com.\n• Si vous collez un lien YouTube, Twitch ou Kick, l'application lit sur votre appareil les données publiques de cette page (titre, durée et, sur YouTube, moments les plus revus). Aucune vidéo ni aucun direct n'est téléchargé : vous modifiez toujours le fichier que vous choisissez. Sans lien, toute l'analyse repose sur la transcription locale.\n• Publicité : l'application affiche une bannière Google AdMob sur certains écrans. AdMob peut utiliser l'identifiant publicitaire de votre appareil et des données de l'appareil pour diffuser des annonces et mesurer leurs performances. Lorsque la loi l'exige (EEE, Royaume-Uni), nous demandons votre consentement et vous pouvez le modifier dans Paramètres → Options de confidentialité des annonces. Vous pouvez réinitialiser ou supprimer votre identifiant publicitaire dans les paramètres Android. Plus d'informations : policies.google.com/technologies/ads.\n• Aucun compte ni outil d'analyse propre.\n• La vidéo exportée ne quitte l'application que lorsque vous touchez Enregistrer ou Partager.\n• Vous pouvez supprimer projets et modèles dans les Paramètres à tout moment.\n\nSi vous utilisez des vidéos de tiers, vous devez détenir les droits nécessaires.
+licenses_body|Cette application utilise des logiciels open source :\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose et AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin et kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK et User Messaging Platform – Conditions de Google\n\nLes modèles vocaux Vosk sont distribués sous Apache License 2.0.
 import_title|Importer une vidéo
 video_required_hint|C'est la seule exigence. Pour les directs Twitch/Kick, choisissez le fichier que vous avez déjà téléchargé.
 link_title|Lien (facultatif)
@@ -130,12 +130,7 @@ error_export|La vidéo n'a pas pu être générée. Essayez 720p dans les Param�
 error_save|La vidéo n'a pas pu être enregistrée dans la galerie.
 step_radar|Analyse de l'audio (pics de volume)
 step_motion|Mesure du mouvement du visage
-channel_progress|Analyse des clips
-channel_progress_desc|Progression de l'analyse vidéo en arrière-plan
-notif_done_title|Vos clips sont prêts !
-notif_done_text|« %1$s » est prêt à être modifié.
-run_in_background|Continuer en arrière-plan
-background_hint|L'analyse continue même si vous changez d'appli ; suivez sa progression dans la notification.
+keep_app_open_warning|Ne changez pas d'appli et ne verrouillez pas l'écran pendant l'analyse : elle s'arrêterait.
 analysis_running|Traitement de la vidéo… %1$d%%
 trim_title|Découper un extrait
 trim_hint|Choisissez un extrait de 15 minutes maximum. Le découpage est instantané et sans perte.
@@ -173,4 +168,3 @@ signal_audio|Pic audio
 signal_motion|Mouvement
 signal_chat|Chat en feu
 fast_mode_note|Mode rapide : seules les fenêtres les plus fortes de la vidéo ont été analysées.
-channel_done|Analyse terminée

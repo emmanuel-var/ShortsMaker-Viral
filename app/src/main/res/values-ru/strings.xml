@@ -35,8 +35,8 @@
     <string name="ads_privacy_options">Параметры конфиденциальности рекламы</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
     <string name="open_source_licenses">Лицензии открытого ПО</string>
-    <string name="privacy_policy_body">ShortsMaker Viral обрабатывает ваши видео на вашем устройстве.\n\n• Ваши видео, расшифровки и проекты хранятся только в закрытом хранилище приложения. Они не отправляются на наши серверы.\n• Расшифровка речи (Vosk) и распознавание лиц (MediaPipe) выполняются локально. Голосовые модели скачиваются один раз с alphacephei.com.\n• Если вы вставляете ссылку YouTube, Twitch или Kick, приложение считывает на вашем устройстве общедоступные данные этой страницы (название, длительность и, на YouTube, самые пересматриваемые моменты). Никакие видео или трансляции не скачиваются: вы всегда редактируете выбранный вами файл. Без ссылки весь анализ строится на локальной расшифровке.\n• Реклама: на некоторых экранах приложение показывает баннер Google AdMob. AdMob может использовать рекламный идентификатор вашего устройства и данные об устройстве для показа рекламы и оценки её эффективности. Там, где этого требует закон (ЕЭП, Великобритания), мы запрашиваем ваше согласие; изменить его можно в разделе «Настройки → Параметры конфиденциальности рекламы». Рекламный идентификатор можно сбросить или удалить в настройках Android. Подробнее: policies.google.com/technologies/ads.\n• Нет аккаунтов и собственной аналитики.\n• Экспортированное видео покидает приложение только тогда, когда вы нажимаете «Сохранить» или «Поделиться».\n• Проекты и модели можно удалить в настройках в любой момент.\n\nИспользуя чужие видео, вы отвечаете за наличие необходимых прав.</string>
-    <string name="licenses_body">Это приложение использует программное обеспечение с открытым исходным кодом:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose и AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin и kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK и User Messaging Platform – условия Google\n\nГолосовые модели Vosk распространяются по лицензии Apache License 2.0.</string>
+    <string name="privacy_policy_body">ShortsMaker Viral обрабатывает ваши видео на вашем устройстве.\n\n• Ваши видео, расшифровки и проекты хранятся только в закрытом хранилище приложения. Они не отправляются на наши серверы.\n• Расшифровка речи (Vosk) и распознавание лиц (Android) выполняются локально. Голосовые модели скачиваются один раз с alphacephei.com.\n• Если вы вставляете ссылку YouTube, Twitch или Kick, приложение считывает на вашем устройстве общедоступные данные этой страницы (название, длительность и, на YouTube, самые пересматриваемые моменты). Никакие видео или трансляции не скачиваются: вы всегда редактируете выбранный вами файл. Без ссылки весь анализ строится на локальной расшифровке.\n• Реклама: на некоторых экранах приложение показывает баннер Google AdMob. AdMob может использовать рекламный идентификатор вашего устройства и данные об устройстве для показа рекламы и оценки её эффективности. Там, где этого требует закон (ЕЭП, Великобритания), мы запрашиваем ваше согласие; изменить его можно в разделе «Настройки → Параметры конфиденциальности рекламы». Рекламный идентификатор можно сбросить или удалить в настройках Android. Подробнее: policies.google.com/technologies/ads.\n• Нет аккаунтов и собственной аналитики.\n• Экспортированное видео покидает приложение только тогда, когда вы нажимаете «Сохранить» или «Поделиться».\n• Проекты и модели можно удалить в настройках в любой момент.\n\nИспользуя чужие видео, вы отвечаете за наличие необходимых прав.</string>
+    <string name="licenses_body">Это приложение использует программное обеспечение с открытым исходным кодом:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose и AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin и kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK и User Messaging Platform – условия Google\n\nГолосовые модели Vosk распространяются по лицензии Apache License 2.0.</string>
     <string name="import_title">Импорт видео</string>
     <string name="video_required_hint">Это единственное обязательное условие. Для трансляций Twitch/Kick выберите уже скачанный файл.</string>
     <string name="link_title">Ссылка (необязательно)</string>
@@ -132,12 +132,7 @@
     <string name="error_save">Не удалось сохранить видео в галерею.</string>
     <string name="step_radar">Анализ аудио (пики громкости)</string>
     <string name="step_motion">Измерение движения лица</string>
-    <string name="channel_progress">Анализ клипов</string>
-    <string name="channel_progress_desc">Ход анализа видео в фоне</string>
-    <string name="notif_done_title">Ваши клипы готовы!</string>
-    <string name="notif_done_text">«%1$s» можно редактировать.</string>
-    <string name="run_in_background">Продолжить в фоне</string>
-    <string name="background_hint">Анализ продолжится, даже если вы переключитесь в другое приложение; ход виден в уведомлении.</string>
+    <string name="keep_app_open_warning">Во время анализа не переключайтесь на другое приложение и не блокируйте экран: анализ прервётся.</string>
     <string name="analysis_running">Обработка видео… %1$d%%</string>
     <string name="trim_title">Обрезать фрагмент</string>
     <string name="trim_hint">Выберите фрагмент до 15 минут. Обрезка мгновенная и без потери качества.</string>
@@ -175,7 +170,6 @@
     <string name="signal_motion">Движение</string>
     <string name="signal_chat">Чат в огне</string>
     <string name="fast_mode_note">Быстрый режим: проанализированы только самые громкие участки видео.</string>
-    <string name="channel_done">Анализ завершён</string>
     <plurals name="clip_count">
         <item quantity="one">%1$d клип</item>
         <item quantity="few">%1$d клипа</item>

@@ -29,7 +29,7 @@ object LongVideo {
 
 /**
  * Modo rápido ("Audio Radar Fallback"): en vez de transcribir 4 horas, se extrae sólo la energía del audio, se
- * buscan los 5 momentos más fuertes y Vosk/MediaPipe se ejecutan únicamente en ventanas de 2 minutos a su alrededor.
+ * buscan los 5 momentos más fuertes y Vosk + detector de rostros se ejecutan únicamente en ventanas de 2 minutos a su alrededor.
  */
 object FastModePlanner {
     const val PEAKS = 5

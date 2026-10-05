@@ -48,7 +48,7 @@ data class ScoredWindow(
  * "silencio → explosión"), MOVIMIENTO del rostro y CHAT del VOD. Todo local.
  *
  * Se hace en dos etapas para ahorrar batería: (A) se puntúan TODAS las ventanas con texto + audio + chat, que son baratos;
- * (B) sólo para las mejores se mide el movimiento del rostro (MediaPipe es caro) y se calcula el puntaje final.
+ * (B) sólo para las mejores se mide el movimiento del rostro (el detector de rostros es caro) y se calcula el puntaje final.
  */
 object MultimediaClipGenerator {
     const val PRESELECT = 10

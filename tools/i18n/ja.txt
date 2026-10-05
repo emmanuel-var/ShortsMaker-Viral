@@ -33,8 +33,8 @@ affiliation_disclaimer|ShortsMaker Viral は独立したアプリであり、You
 ads_privacy_options|広告のプライバシー オプション
 privacy_policy|プライバシーポリシー
 open_source_licenses|オープンソースライセンス
-privacy_policy_body|ShortsMaker Viral は、お使いの端末上で動画を処理します。\n\n• 動画、文字起こし、プロジェクトはアプリ専用のストレージにのみ保存され、当社のサーバーには送信されません。\n• 文字起こし（Vosk）と顔検出（MediaPipe）は端末内で実行されます。音声モデルは alphacephei.com から一度だけダウンロードされます。\n• YouTube・Twitch・Kick のリンクを貼り付けると、アプリは端末上でそのページの公開情報（タイトル、長さ、YouTube ではよく再生される部分）を読み取ります。動画や配信はダウンロードされず、編集するのは常にあなたが選んだファイルです。リンクがない場合、分析はすべて端末内の文字起こしだけで行われます。\n• 広告：一部の画面に Google AdMob のバナーを表示します。AdMob は広告の配信と効果測定のために、端末の広告 ID や端末データを使用することがあります。法律で必要とされる地域（EEA、英国）では同意をお願いしており、「設定 → 広告のプライバシー オプション」からいつでも変更できます。広告 ID は Android の設定でリセットまたは削除できます。詳細：policies.google.com/technologies/ads\n• アカウントや独自の分析はありません。\n• 書き出した動画は、「保存」または「共有」をタップしたときにのみアプリの外に出ます。\n• プロジェクトとモデルは、設定からいつでも削除できます。\n\n第三者の動画を使用する場合は、必要な権利を保有する責任があなたにあります。
-licenses_body|このアプリは次のオープンソースソフトウェアを使用しています：\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose と AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin と kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK と User Messaging Platform – Google の利用規約\n\nVosk の音声モデルは Apache License 2.0 で配布されています。
+privacy_policy_body|ShortsMaker Viral は、お使いの端末上で動画を処理します。\n\n• 動画、文字起こし、プロジェクトはアプリ専用のストレージにのみ保存され、当社のサーバーには送信されません。\n• 文字起こし（Vosk）と顔検出（Android）は端末内で実行されます。音声モデルは alphacephei.com から一度だけダウンロードされます。\n• YouTube・Twitch・Kick のリンクを貼り付けると、アプリは端末上でそのページの公開情報（タイトル、長さ、YouTube ではよく再生される部分）を読み取ります。動画や配信はダウンロードされず、編集するのは常にあなたが選んだファイルです。リンクがない場合、分析はすべて端末内の文字起こしだけで行われます。\n• 広告：一部の画面に Google AdMob のバナーを表示します。AdMob は広告の配信と効果測定のために、端末の広告 ID や端末データを使用することがあります。法律で必要とされる地域（EEA、英国）では同意をお願いしており、「設定 → 広告のプライバシー オプション」からいつでも変更できます。広告 ID は Android の設定でリセットまたは削除できます。詳細：policies.google.com/technologies/ads\n• アカウントや独自の分析はありません。\n• 書き出した動画は、「保存」または「共有」をタップしたときにのみアプリの外に出ます。\n• プロジェクトとモデルは、設定からいつでも削除できます。\n\n第三者の動画を使用する場合は、必要な権利を保有する責任があなたにあります。
+licenses_body|このアプリは次のオープンソースソフトウェアを使用しています：\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose と AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin と kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK と User Messaging Platform – Google の利用規約\n\nVosk の音声モデルは Apache License 2.0 で配布されています。
 import_title|動画をインポート
 video_required_hint|必須なのはこれだけです。Twitch/Kick の配信は、すでにダウンロードしたファイルを選んでください。
 link_title|リンク（任意）
@@ -130,12 +130,7 @@ error_export|動画をレンダリングできませんでした。設定で 720
 error_save|動画をギャラリーに保存できませんでした。
 step_radar|音声を分析中（音量のピーク）
 step_motion|顔の動きを計測中
-channel_progress|クリップ分析
-channel_progress_desc|動画分析のバックグラウンド進捗
-notif_done_title|クリップの準備ができました！
-notif_done_text|「%1$s」を編集できます。
-run_in_background|バックグラウンドで続行
-background_hint|アプリを切り替えても分析は続きます。進捗は通知で確認できます。
+keep_app_open_warning|分析中は他のアプリに切り替えたり画面をロックしたりしないでください。分析が中断されます。
 analysis_running|動画を処理中… %1$d%%
 trim_title|区間をトリミング
 trim_hint|最大15分の区間を選んでください。トリミングは一瞬で、画質の劣化もありません。
@@ -173,4 +168,3 @@ signal_audio|音声ピーク
 signal_motion|動き
 signal_chat|チャットが盛り上がり
 fast_mode_note|高速モード：動画内で最も音量の大きい区間のみ分析しました。
-channel_done|分析完了

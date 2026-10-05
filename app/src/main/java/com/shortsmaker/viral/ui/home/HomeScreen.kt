@@ -67,10 +67,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import com.shortsmaker.viral.work.AnalysisWorker
-import com.shortsmaker.viral.work.labelRes
+import com.shortsmaker.viral.data.labelRes
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -87,20 +84,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 
-/** Análisis en curso (WorkManager), para el aviso de la pantalla de inicio. */
+/** Análisis en curso , para el aviso de la pantalla de inicio. */
 data class ActiveAnalysis(val projectId: String, val percent: Int, val stepRes: Int?)
 
 class HomeViewModel(private val container: AppContainer) : ViewModel() {
     val projects: StateFlow<List<ProjectSummary>> = container.projects.summaries
 
-    val active: StateFlow<List<ActiveAnalysis>> = WorkManager.getInstance(container.app)
-        .getWorkInfosByTagFlow(AnalysisWorker.TAG_ANALYSIS)
-        .map { infos ->
-            infos.filter { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }.mapNotNull { info ->
-                val id = info.tags.firstOrNull { it.startsWith(AnalysisWorker.PROJECT_TAG_PREFIX) }
-                    ?.removePrefix(AnalysisWorker.PROJECT_TAG_PREFIX) ?: return@mapNotNull null
-                val p = with(AnalysisWorker) { info.progress.toPipelineProgress() }
-                ActiveAnalysis(id, ((p?.overall ?: 0f) * 100).toInt(), p?.current?.labelRes)
+    val active: StateFlow<List<ActiveAnalysis>> = container.analysis.states
+        .map { map ->
+            map.filter { it.value.running }.map { (id, st) ->
+                ActiveAnalysis(id, ((st.progress?.overall ?: 0f) * 100).toInt(), st.progress?.current?.labelRes)
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())

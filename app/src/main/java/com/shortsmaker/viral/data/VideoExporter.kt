@@ -152,7 +152,7 @@ class VideoExporter(private val context: Context) {
                 composition = Composition.Builder(listOf(EditedMediaItemSequence.Builder(main).build(), sfxSequence)).build()
             }
         } else {
-            // Arriba: rostro (seguido por MediaPipe) recortado a la mitad superior 9:8. Abajo: gameplay original o B-roll.
+            // Arriba: rostro (seguido por el detector de rostros) recortado a la mitad superior 9:8. Abajo: gameplay original o B-roll.
             val halfH = h / 2
             val top = EditedMediaItem.Builder(clipped(job.source))
                 .setEffects(

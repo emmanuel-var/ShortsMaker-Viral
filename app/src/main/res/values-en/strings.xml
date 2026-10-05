@@ -35,8 +35,8 @@
     <string name="ads_privacy_options">Ad privacy options</string>
     <string name="privacy_policy">Privacy policy</string>
     <string name="open_source_licenses">Open-source licenses</string>
-    <string name="privacy_policy_body">ShortsMaker Viral processes your videos on your device.\n\n• Your videos, transcripts and projects are stored only in the app\'s private storage. They are never uploaded to any server of ours.\n• Transcription (Vosk) and face detection (MediaPipe) run locally. Voice models are downloaded once from alphacephei.com.\n• If you paste a YouTube, Twitch or Kick link, the app reads that page\'s public data on your device (title, duration and, on YouTube, most-replayed moments). No video or stream is downloaded: you always edit the file you choose. Without a link, all analysis uses the local transcript.\n• Ads: the app shows a Google AdMob banner on some screens. AdMob may use your device\'s advertising ID and device data to serve ads and measure performance. Where required by law (EEA, UK) we ask for your consent and you can change it in Settings → Ad privacy options. You can reset or delete your advertising ID in Android settings. More info: policies.google.com/technologies/ads.\n• No accounts or first-party analytics.\n• The exported video only leaves the app when you tap Save or Share.\n• You can delete projects and models in Settings at any time.\n\nWhen using third-party videos you are responsible for holding the necessary rights.</string>
-    <string name="licenses_body">This app uses open-source software:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose and AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin and kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK and User Messaging Platform – Google terms\n\nVosk voice models are distributed under the Apache License 2.0.</string>
+    <string name="privacy_policy_body">ShortsMaker Viral processes your videos on your device.\n\n• Your videos, transcripts and projects are stored only in the app\'s private storage. They are never uploaded to any server of ours.\n• Transcription (Vosk) and face detection (Android) run locally. Voice models are downloaded once from alphacephei.com.\n• If you paste a YouTube, Twitch or Kick link, the app reads that page\'s public data on your device (title, duration and, on YouTube, most-replayed moments). No video or stream is downloaded: you always edit the file you choose. Without a link, all analysis uses the local transcript.\n• Ads: the app shows a Google AdMob banner on some screens. AdMob may use your device\'s advertising ID and device data to serve ads and measure performance. Where required by law (EEA, UK) we ask for your consent and you can change it in Settings → Ad privacy options. You can reset or delete your advertising ID in Android settings. More info: policies.google.com/technologies/ads.\n• No accounts or first-party analytics.\n• The exported video only leaves the app when you tap Save or Share.\n• You can delete projects and models in Settings at any time.\n\nWhen using third-party videos you are responsible for holding the necessary rights.</string>
+    <string name="licenses_body">This app uses open-source software:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose and AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin and kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK and User Messaging Platform – Google terms\n\nVosk voice models are distributed under the Apache License 2.0.</string>
     <string name="import_title">Import video</string>
     <string name="video_required_hint">This is the only requirement. For Twitch/Kick streams, choose the file you already downloaded.</string>
     <string name="link_title">Link (optional)</string>
@@ -132,12 +132,7 @@
     <string name="error_save">The video couldn\'t be saved to the gallery.</string>
     <string name="step_radar">Analyzing audio (volume peaks)</string>
     <string name="step_motion">Measuring face movement</string>
-    <string name="channel_progress">Clip analysis</string>
-    <string name="channel_progress_desc">Background video analysis progress</string>
-    <string name="notif_done_title">Your clips are ready!</string>
-    <string name="notif_done_text">“%1$s” is ready to edit.</string>
-    <string name="run_in_background">Keep going in background</string>
-    <string name="background_hint">Analysis continues even if you switch apps; follow its progress in the notification.</string>
+    <string name="keep_app_open_warning">Don\'t switch to another app or lock the screen while analyzing: the analysis would stop.</string>
     <string name="analysis_running">Processing video… %1$d%%</string>
     <string name="trim_title">Trim segment</string>
     <string name="trim_hint">Choose a segment of up to 15 minutes. Trimming is instant and lossless.</string>
@@ -175,7 +170,6 @@
     <string name="signal_motion">Movement</string>
     <string name="signal_chat">Chat on fire</string>
     <string name="fast_mode_note">Fast mode: only the loudest windows of the video were analyzed.</string>
-    <string name="channel_done">Analysis complete</string>
     <plurals name="clip_count">
         <item quantity="one">%1$d clip</item>
         <item quantity="other">%1$d clips</item>

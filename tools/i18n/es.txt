@@ -33,8 +33,8 @@ affiliation_disclaimer|ShortsMaker Viral es independiente y no está afiliada a 
 ads_privacy_options|Opciones de privacidad de anuncios
 privacy_policy|Política de privacidad
 open_source_licenses|Licencias de código abierto
-privacy_policy_body|ShortsMaker Viral procesa tus videos en tu dispositivo.\n\n• Tus videos, transcripciones y proyectos se guardan sólo en el almacenamiento privado de la app. No se suben a ningún servidor nuestro.\n• La transcripción (Vosk) y la detección de rostros (MediaPipe) se ejecutan localmente. Los modelos de voz se descargan una vez desde alphacephei.com.\n• Si pegas un enlace de YouTube, Twitch o Kick, la app lee desde tu dispositivo los datos públicos de esa página (título, duración y, en YouTube, los momentos más reproducidos). No se descarga ningún video ni directo: siempre editas el archivo que tú eliges. Sin enlace, todo el análisis se hace con la transcripción local.\n• Anuncios: la app muestra un banner de Google AdMob en algunas pantallas. AdMob puede usar el ID de publicidad de tu dispositivo y datos del dispositivo para mostrar anuncios y medir su rendimiento. Donde la ley lo exige (EEE, Reino Unido) te pedimos consentimiento y puedes cambiarlo en Ajustes → Opciones de privacidad de anuncios. Puedes restablecer o borrar tu ID de publicidad en los ajustes de Android. Más información: policies.google.com/technologies/ads.\n• No hay cuentas ni analíticas propias.\n• El video exportado sólo sale de la app cuando tú pulsas Guardar o Compartir.\n• Puedes borrar proyectos y modelos en Ajustes en cualquier momento.\n\nAl usar videos de terceros eres responsable de tener los derechos necesarios.
-licenses_body|Esta app usa software de código abierto:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• Google MediaPipe Tasks – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose y AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin y kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK y User Messaging Platform – Términos de Google\n\nLos modelos de voz de Vosk se distribuyen bajo Apache License 2.0.
+privacy_policy_body|ShortsMaker Viral procesa tus videos en tu dispositivo.\n\n• Tus videos, transcripciones y proyectos se guardan sólo en el almacenamiento privado de la app. No se suben a ningún servidor nuestro.\n• La transcripción (Vosk) y la detección de rostros (Android) se ejecutan localmente. Los modelos de voz se descargan una vez desde alphacephei.com.\n• Si pegas un enlace de YouTube, Twitch o Kick, la app lee desde tu dispositivo los datos públicos de esa página (título, duración y, en YouTube, los momentos más reproducidos). No se descarga ningún video ni directo: siempre editas el archivo que tú eliges. Sin enlace, todo el análisis se hace con la transcripción local.\n• Anuncios: la app muestra un banner de Google AdMob en algunas pantallas. AdMob puede usar el ID de publicidad de tu dispositivo y datos del dispositivo para mostrar anuncios y medir su rendimiento. Donde la ley lo exige (EEE, Reino Unido) te pedimos consentimiento y puedes cambiarlo en Ajustes → Opciones de privacidad de anuncios. Puedes restablecer o borrar tu ID de publicidad en los ajustes de Android. Más información: policies.google.com/technologies/ads.\n• No hay cuentas ni analíticas propias.\n• El video exportado sólo sale de la app cuando tú pulsas Guardar o Compartir.\n• Puedes borrar proyectos y modelos en Ajustes en cualquier momento.\n\nAl usar videos de terceros eres responsable de tener los derechos necesarios.
+licenses_body|Esta app usa software de código abierto:\n\n• Vosk (Alpha Cephei) – Apache License 2.0\n• AndroidX Media3 (ExoPlayer, Transformer) – Apache License 2.0\n• Jetpack Compose y AndroidX – Apache License 2.0\n• OkHttp (Square) – Apache License 2.0\n• Kotlin y kotlinx – Apache License 2.0\n• JNA – Apache License 2.0 / LGPL 2.1\n• Guava (Google) – Apache License 2.0\n• Google Mobile Ads SDK y User Messaging Platform – Términos de Google\n\nLos modelos de voz de Vosk se distribuyen bajo Apache License 2.0.
 import_title|Importar video
 video_required_hint|Es lo único obligatorio. Para directos de Twitch/Kick, elige el archivo que ya descargaste.
 link_title|Enlace (opcional)
@@ -130,12 +130,7 @@ error_export|No se pudo renderizar el video. Prueba con 720p en Ajustes.
 error_save|No se pudo guardar el video en la galería.
 step_radar|Analizando el audio (picos de volumen)
 step_motion|Midiendo movimiento del rostro
-channel_progress|Análisis de clips
-channel_progress_desc|Progreso del análisis de video en segundo plano
-notif_done_title|¡Tus clips están listos!
-notif_done_text|«%1$s» ya se puede editar.
-run_in_background|Seguir en segundo plano
-background_hint|El análisis continúa aunque cambies de app; verás su progreso en la notificación.
+keep_app_open_warning|No cambies de aplicación ni bloquees la pantalla mientras se analiza: el análisis se detendría.
 analysis_running|Procesando video… %1$d%%
 trim_title|Recortar fragmento
 trim_hint|Elige un fragmento de hasta 15 minutos. El recorte es instantáneo y sin pérdida de calidad.
@@ -173,4 +168,3 @@ signal_audio|Pico de audio
 signal_motion|Movimiento
 signal_chat|Chat en llamas
 fast_mode_note|Modo rápido: sólo se analizaron las ventanas de mayor volumen del video.
-channel_done|Análisis completado

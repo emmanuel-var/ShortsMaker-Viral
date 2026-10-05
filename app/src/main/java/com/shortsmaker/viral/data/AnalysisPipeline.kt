@@ -54,7 +54,7 @@ data class PipelineProgress(
  *
  * - **Normal** (≤ 15 min, o recortado): Vosk sobre todo el video; texto + audio + movimiento (+ chat).
  * - **Rápido** (video largo forzado): sólo se extrae la energía del audio, se toman los 5 picos más fuertes y
- *   Vosk + MediaPipe se ejecutan únicamente en ventanas de 2 min alrededor de ellos.
+ *   Vosk + detector de rostros se ejecutan únicamente en ventanas de 2 min alrededor de ellos.
  * Todo corre en el teléfono. Si algo falla o se cancela, se borra el proyecto a medias.
  */
 class AnalysisPipeline(
@@ -184,7 +184,7 @@ class AnalysisPipeline(
 
             report(PipelineStep.MOTION, 0f)
             val preselected = if (heat.isEmpty()) MultimediaClipGenerator.preselect(baseSignals, request.language, cfg) else emptyList()
-            // MediaPipe sólo en las mejores ventanas (normal) o en las ventanas de 2 min (rápido), nunca en las 4 h.
+            // Detector de rostros sólo en las mejores ventanas (normal) o en las ventanas de 2 min (rápido), nunca en las 4 h.
             val motionSpans = when {
                 heat.isNotEmpty() -> emptyList()
                 fast -> windows
@@ -239,7 +239,7 @@ class AnalysisPipeline(
         }
     }
 
-    /** Muestrea el rostro (1 fotograma cada 1.5 s) sólo en los tramos indicados. Null si MediaPipe no está disponible. */
+    /** Muestrea el rostro (1 fotograma cada 1.5 s) sólo en los tramos indicados. Null si el detector falla. */
     private suspend fun sampleMotion(source: File, spans: List<TimeSpan>, onProgress: (Float) -> Unit): MotionTrack? {
         if (spans.isEmpty()) return null
         val all = ArrayList<FacePoint>()

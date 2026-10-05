@@ -4,11 +4,6 @@
 -keep class org.vosk.** { *; }
 -dontwarn java.awt.*
 
-# --- MediaPipe ---
--keep class com.google.mediapipe.** { *; }
--dontwarn com.google.mediapipe.**
--dontwarn com.google.protobuf.**
-
 # --- OkHttp ---
 -dontwarn okhttp3.internal.platform.**
 -dontwarn org.conscrypt.**
@@ -20,7 +15,7 @@
 -dontwarn org.checkerframework.**
 -dontwarn com.google.errorprone.annotations.**
 
-# --- AutoValue (dependencia transitiva de MediaPipe): referencia clases de javax.lang.model que no existen en Android.
+# --- AutoValue (dependencia transitiva): referencia clases de javax.lang.model que no existen en Android.
 # Es código de procesadores de anotaciones que nunca se ejecuta en el dispositivo.
 -dontwarn javax.lang.model.**
 -dontwarn javax.annotation.processing.**

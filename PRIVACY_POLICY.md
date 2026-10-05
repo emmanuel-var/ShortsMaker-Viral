@@ -1,6 +1,6 @@
 POLÍTICA DE PRIVACIDAD DE SHORTSMAKER VIRAL
 
-Última actualización: 4 de octubre de 2026
+Última actualización: 5 de octubre de 2026
 
 Desarrollador: Emmanuel Vargas
 Contacto: axiebecashv@gmail.com
@@ -24,7 +24,7 @@ a) Videos y audio: los videos que seleccionas desde tu galería o archivos, y el
 
 b) Transcripciones: el texto y los tiempos por palabra generados por el reconocimiento de voz local (Vosk) a partir del audio de tu video.
 
-c) Análisis de audio y movimiento: niveles de volumen del audio (para detectar picos) y posiciones aproximadas del rostro a lo largo del tiempo (para el encuadre automático y la medición de movimiento), calculadas con MediaPipe. No se guardan imágenes de tu rostro ni se crean plantillas biométricas de identificación; solo se almacenan coordenadas numéricas del encuadre dentro del proyecto local.
+c) Análisis de audio y movimiento: niveles de volumen del audio (para detectar picos) y posiciones aproximadas del rostro a lo largo del tiempo (para el encuadre automático y la medición de movimiento), calculadas con el detector de rostros incluido en Android. No se guardan imágenes de tu rostro ni se crean plantillas biométricas de identificación; solo se almacenan coordenadas numéricas del encuadre dentro del proyecto local.
 
 d) Proyectos y ajustes: tus clips sugeridos, ediciones (recortes, estilos de subtítulos, diseños, efectos), el idioma de la interfaz, el idioma del video y la resolución de exportación elegida.
 
@@ -51,7 +51,6 @@ No recopilamos nombre, correo, número de teléfono, cuentas de usuario, contact
 Usamos la información descrita únicamente para:
 - Transcribir tus videos, sugerir momentos virales y crear clips verticales con subtítulos, encuadre y efectos.
 - Permitirte reeditar tus proyectos y guardar o compartir el resultado.
-- Mostrar una notificación de progreso mientras el análisis se ejecuta en segundo plano.
 - Mostrar publicidad y medir su rendimiento (ver sección 5).
 
 No vendemos tu información ni la usamos para crear perfiles propios.
@@ -70,8 +69,6 @@ Control del ID de publicidad: puedes restablecerlo o eliminarlo en los ajustes d
 
 - Internet: descarga del modelo de voz, lectura opcional de datos de enlaces y anuncios.
 - ID de publicidad (AD_ID): necesario para AdMob en Android 13 o superior.
-- Servicio en primer plano (tipos de sincronización de datos y procesamiento de medios): permite que el análisis de un video continúe cuando cambias a otra aplicación y muestra una notificación de progreso. Se inicia solo cuando tú lo solicitas.
-- Notificaciones (Android 13 o superior, opcional): para mostrar el progreso y el aviso de "clips listos". La App funciona si la rechazas.
 - Almacenamiento (solo Android 9 o inferior): únicamente para guardar el video exportado en tu galería.
 
 La App no solicita acceso a tu cámara, micrófono, contactos, ubicación ni a todos tus archivos. Los videos se eligen con el selector de fotos del sistema, que solo da acceso a los archivos que seleccionas.
@@ -88,7 +85,7 @@ Podemos divulgar información si una ley o una autoridad competente lo exige, au
 
 8. SOFTWARE DE TERCEROS
 
-La App usa software de código abierto y servicios de terceros, entre ellos Vosk (Alpha Cephei), Google MediaPipe, AndroidX Media3, Jetpack Compose, WorkManager, OkHttp, Kotlin y Google Mobile Ads SDK con User Messaging Platform. Sus licencias se muestran dentro de la App (Ajustes > Licencias de código abierto). Los modelos y las bibliotecas de reconocimiento de voz y detección de rostros se ejecutan localmente.
+La App usa software de código abierto y servicios de terceros, entre ellos Vosk (Alpha Cephei), AndroidX Media3, Jetpack Compose, OkHttp, Kotlin y Google Mobile Ads SDK con User Messaging Platform. Sus licencias se muestran dentro de la App (Ajustes > Licencias de código abierto). Los modelos y las bibliotecas de reconocimiento de voz y detección de rostros se ejecutan localmente.
 
 9. CONSERVACIÓN Y ELIMINACIÓN
 

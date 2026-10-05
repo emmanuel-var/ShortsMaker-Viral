@@ -11,7 +11,7 @@ import com.shortsmaker.viral.data.VideoExporter
 import com.shortsmaker.viral.data.VoskModelManager
 import com.shortsmaker.viral.data.VoskTranscriber
 import com.shortsmaker.viral.data.LinkMetadataClient
-import com.shortsmaker.viral.data.PendingRequestStore
+import com.shortsmaker.viral.data.AnalysisRunner
 import com.shortsmaker.viral.domain.Language
 import com.shortsmaker.viral.domain.MediaLink
 import kotlinx.coroutines.CoroutineScope
@@ -24,11 +24,11 @@ import java.util.concurrent.TimeUnit
 enum class ProcessingMode {
     /** Transcribe todo el video y analiza texto + audio + movimiento (+ chat). */
     NORMAL,
-    /** Video largo forzado (> 15 min): Audio Radar → 5 picos → Vosk/MediaPipe sólo en ventanas de 2 min. */
+    /** Video largo forzado (> 15 min): Audio Radar → 5 picos → Vosk + detector de rostros sólo en ventanas de 2 min. */
     FAST,
 }
 
-/** Datos que viajan de la pantalla de importación al procesamiento (y se guardan en disco para el WorkManager). */
+/** Datos que viajan de la pantalla de importación al procesamiento . */
 data class ImportRequest(
     val sourceUri: Uri,
     val displayName: String?,
@@ -57,10 +57,10 @@ class AppContainer(val app: Application) {
     val modelManager = VoskModelManager(app, http)
     val linkMetadata = LinkMetadataClient(app, http)
     val transcriber = VoskTranscriber()
-    val faceTracker = FaceTracker(app)
+    val faceTracker = FaceTracker()
     val exporter = VideoExporter(app)
     val pipeline = AnalysisPipeline(app, projects, modelManager, linkMetadata, transcriber, faceTracker)
-    val pendingRequests = PendingRequestStore(app)
+    val analysis = AnalysisRunner(pipeline, appScope)
 
     val pendingImports = ConcurrentHashMap<String, ImportRequest>()
 }

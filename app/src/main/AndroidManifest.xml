@@ -4,13 +4,6 @@
 
     <!-- Descarga única del modelo de voz y lectura de datos públicos de YouTube. -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Análisis en segundo plano (WorkManager + Foreground Service). En Android 15+ se usa el tipo mediaProcessing;
-         en Android 10-14, dataSync. Ver PLAY_STORE.md (declaración de servicios en primer plano). -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING" />
-    <!-- Android 13+: mostrar la notificación de progreso (opcional; el análisis funciona sin ella). -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- ID de publicidad (obligatorio con targetSdk 33+ para AdMob). Los usuarios pueden restablecerlo/borrarlo en Ajustes de Android. -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <!-- Sólo Android 9 o inferior: guardar el video exportado en la galería. En 10+ se usa MediaStore sin permisos. -->
@@ -54,12 +47,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Servicio en primer plano de WorkManager: se fusionan los tipos declarados. -->
-        <service
-            android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:foregroundServiceType="dataSync|mediaProcessing"
-            tools:node="merge" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

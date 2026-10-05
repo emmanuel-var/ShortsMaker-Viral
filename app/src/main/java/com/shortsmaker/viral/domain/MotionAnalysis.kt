@@ -5,7 +5,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * Movimiento brusco del rostro a partir de las muestras de MediaPipe: desplazamientos del centro (gesticular,
+ * Movimiento brusco del rostro a partir de las muestras del detector de rostros: desplazamientos del centro (gesticular,
  * moverse) y cambios de tamaño (acercarse / alejarse de la cámara). Se mide como velocidad (unidades/segundo)
  * y se normaliza contra el propio video (percentil 90).
  */
