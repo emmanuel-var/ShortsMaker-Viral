@@ -19,3 +19,11 @@
 -dontwarn javax.annotation.**
 -dontwarn org.checkerframework.**
 -dontwarn com.google.errorprone.annotations.**
+
+# --- AutoValue (dependencia transitiva de MediaPipe): referencia clases de javax.lang.model que no existen en Android.
+# Es código de procesadores de anotaciones que nunca se ejecuta en el dispositivo.
+-dontwarn javax.lang.model.**
+-dontwarn javax.annotation.processing.**
+-dontwarn autovalue.shaded.**
+-dontwarn com.google.auto.value.**
+-dontwarn com.google.auto.**
